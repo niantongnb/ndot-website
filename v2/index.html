@@ -85,11 +85,12 @@ button{font:inherit}
   z-index:3;
   left:var(--pad);
   top:clamp(104px,15vh,170px);
-  width:min(10.3ch,88vw);
+  width:min(11.2ch,90vw);
   font-size:clamp(66px,11.8vw,178px);
   font-weight:800;
-  letter-spacing:-.082em;
-  line-height:.76;
+  /* .76/-.082em collided the two lines and crowded the letterforms */
+  letter-spacing:-.05em;
+  line-height:.9;
   text-transform:uppercase;
   pointer-events:none;
   transform:translate3d(0,var(--hero-title-shift,0px),0);
@@ -115,6 +116,7 @@ button{font:inherit}
   transition:opacity .14s ease;
   white-space:nowrap;
 }
+#tip.flip{transform:translate(calc(-100% - 16px),-50%)}
 .hero-foot{
   position:absolute;
   z-index:6;
@@ -601,6 +603,7 @@ function frame(now){
     var label=view===NATION?names[near]:(form[STATE].names?form[STATE].names[near]:"");
     if(label){
       if(label!==tip.textContent)tip.textContent=label;
+      tip.classList.toggle("flip",mx+tip.offsetWidth+34>W);
       tip.style.left=mx+"px";tip.style.top=my+"px";tip.style.opacity="1";
     }else tip.style.opacity="0";
   }else tip.style.opacity="0";

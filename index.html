@@ -80,6 +80,9 @@
     will-change:transform;
   }
   .stack.pinned > .panel .shell{padding-top:0;padding-bottom:0}
+  /* the marquee overlays the mission panel's foot, so reserve its height or the
+     centred content reads low by half of it (--verbs-h is measured in script) */
+  .stack.pinned > #mission .shell{padding-bottom:var(--verbs-h,0px)}
   .veil{
     position:absolute;inset:0;z-index:30;pointer-events:none;
     background:#0F1113;opacity:0;
@@ -98,14 +101,14 @@
   #dots{position:absolute;inset:0;width:100%;height:100%}
   .hero-copy{
     position:absolute;left:clamp(24px,4vw,56px);top:50%;transform:translateY(-50%);
-    z-index:3;pointer-events:none;max-width:620px;
+    z-index:3;pointer-events:none;max-width:700px;
   }
   h1{
     font-family:var(--serif);
     font-weight:400;
-    font-size:clamp(54px,min(7.2vw,10vh),110px);
-    line-height:1.0;letter-spacing:-0.02em;
-    max-width:12ch;
+    font-size:clamp(62px,min(8.4vw,12.5vh),132px);
+    line-height:0.98;letter-spacing:-0.025em;
+    max-width:11ch;
   }
   h1 em{font-style:normal;color:var(--pin);letter-spacing:-0.02em}
   .hero-copy .sub{
@@ -217,11 +220,25 @@
   .route{
     position:absolute;inset:0;pointer-events:none;overflow:visible;
   }
-  .route path{
+  .route .line{
     fill:none;stroke:var(--ink-18);stroke-width:1.2;
     stroke-dasharray:2 7;stroke-linecap:round;
   }
+  /* a lit segment creeps along the route, like a leg being travelled */
+  .route .live{
+    fill:none;stroke:var(--pin);stroke-width:1.1;stroke-linecap:round;
+    opacity:.34;
+  }
   .route .runner{fill:var(--pin)}
+  .route .runner.trail{opacity:.4}
+  /* stops along the way: they hold, then ping */
+  .route .wp{fill:var(--paper);stroke:var(--ink-40);stroke-width:1.2}
+  .route .ping{fill:none;stroke:var(--pin);opacity:0;transform-box:fill-box;transform-origin:center}
+  @keyframes wpPing{
+    0%,72%   {r:3;  opacity:0}
+    78%      {r:4;  opacity:.85}
+    100%     {r:15; opacity:0}
+  }
 
   /* CTA halftone mark */
   #ctaMark{display:block;margin:0 auto clamp(28px,5vh,48px);width:clamp(120px,14vw,180px);height:auto}
@@ -271,7 +288,6 @@
     .phases{flex-direction:row;gap:16px;left:clamp(24px,4vw,56px);right:auto;bottom:56px}
     .hint{bottom:24px}
     .ghost{font-size:34vw}
-    .mission .shell{padding-bottom:120px}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01s!important;transition-duration:.01s!important}
@@ -319,6 +335,28 @@
 <!-- ============ MISSION ============ -->
 <section class="reveal panel" id="mission" style="background:var(--paper)">
   <div class="ghost" aria-hidden="true" data-px="-0.3">01</div>
+  <svg class="route" viewBox="0 0 1440 700" preserveAspectRatio="none" aria-hidden="true">
+    <!-- sweeps below the statement, then climbs past the ghost numeral -->
+    <path id="routeMission" class="line"
+          d="M-60,700 C200,762 520,800 820,796 C1080,792 1232,772 1312,690 C1372,628 1420,420 1492,150"/>
+    <path class="live"
+          d="M-60,700 C200,762 520,800 820,796 C1080,792 1232,772 1312,690 C1372,628 1420,420 1492,150"
+          stroke-dasharray="150 1600" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" from="0" to="-1750" dur="19s" repeatCount="indefinite"/>
+    </path>
+    <g>
+      <circle class="wp" cx="820" cy="796" r="3.4"/>
+      <circle class="ping" cx="820" cy="796" r="3" style="animation:wpPing 19s linear infinite 5.2s"/>
+      <circle class="wp" cx="1312" cy="690" r="3.4"/>
+      <circle class="ping" cx="1312" cy="690" r="3" style="animation:wpPing 19s linear infinite 11.8s"/>
+    </g>
+    <circle class="runner trail" r="2.6">
+      <animateMotion dur="19s" begin="-0.9s" repeatCount="indefinite" rotate="none"><mpath href="#routeMission"/></animateMotion>
+    </circle>
+    <circle class="runner" r="4">
+      <animateMotion dur="19s" repeatCount="indefinite" rotate="none"><mpath href="#routeMission"/></animateMotion>
+    </circle>
+  </svg>
   <svg class="mini-map" viewBox="0 0 400 400" aria-hidden="true" data-px="-0.36">
     <g fill="#15181A" opacity=".16">
       <circle cx="60" cy="80" r="3"/><circle cx="140" cy="50" r="2.2"/><circle cx="230" cy="90" r="3.4"/>
@@ -358,11 +396,25 @@
 <section class="reveal alt graticule panel" id="vision">
   <div class="ghost" aria-hidden="true" data-px="-0.3">02</div>
   <svg class="route" viewBox="0 0 1440 700" preserveAspectRatio="none" aria-hidden="true">
-    <path id="routePath" d="M-40,640 C240,560 300,300 560,330 C820,360 880,120 1180,150 C1320,164 1420,90 1500,60"/>
+    <!-- runs under the copy, not across it: low along the left, then up the right -->
+    <path id="routeVision" class="line"
+          d="M-60,706 C200,776 520,822 820,826 C1100,836 1268,812 1348,716 C1402,648 1444,436 1512,196"/>
+    <path class="live"
+          d="M-60,706 C200,776 520,822 820,826 C1100,836 1268,812 1348,716 C1402,648 1444,436 1512,196"
+          stroke-dasharray="150 1600" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" from="0" to="-1750" dur="17s" repeatCount="indefinite"/>
+    </path>
+    <g>
+      <circle class="wp" cx="820" cy="826" r="3.4"/>
+      <circle class="ping" cx="820" cy="826" r="3" style="animation:wpPing 17s linear infinite 4.6s"/>
+      <circle class="wp" cx="1348" cy="716" r="3.4"/>
+      <circle class="ping" cx="1348" cy="716" r="3" style="animation:wpPing 17s linear infinite 12.4s"/>
+    </g>
+    <circle class="runner trail" r="2.6">
+      <animateMotion dur="17s" begin="-0.9s" repeatCount="indefinite" rotate="none"><mpath href="#routeVision"/></animateMotion>
+    </circle>
     <circle class="runner" r="4">
-      <animateMotion dur="14s" repeatCount="indefinite" rotate="none">
-        <mpath href="#routePath"/>
-      </animateMotion>
+      <animateMotion dur="17s" repeatCount="indefinite" rotate="none"><mpath href="#routeVision"/></animateMotion>
     </circle>
   </svg>
   <div class="shell">
@@ -413,6 +465,17 @@ const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target);} });
 },{threshold:0.25});
 document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
+
+/* the marquee sits over the mission panel's foot; publish its height so the
+   panel can reserve that space and keep the copy optically centred */
+(function(){
+  const m = document.querySelector('#mission'), v = m && m.querySelector('.verbs');
+  if(!m || !v) return;
+  const sync = () => m.style.setProperty('--verbs-h', v.getBoundingClientRect().height.toFixed(1)+'px');
+  sync();
+  if(window.ResizeObserver) new ResizeObserver(sync).observe(v);
+  addEventListener('resize', sync);
+})();
 
 /* ---------- panel cover: each section pins while the next slides over ----------
    `enter` runs 0 -> 1 as a panel rises into place, `cover` runs 0 -> 1 as the
@@ -869,7 +932,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     order = idx; names = idx.map(i=>DATA[i][3]);
 
     // right-of-copy region for the map (copy sits left)
-    mapX0 = W > 900 ? W*0.34 : 0; mapW = W - mapX0;
+    mapX0 = W > 900 ? W*0.40 : 0; mapW = W - mapX0;
 
     /* -- 1: the nation, Albers 975x610 fit -- */
     {

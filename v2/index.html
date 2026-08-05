@@ -776,10 +776,10 @@ function configureLenis(){
   if(shouldRun&&!lenisInstance){
     lenisInstance=new window.Lenis({
       autoRaf:true,
-      anchors:{lerp:.11},
-      lerp:.095,
+      anchors:{lerp:.24},
+      lerp:.26,
       smoothWheel:true,
-      wheelMultiplier:.92,
+      wheelMultiplier:1.15,
       overscroll:true
     });
     lenisInstance.on("scroll",requestScrollEffects);

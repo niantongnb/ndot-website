@@ -89,7 +89,8 @@
   }
   /* invisible spacers give each pinned panel a beat before the next covers it */
   .stack > .gap{display:none;pointer-events:none}
-  .stack.pinned > .gap{display:block;height:52svh}
+  /* just enough dwell to read a pinned panel, not a dead screen */
+  .stack.pinned > .gap{display:block;height:20svh}
 
   /* ---------- hero ---------- */
   .hero{

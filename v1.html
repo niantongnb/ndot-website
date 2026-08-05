@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDot AI — Building the AI platform for local life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0a0a;
+    --ink-soft:#3d3a36;
+    --cream:#faf7f1;
+    --cream-dim:#f1ece2;
+    --white:#f5f2ec;
+    --grey:#8a867f;
+    --grey-dark:#5d5952;
+    --dot:#ff4b33;
+    --line:rgba(10,10,10,.12);
+    --line-light:rgba(245,242,236,.14);
+    --sans:'Instrument Sans', -apple-system, sans-serif;
+    --serif:'Instrument Serif', Georgia, serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--ink);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:clip;        /* clip, not hidden: hidden would break position:sticky */
+  }
+  ::selection{background:var(--dot);color:#fff}
+
+  /* ---------- grain ---------- */
+  .grain{
+    position:fixed;inset:-100%;z-index:60;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain 7s steps(8) infinite;
+  }
+  @keyframes grain{
+    0%,100%{transform:translate(0,0)}
+    20%{transform:translate(-3%,2%)}
+    40%{transform:translate(2%,-3%)}
+    60%{transform:translate(-2%,-2%)}
+    80%{transform:translate(3%,3%)}
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px clamp(24px,5vw,64px);
+    mix-blend-mode:difference;color:#fff;
+    opacity:0;animation:fadeDown 1s var(--ease) .3s forwards;
+  }
+  nav .wordmark{height:20px;display:block;color:#fff}
+  nav .wordmark svg{height:100%;width:auto;display:block}
+  .nav-links{display:flex;gap:32px;align-items:center;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  .nav-links a{color:#fff;text-decoration:none;position:relative;padding-bottom:3px}
+  .nav-links a::after{
+    content:'';position:absolute;left:0;bottom:0;height:1px;width:100%;
+    background:currentColor;transform:scaleX(0);transform-origin:right;
+    transition:transform .45s var(--ease);
+  }
+  .nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ---------- stacked panels: each pins while the next slides over it ---------- */
+  /* Default is ordinary flow. Script adds .pinned once it has confirmed every
+     panel's content fits one screen, so nothing is ever clipped. */
+  .stack{position:relative;background:var(--ink)}
+  .stack > .panel{
+    position:relative;
+    min-height:100svh;
+    overflow:hidden;
+    display:flex;align-items:center;
+    transform-origin:50% 42%;
+  }
+  .stack > .panel .shell{
+    padding-top:clamp(88px,12vh,150px);padding-bottom:clamp(88px,12vh,150px);
+  }
+  .stack.pinned > .panel{
+    position:sticky;top:0;
+    height:100svh;min-height:0;
+    will-change:transform;
+  }
+  .stack.pinned > .panel .shell{padding-top:0;padding-bottom:0}
+  .veil{
+    position:absolute;inset:0;z-index:20;pointer-events:none;
+    background:#000;opacity:0;
+  }
+  /* invisible spacers give each pinned panel a beat of rest before the next covers it */
+  .stack > .gap{display:none;pointer-events:none}
+  .stack.pinned > .gap{display:block;height:55svh}
+
+  /* ---------- hero ---------- */
+  .stack > .hero.panel, .hero{
+    flex-direction:column;justify-content:flex-end;align-items:stretch;
+    background:radial-gradient(120% 90% at 50% -10%, #1c1b19 0%, #0a0a0a 55%);
+    color:var(--white);
+    padding:0 clamp(24px,5vw,64px) clamp(40px,7vh,80px);
+  }
+  #dotfield{position:absolute;inset:0;width:100%;height:100%;opacity:0;animation:fadeIn 2.4s ease 0.6s forwards;will-change:transform}
+  @keyframes fadeIn{to{opacity:1}}
+  /* vignette keeps the headline legible over the busy field */
+  .hero::after{
+    content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:
+      linear-gradient(100deg, rgba(10,10,10,.92) 0%, rgba(10,10,10,.72) 26%, rgba(10,10,10,.2) 52%, rgba(10,10,10,0) 72%),
+      linear-gradient(to top, rgba(10,10,10,.85) 0%, rgba(10,10,10,0) 38%);
+  }
+  .hero-inner{position:relative;z-index:2;max-width:1200px;will-change:transform}
+  h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(38px,min(7.2vw,11vh),118px);
+    line-height:1.0;
+    letter-spacing:-0.022em;
+    max-width:13ch;
+    min-height:3em;          /* reserve the three lines so typing doesn't shift the page */
+  }
+  h1 .line{display:block;white-space:pre}
+  h1 .ch{display:none}
+  h1 .ch.on{display:inline}
+  .caret{
+    display:inline-block;width:.06em;height:.78em;
+    background:var(--dot);vertical-align:-.06em;
+    margin-left:.04em;
+    animation:blink 1s steps(1) infinite;
+  }
+  .caret.done{animation:blink 1.15s steps(1) infinite}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  h1 em{font-style:italic;font-weight:400;color:var(--dot);letter-spacing:-0.015em}
+  @keyframes riseUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .hero-foot{
+    position:relative;z-index:2;
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-top:clamp(32px,6vh,64px);
+    opacity:0;animation:riseUp 1.1s var(--ease) 1.35s forwards;
+  }
+  .hero-foot p{font-size:14px;line-height:1.6;color:var(--grey);max-width:34ch;text-wrap:pretty}
+  .scroll-cue{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);
+  }
+  .scroll-cue .track{width:1px;height:44px;background:var(--line-light);position:relative;overflow:hidden}
+  .scroll-cue .track::after{
+    content:'';position:absolute;left:0;top:-40%;width:100%;height:40%;
+    background:var(--white);animation:drip 2.2s var(--ease) infinite;
+  }
+  @keyframes drip{0%{top:-40%}60%,100%{top:110%}}
+
+  /* ---------- shared section shell ---------- */
+  section{position:relative}
+  .light{background:var(--cream);color:var(--ink)}
+  .dark{background:var(--ink);color:var(--white)}
+  .shell{
+    width:100%;max-width:1200px;margin:0 auto;
+    padding:0 clamp(24px,5vw,64px);
+  }
+  .kicker{
+    display:flex;align-items:center;gap:14px;
+    font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+    margin-bottom:clamp(28px,5vh,56px);
+  }
+  .kicker .num{font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.06em;opacity:.5}
+  .kicker .rule{height:1px;flex:1;background:var(--line);transform-origin:left;transform:scaleX(0);transition:transform 1.4s var(--ease) .2s}
+  .dark .kicker .rule{background:var(--line-light)}
+  .in-view .kicker .rule{transform:scaleX(1)}
+  .statement{
+    font-family:var(--serif);font-weight:400;
+    font-size:clamp(30px,min(4.6vw,7vh),70px);
+    line-height:1.06;letter-spacing:-0.02em;
+    max-width:20ch;
+    text-wrap:balance;      /* even line lengths, no single-word last line */
+  }
+  .statement em{font-style:italic}
+  .statement .w{
+    display:inline-block;
+    opacity:0;transform:translateY(28px);
+    transition:opacity .9s var(--ease),transform .9s var(--ease);
+  }
+  .in-view .statement .w{opacity:1;transform:translateY(0)}
+  .section-body{
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:clamp(24px,4vw,64px);
+    margin-top:clamp(32px,6vh,80px);
+  }
+  .section-body .spacer{min-height:1px}
+  .section-body p{
+    font-size:clamp(15px,min(1.3vw,2.1vh),19px);line-height:1.7;color:var(--ink-soft);
+    max-width:52ch;text-wrap:pretty;
+    opacity:0;transform:translateY(24px);
+    transition:opacity 1s var(--ease) .35s,transform 1s var(--ease) .35s;
+  }
+  .dark .section-body p{color:#b5b1a8}
+  .in-view .section-body p{opacity:1;transform:translateY(0)}
+
+  /* mission decorative dots */
+  .mission .map-dots{
+    position:absolute;right:clamp(-80px,-4vw,-20px);top:50%;transform:translateY(-50%);
+    width:min(42vw,520px);aspect-ratio:1;pointer-events:none;opacity:.9;
+  }
+
+  /* ---------- vision (dark) ---------- */
+  .vision::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(90% 70% at 80% 20%, #1d1c1a 0%, transparent 60%);
+  }
+  .vision .shell{position:relative}
+  .orbit{
+    position:absolute;top:clamp(80px,14vh,150px);right:clamp(24px,5vw,64px);
+    width:clamp(120px,14vw,190px);aspect-ratio:1;pointer-events:none;
+  }
+  .orbit svg{width:100%;height:100%;overflow:visible}
+  .orbit .ring{animation:spin 40s linear infinite;transform-origin:50% 50%}
+  .orbit .ring2{animation:spin 64s linear infinite reverse;transform-origin:50% 50%}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- verbs strip: sits along the foot of the mission panel ---------- */
+  .verbs{
+    position:absolute;left:0;right:0;bottom:0;z-index:5;
+    border-top:1px solid var(--line);
+    background:var(--cream-dim);
+    overflow:hidden;white-space:nowrap;
+    padding:18px 0;
+  }
+  .verbs .track{
+    display:inline-flex;gap:0;
+    animation:marquee 30s linear infinite;
+  }
+  .verbs span{
+    font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(19px,2.1vw,28px);color:var(--grey-dark);
+    letter-spacing:-0.01em;
+    padding:0 18px;display:inline-flex;align-items:center;gap:36px;
+  }
+  .verbs .d{width:6px;height:6px;border-radius:50%;background:var(--dot);display:inline-block;flex:none}
+  @keyframes marquee{to{transform:translateX(-50%)}}
+
+  /* ---------- CTA ---------- */
+  .cta{text-align:center}
+  .cta .mark{
+    width:clamp(40px,min(4.6vw,6vh),60px);margin:0 auto clamp(28px,5vh,52px);
+    color:var(--white);
+    opacity:0;transform:translateY(24px) ;
+    transition:opacity 1s var(--ease),transform 1s var(--ease);
+  }
+  .cta.in-view .mark{opacity:1;transform:translateY(0)}
+  .cta .mark svg{width:100%;height:auto;display:block}
+  .cta h2{
+    font-family:var(--serif);font-weight:400;font-style:italic;
+    font-size:clamp(38px,min(6vw,9vh),90px);line-height:1.02;letter-spacing:-0.02em;text-wrap:balance;
+    opacity:0;transform:translateY(28px);
+    transition:opacity 1s var(--ease) .15s,transform 1s var(--ease) .15s;
+  }
+  .cta.in-view h2{opacity:1;transform:translateY(0)}
+  .cta a.mail{
+    display:inline-block;margin-top:clamp(32px,5vh,48px);
+    font-family:var(--sans);font-size:clamp(15px,1.4vw,18px);letter-spacing:.04em;
+    color:var(--white);text-decoration:none;
+    border:1px solid rgba(245,242,236,.3);border-radius:999px;
+    padding:16px 34px;
+    transition:background .5s var(--ease),color .5s var(--ease),border-color .5s var(--ease),transform .5s var(--ease);
+    opacity:0;transform:translateY(24px);
+    transition-delay:0s;
+  }
+  .cta.in-view a.mail{
+    opacity:1;transform:translateY(0);
+    transition:opacity 1s var(--ease) .3s,transform 1s var(--ease) .3s,background .5s var(--ease),color .5s var(--ease),border-color .5s var(--ease);
+  }
+  .cta a.mail:hover{background:var(--white);color:var(--ink);border-color:var(--white)}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink);color:var(--grey);
+    border-top:1px solid var(--line-light);
+    display:flex;justify-content:space-between;align-items:center;
+    padding:28px clamp(24px,5vw,64px);
+    font-size:12px;letter-spacing:.06em;
+  }
+  footer .wordmark{height:14px;color:var(--grey)}
+  footer .wordmark svg{height:100%;width:auto;display:block}
+
+  @media (max-width:760px){
+    .section-body{grid-template-columns:1fr}
+    .section-body .spacer{display:none}
+    .mission .map-dots{display:none}
+    .orbit{display:none}
+    .hero-foot p{max-width:26ch}
+    .nav-links{gap:20px}
+    .mission .shell{padding-bottom:120px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}
+    .verbs .track{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <a href="#top" class="wordmark" aria-label="NDot AI">
+    <svg viewBox="335.68 640.24 929.11 316.84" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M1159.34 641.716C1134.57 641.875 1108.19 642.045 1083.52 641.75C1084.04 664.92 1083.75 688.933 1083.76 712.168C1069.3 711.961 1053.61 712.293 1039.34 711.48C1039.2 716.598 1039.33 721.08 1039.51 726.171C1067.29 745.025 1086.53 774.052 1093.07 806.976C1096.46 824.151 1096.5 845.866 1092.14 862.852C1088.18 876.786 1084.83 884.329 1089.04 898.82C1094.19 916.565 1103.08 934.763 1119.56 944.772C1145.66 960.633 1179.86 963.429 1209.31 957.078C1221.25 954.505 1232.55 951.285 1243.56 946.057C1249.62 943.099 1254.56 939.451 1261.18 936.598L1264.79 934.809L1261.87 928.333C1261.87 928.333 1249.85 902 1244.62 888.361C1243.02 884.158 1239.55 877.817 1238.43 873.721C1233.68 875.247 1228.95 878.1 1224.43 880.311C1209.09 887.809 1193.87 892.39 1177.63 884.518C1166.32 879.03 1161.71 867.14 1161.4 855.255C1161.1 843.579 1161.43 831.843 1161.41 820.158C1161.35 806.753 1161.16 793.348 1160.86 779.947C1188.63 779.672 1216.52 780.755 1244.39 780.333C1244.67 757.59 1244.31 735.038 1244.36 712.309C1220.55 713.171 1195.92 711.302 1172.03 712.025C1168.61 712.129 1164.77 712.111 1161.37 712.007C1161.17 688.768 1161.61 664.831 1161.01 641.705L1159.34 641.716Z"/>
+      <path d="M813.205 641.48C829.24 641.134 847.776 641.763 864.073 641.86C863.594 653.136 864.026 666.896 864.061 678.345L864.137 746.127C855.27 759.562 846.422 767.392 840.717 784.498C828.126 822.249 829.202 858.504 846.605 894.651C850.906 903.583 859.475 912.163 863.682 920.41C863.119 929.534 863.646 943.921 863.721 953.413C847.106 953.613 830.489 953.645 813.873 953.509C805.795 953.508 797.462 953.275 789.437 953.8L789.356 944.675C754.775 955.391 728.981 958.093 693.258 948.637C685.374 945.75 678.581 942.946 671.026 939.31C609.127 909.521 591.513 829.707 620.73 770.536C648.545 714.204 731.585 687.582 786.404 716.661C786.598 713.361 786.655 710.034 786.58 706.73C786.092 685.1 787.002 663.264 786.188 641.664C795.19 641.912 804.202 641.66 813.205 641.48ZM785.024 825.871C782.64 796.848 757.068 775.323 728.06 777.922C699.355 780.495 678.101 805.738 680.46 834.457C682.819 863.176 707.907 884.614 736.646 882.469C765.69 880.302 787.408 854.893 785.024 825.871Z"/>
+      <path d="M957.431 780.906C986.035 777.443 1012.06 797.746 1015.66 826.329C1019.25 854.912 999.068 881.027 970.498 884.756C941.738 888.51 915.41 868.166 911.79 839.393C908.17 810.621 928.639 784.391 957.431 780.906Z"/>
+      <rect x="496.869" y="640.237" width="78.325" height="313.3"/>
+      <rect x="335.679" y="641.373" width="78.325" height="313.3"/>
+      <rect x="340.22" y="682.806" width="85.1359" height="313.3" transform="rotate(-30 340.22 682.806)"/>
+    </svg>
+  </a>
+  <div class="nav-links">
+    <a href="#mission">Mission</a>
+    <a href="#vision">Vision</a>
+    <a href="mailto:career@ndotai.com">Careers</a>
+  </div>
+</nav>
+
+<div class="stack">
+
+<!-- ============ HERO ============ -->
+<header class="hero panel" id="top">
+  <canvas id="dotfield" aria-hidden="true" data-px="-0.12"></canvas>
+  <div class="hero-inner" data-px="0.22" data-px-fade>
+    <h1 data-typewriter><span class="line">Building the</span><span class="line">AI platform for</span><span class="line"><em>local life</em></span></h1>
+  </div>
+  <div class="hero-foot">
+    <p>The information, services, and choices around us, made simple enough to act on.</p>
+    <div class="scroll-cue"><span>Scroll</span><span class="track"></span></div>
+  </div>
+</header>
+<div class="gap" aria-hidden="true"></div>
+
+<!-- ============ MISSION ============ -->
+<section class="light mission reveal panel" id="mission">
+  <svg class="map-dots" viewBox="0 0 400 400" aria-hidden="true" data-px="-0.35">
+    <g fill="#0a0a0a" opacity=".14">
+      <circle cx="60" cy="80" r="3"/><circle cx="140" cy="50" r="2.2"/><circle cx="230" cy="90" r="3.4"/>
+      <circle cx="320" cy="60" r="2"/><circle cx="90" cy="170" r="2.6"/><circle cx="190" cy="150" r="2"/>
+      <circle cx="290" cy="180" r="3"/><circle cx="360" cy="140" r="2.4"/><circle cx="50" cy="260" r="2.2"/>
+      <circle cx="150" cy="240" r="3.2"/><circle cx="250" cy="270" r="2"/><circle cx="340" cy="250" r="2.8"/>
+      <circle cx="110" cy="340" r="2.4"/><circle cx="210" cy="330" r="2.8"/><circle cx="310" cy="350" r="2.2"/>
+    </g>
+    <g stroke="#0a0a0a" stroke-width="1" opacity=".07">
+      <line x1="60" y1="80" x2="140" y2="50"/><line x1="140" y1="50" x2="230" y2="90"/>
+      <line x1="230" y1="90" x2="290" y2="180"/><line x1="90" y1="170" x2="150" y2="240"/>
+      <line x1="150" y1="240" x2="250" y2="270"/><line x1="190" y1="150" x2="230" y2="90"/>
+      <line x1="290" y1="180" x2="340" y2="250"/><line x1="150" y1="240" x2="210" y2="330"/>
+    </g>
+    <circle cx="190" cy="150" r="4.5" fill="#ff4b33">
+      <animate attributeName="r" values="4.5;6;4.5" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+  <div class="shell">
+    <div class="kicker"><span class="num">01</span> Mission <span class="rule"></span></div>
+    <p class="statement" data-split data-px="0.2">Make local life easier to navigate, decide, and get things done.</p>
+    <div class="section-body" data-px="0.42">
+      <div class="spacer"></div>
+      <p>Local life touches nearly every part of our day, yet the information, services, and choices around us remain fragmented and difficult to navigate. We believe AI can make local experiences simpler, more useful, and easier to act on.</p>
+    </div>
+  </div>
+  <div class="verbs" aria-hidden="true">
+  <div class="track">
+    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
+    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
+    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
+    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
+  </div>
+  </div>
+</section>
+<div class="gap" aria-hidden="true"></div>
+
+<!-- ============ VISION ============ -->
+<section class="dark vision reveal panel" id="vision">
+  <div class="orbit" data-px="-0.4">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <g class="ring">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(245,242,236,.16)" stroke-width=".6" stroke-dasharray="2 5"/>
+        <circle cx="96" cy="50" r="2.4" fill="#ff4b33"/>
+      </g>
+      <g class="ring2">
+        <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(245,242,236,.12)" stroke-width=".6"/>
+        <circle cx="50" cy="20" r="1.8" fill="#f5f2ec"/>
+      </g>
+      <circle cx="50" cy="50" r="3" fill="#f5f2ec"/>
+    </svg>
+  </div>
+  <div class="shell">
+    <div class="kicker"><span class="num">02</span> Vision <span class="rule"></span></div>
+    <p class="statement" data-split data-px="0.2">Become the definitive AI platform for local life—uniting people, information, and commerce to build more connected, informed, and vibrant communities.</p>
+    <div class="section-body" data-px="0.42">
+      <div class="spacer"></div>
+      <p>We envision a future where AI does more than provide information. It helps people make better decisions, take meaningful action, and engage more easily with the communities and businesses around them.</p>
+    </div>
+  </div>
+</section>
+<div class="gap" aria-hidden="true"></div>
+
+<!-- ============ CTA ============ -->
+<section class="dark cta reveal panel">
+  <div class="shell" data-px="0.28">
+    <div class="mark">
+      <svg viewBox="472 369 656.58 861.96" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="913.871" y="369" width="214.712" height="858.848"/>
+        <rect x="472" y="372.114" width="214.712" height="858.848"/>
+        <path d="M484.448 485.692L686.5 372L1115.99 1112.79L913.872 1229.48L484.448 485.692Z"/>
+      </svg>
+    </div>
+    <h2>Apply to build with us</h2>
+    <br>
+    <a class="mail" href="mailto:career@ndotai.com">career@ndotai.com</a>
+  </div>
+</section>
+
+</div><!-- /.stack -->
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <a href="#top" class="wordmark" aria-label="NDot AI">
+    <svg viewBox="335.68 640.24 929.11 316.84" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M1159.34 641.716C1134.57 641.875 1108.19 642.045 1083.52 641.75C1084.04 664.92 1083.75 688.933 1083.76 712.168C1069.3 711.961 1053.61 712.293 1039.34 711.48C1039.2 716.598 1039.33 721.08 1039.51 726.171C1067.29 745.025 1086.53 774.052 1093.07 806.976C1096.46 824.151 1096.5 845.866 1092.14 862.852C1088.18 876.786 1084.83 884.329 1089.04 898.82C1094.19 916.565 1103.08 934.763 1119.56 944.772C1145.66 960.633 1179.86 963.429 1209.31 957.078C1221.25 954.505 1232.55 951.285 1243.56 946.057C1249.62 943.099 1254.56 939.451 1261.18 936.598L1264.79 934.809L1261.87 928.333C1261.87 928.333 1249.85 902 1244.62 888.361C1243.02 884.158 1239.55 877.817 1238.43 873.721C1233.68 875.247 1228.95 878.1 1224.43 880.311C1209.09 887.809 1193.87 892.39 1177.63 884.518C1166.32 879.03 1161.71 867.14 1161.4 855.255C1161.1 843.579 1161.43 831.843 1161.41 820.158C1161.35 806.753 1161.16 793.348 1160.86 779.947C1188.63 779.672 1216.52 780.755 1244.39 780.333C1244.67 757.59 1244.31 735.038 1244.36 712.309C1220.55 713.171 1195.92 711.302 1172.03 712.025C1168.61 712.129 1164.77 712.111 1161.37 712.007C1161.17 688.768 1161.61 664.831 1161.01 641.705L1159.34 641.716Z"/>
+      <path d="M813.205 641.48C829.24 641.134 847.776 641.763 864.073 641.86C863.594 653.136 864.026 666.896 864.061 678.345L864.137 746.127C855.27 759.562 846.422 767.392 840.717 784.498C828.126 822.249 829.202 858.504 846.605 894.651C850.906 903.583 859.475 912.163 863.682 920.41C863.119 929.534 863.646 943.921 863.721 953.413C847.106 953.613 830.489 953.645 813.873 953.509C805.795 953.508 797.462 953.275 789.437 953.8L789.356 944.675C754.775 955.391 728.981 958.093 693.258 948.637C685.374 945.75 678.581 942.946 671.026 939.31C609.127 909.521 591.513 829.707 620.73 770.536C648.545 714.204 731.585 687.582 786.404 716.661C786.598 713.361 786.655 710.034 786.58 706.73C786.092 685.1 787.002 663.264 786.188 641.664C795.19 641.912 804.202 641.66 813.205 641.48ZM785.024 825.871C782.64 796.848 757.068 775.323 728.06 777.922C699.355 780.495 678.101 805.738 680.46 834.457C682.819 863.176 707.907 884.614 736.646 882.469C765.69 880.302 787.408 854.893 785.024 825.871Z"/>
+      <path d="M957.431 780.906C986.035 777.443 1012.06 797.746 1015.66 826.329C1019.25 854.912 999.068 881.027 970.498 884.756C941.738 888.51 915.41 868.166 911.79 839.393C908.17 810.621 928.639 784.391 957.431 780.906Z"/>
+      <rect x="496.869" y="640.237" width="78.325" height="313.3"/>
+      <rect x="335.679" y="641.373" width="78.325" height="313.3"/>
+      <rect x="340.22" y="682.806" width="85.1359" height="313.3" transform="rotate(-30 340.22 682.806)"/>
+    </svg>
+  </a>
+  <span>© 2026 NDot AI</span>
+</footer>
+
+<script>
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- hero typewriter ---------- */
+(function(){
+  const h1 = document.querySelector('[data-typewriter]');
+  if(!h1) return;
+  const lines = [...h1.querySelectorAll('.line')];
+  const cells = [];   // every char span, in typing order
+
+  lines.forEach(line=>{
+    const nodes = [...line.childNodes];
+    line.textContent = '';
+    nodes.forEach(node=>{
+      const isEm = node.nodeType === 1 && node.tagName === 'EM';
+      const text = node.textContent;
+      const host = isEm ? document.createElement('em') : line;
+      if(isEm) line.appendChild(host);
+      for(const chr of text){
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.textContent = chr;
+        host.appendChild(s);
+        cells.push(s);
+      }
+    });
+  });
+
+  const caret = document.createElement('i');
+  caret.className = 'caret';
+
+  if(REDUCED){
+    cells.forEach(c=>c.classList.add('on'));
+    lines[lines.length-1].appendChild(caret);
+    caret.classList.add('done');
+    return;
+  }
+
+  let i = 0;
+  function type(){
+    if(i >= cells.length){
+      caret.classList.add('done');
+      return;
+    }
+    const cell = cells[i];
+    cell.classList.add('on');
+    cell.parentNode.insertBefore(caret, cell.nextSibling);
+    const chr = cell.textContent;
+    i++;
+    // a beat at the end of each line, a shorter one after spaces
+    const atLineEnd = i < cells.length && cells[i].closest('.line') !== cell.closest('.line');
+    setTimeout(type, atLineEnd ? 260 : (chr === ' ' ? 74 : 34 + Math.random()*26));
+  }
+  setTimeout(type, 700);
+})();
+
+/* ---------- panel parallax ----------
+   Each panel pins at the top while the next slides over it. Panels are driven
+   by two values: `enter` (0 -> 1 as it rises into place) and `cover` (0 -> 1 as
+   the next panel covers it). Inner layers move at their own data-px rate. */
+(function(){
+  const panels = [...document.querySelectorAll('.stack > .panel')];
+  if(!panels.length) return;
+  const clamp = v => v < 0 ? 0 : v > 1 ? 1 : v;
+
+  const layers = panels.map(panel=>{
+    const veil = document.createElement('div');
+    veil.className = 'veil';
+    panel.appendChild(veil);
+    return {
+      panel, veil,
+      px: [...panel.querySelectorAll('[data-px]')].map(el=>({
+        el, sp: parseFloat(el.dataset.px), fade: el.hasAttribute('data-px-fade')
+      }))
+    };
+  });
+
+  const stackEl = document.querySelector('.stack');
+  let stacked = false, ticking = false;
+
+  // a panel may only pin if its content genuinely fits one screen, otherwise
+  // the fixed 100svh height would clip it. Measured, not guessed from width.
+  // Measure the rendered extent of the shell's children rather than the shell
+  // box: scrollHeight counts padding inconsistently, which made the same
+  // content measure differently pinned vs unpinned and could flip-flop.
+  function contentHeight(panel){
+    const sh = panel.querySelector('.shell');
+    if(!sh) return 0;                                  // hero is full-bleed
+    let top = Infinity, bottom = -Infinity;
+    for(const kid of sh.children){
+      const r = kid.getBoundingClientRect();
+      if(!r.height && !r.width) continue;
+      top = Math.min(top, r.top); bottom = Math.max(bottom, r.bottom);
+    }
+    return isFinite(top) ? bottom - top : 0;
+  }
+  function measure(){
+    const room = innerHeight - 56;
+    const ok = !REDUCED
+      && matchMedia('(min-width:600px)').matches       // phones keep plain scrolling
+      && layers.every(L => contentHeight(L.panel) <= room);
+    if(ok !== stacked){
+      stacked = ok;
+      stackEl.classList.toggle('pinned', ok);
+    }
+  }
+
+  function update(){
+    ticking = false;
+    const vh = innerHeight;
+    layers.forEach((L,i)=>{
+      const r = L.panel.getBoundingClientRect();
+      const enter = clamp(1 - Math.max(0, r.top)/vh);
+      const next = layers[i+1];
+      const cover = next ? clamp(1 - Math.max(0, next.panel.getBoundingClientRect().top)/vh) : 0;
+
+      if(stacked){
+        L.veil.style.opacity = (cover*0.78).toFixed(3);
+        L.panel.style.transform = cover ? `scale(${(1-cover*0.07).toFixed(4)})` : '';
+        L.panel.style.borderRadius = cover ? (cover*28).toFixed(1)+'px' : '';
+      } else {
+        L.veil.style.opacity = '0';
+        L.panel.style.transform = '';
+        L.panel.style.borderRadius = '';
+      }
+
+      for(const p of L.px){
+        const y = stacked
+          ? (1-enter)*p.sp*210 - cover*p.sp*170
+          : ((r.top + r.height/2 - vh/2)/vh) * p.sp * 100;
+        p.el.style.transform = `translate3d(0,${y.toFixed(2)}px,0)`;
+        if(p.fade) p.el.style.opacity = (1 - cover*0.85).toFixed(3);
+      }
+    });
+  }
+  measure();
+  /* the verb marquee picks up speed with the scroll, then settles */
+  const track = document.querySelector('.verbs .track');
+  let lastY = scrollY, vel = 0;
+  function marquee(){
+    vel *= 0.92;
+    if(track) track.style.animationDuration = (30 / (1 + Math.min(vel/9, 3.2))).toFixed(2) + 's';
+    requestAnimationFrame(marquee);
+  }
+  if(track) requestAnimationFrame(marquee);
+
+  addEventListener('scroll',()=>{
+    vel = Math.min(120, vel + Math.abs(scrollY - lastY));
+    lastY = scrollY;
+    if(!ticking){ ticking = true; requestAnimationFrame(update); }
+  },{passive:true});
+  const remeasure = ()=>{ measure(); update(); };
+  addEventListener('resize', remeasure);
+  // Content height changes after webfonts land, and fonts.ready can resolve
+  // before the reflow lands — so watch the shells themselves and re-decide
+  // whenever their measured height actually changes.
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(()=>requestAnimationFrame(()=>requestAnimationFrame(remeasure)));
+  }
+  if(window.ResizeObserver){
+    const ro = new ResizeObserver(remeasure);
+    layers.forEach(L=>{ const sh = L.panel.querySelector('.shell'); if(sh) ro.observe(sh); });
+  }
+  update();
+})();
+
+/* ---------- split statements into animated words ---------- */
+document.querySelectorAll('[data-split]').forEach(el=>{
+  const words = el.textContent.trim().split(/\s+/);
+  el.innerHTML = words.map((w,i)=>
+    `<span class="w" style="transition-delay:${i*0.035}s">${w}</span>`
+  ).join(' ');
+});
+
+/* ---------- scroll reveals ---------- */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+  });
+},{threshold:0.25});
+document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
+
+/* ---------- hero dot field ----------
+   A living map: nodes drift, nearby nodes link, and signals travel
+   the links outward from pulsing hubs. */
+(function(){
+  const canvas = document.getElementById('dotfield');
+  if(!canvas) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ctx = canvas.getContext('2d');
+  const LINK = 148;
+  let W,H,dpr,dots=[],hubs=[],signals=[],edges=[],lastEmit=0;
+  const mouse = {x:-9999,y:-9999,active:false};
+
+  function resize(){
+    dpr = Math.min(devicePixelRatio||1,2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    seed();
+  }
+  function seed(){
+    const n = Math.min(240, Math.max(90, Math.floor(W*H/6200)));
+    dots = Array.from({length:n},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.42, vy:(Math.random()-.5)*.42,
+      r:Math.random()*1.7+.7,
+      tw:Math.random()*Math.PI*2
+    }));
+    // hubs: the "places" of the map, each on a slow independent breath
+    hubs = [
+      {ix:.70,iy:.30,phase:0},
+      {ix:.86,iy:.62,phase:2.1},
+      {ix:.55,iy:.78,phase:4.2}
+    ].map(h=>({x:W*h.ix,y:H*h.iy,phase:h.phase}));
+    signals = [];
+  }
+
+  /* a signal rides one link from a to b, then dies */
+  function emit(t){
+    if(!edges.length) return;
+    for(let k=0;k<2;k++){
+      const e = edges[(Math.random()*edges.length)|0];
+      if(e) signals.push({a:e.a,b:e.b,p:0,sp:.012+Math.random()*.016,hot:Math.random()<.35});
+    }
+  }
+
+  function step(t){
+    ctx.clearRect(0,0,W,H);
+
+    /* drifting glow, the atmosphere behind the field */
+    const gx = W*(.62 + Math.sin(t/9000)*.12);
+    const gy = H*(.42 + Math.cos(t/11000)*.14);
+    const glow = ctx.createRadialGradient(gx,gy,0,gx,gy,Math.max(W,H)*.55);
+    glow.addColorStop(0,'rgba(255,75,51,.085)');
+    glow.addColorStop(.45,'rgba(120,90,80,.035)');
+    glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+
+    /* move nodes */
+    for(const d of dots){
+      if(!reduced){
+        d.x+=d.vx; d.y+=d.vy;
+        const dx=d.x-mouse.x, dy=d.y-mouse.y, dist=Math.hypot(dx,dy);
+        if(dist<180){ const f=(1-dist/180)*1.7; d.x+=dx/dist*f; d.y+=dy/dist*f; }
+        if(d.x<-20)d.x=W+20; if(d.x>W+20)d.x=-20;
+        if(d.y<-20)d.y=H+20; if(d.y>H+20)d.y=-20;
+      }
+    }
+
+    /* links */
+    edges.length = 0;
+    ctx.lineWidth = .8;
+    for(let i=0;i<dots.length;i++){
+      for(let j=i+1;j<dots.length;j++){
+        const a=dots[i], b=dots[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        if(Math.abs(dx)>LINK||Math.abs(dy)>LINK) continue;
+        const dist=Math.hypot(dx,dy);
+        if(dist<LINK){
+          const k = 1-dist/LINK;
+          ctx.strokeStyle=`rgba(245,242,236,${k*0.26})`;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+          if(k>.35) edges.push({a,b});
+        }
+      }
+    }
+
+    /* nodes */
+    for(const d of dots){
+      const a = .55 + Math.sin(t/620 + d.tw)*.35;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7);
+      ctx.fillStyle=`rgba(245,242,236,${a})`;
+      ctx.fill();
+    }
+
+    /* signals travelling the links */
+    if(!reduced && t-lastEmit > 190){ emit(t); lastEmit = t; }
+    for(let i=signals.length-1;i>=0;i--){
+      const s = signals[i];
+      s.p += s.sp;
+      if(s.p>=1){ signals.splice(i,1); continue; }
+      const x = s.a.x+(s.b.x-s.a.x)*s.p;
+      const y = s.a.y+(s.b.y-s.a.y)*s.p;
+      const fade = Math.sin(s.p*Math.PI);
+      // trail
+      const tp = Math.max(0,s.p-.4);
+      const tx = s.a.x+(s.b.x-s.a.x)*tp, ty = s.a.y+(s.b.y-s.a.y)*tp;
+      const grad = ctx.createLinearGradient(tx,ty,x,y);
+      grad.addColorStop(0,'rgba(255,75,51,0)');
+      grad.addColorStop(1, s.hot?`rgba(255,75,51,${fade*.85})`:`rgba(245,242,236,${fade*.6})`);
+      ctx.strokeStyle=grad; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(x,y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x,y,1.9,0,7);
+      ctx.fillStyle = s.hot?`rgba(255,75,51,${fade})`:`rgba(255,255,255,${fade*.9})`;
+      ctx.fill();
+    }
+
+    /* hubs: pulsing rings, the "you are here" markers */
+    hubs.forEach((h,i)=>{
+      const beat = (t/2000 + h.phase) % 3;
+      for(let n=0;n<2;n++){
+        const p = (beat + n*1.5) % 3 / 3;
+        const R = 6 + p*70;
+        ctx.beginPath(); ctx.arc(h.x,h.y,R,0,7);
+        ctx.strokeStyle=`rgba(255,75,51,${(1-p)*.42})`;
+        ctx.lineWidth=1.1; ctx.stroke();
+      }
+      const core = 3.2 + Math.sin(t/460 + h.phase)*1.1;
+      ctx.beginPath(); ctx.arc(h.x,h.y,core,0,7);
+      ctx.fillStyle= i===0 ? '#ff4b33' : 'rgba(255,75,51,.75)';
+      ctx.fill();
+      ctx.beginPath(); ctx.arc(h.x,h.y,core*2.6,0,7);
+      ctx.fillStyle='rgba(255,75,51,.14)'; ctx.fill();
+    });
+
+    requestAnimationFrame(step);
+  }
+
+  addEventListener('resize',resize);
+  canvas.parentElement.addEventListener('pointermove',e=>{
+    const r=canvas.getBoundingClientRect();
+    mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top;
+  });
+  canvas.parentElement.addEventListener('pointerleave',()=>{mouse.x=-9999;mouse.y=-9999});
+  resize();
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

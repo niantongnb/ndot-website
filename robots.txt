@@ -1,0 +1,4 @@
+# Work in progress: keep this prototype out of search results.
+# Delete this file when the page is ready to be indexed.
+User-agent: *
+Disallow: /

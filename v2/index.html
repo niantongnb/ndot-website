@@ -98,7 +98,22 @@ button{font:inherit}
   will-change:transform;
 }
 .hero-title span{display:block}
-.hero-title .outline{-webkit-text-fill-color:transparent;-webkit-text-stroke:1.5px var(--ink);color:transparent}
+/* glass, not a hole: a translucent pane clipped to the glyphs, with banded
+   sheen across it, so the dot field still reads through but the letters have
+   material. The ink hairline keeps the edge crisp. */
+.hero-title .outline{
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--ink);
+  background-image:linear-gradient(115deg,
+    rgba(255,255,255,.86) 0%,
+    rgba(255,255,255,.44) 24%,
+    rgba(255,255,255,.78) 42%,
+    rgba(255,255,255,.40) 63%,
+    rgba(255,255,255,.82) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 #map-stage{position:absolute;inset:75px 0 0;z-index:2;cursor:crosshair;transform:translate3d(0,var(--map-shift,0px),0);will-change:transform}
 #cv{display:block;width:100%;height:100%;touch-action:pan-y}
 #tip{

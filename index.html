@@ -114,6 +114,12 @@
     max-width:5em;
   }
   h1 em{font-style:normal;color:var(--pin);letter-spacing:-0.02em}
+  .hero-copy h1 .w{display:inline-block;opacity:0;transform:translateY(30px);
+    transition:opacity .9s var(--ease),transform .9s var(--ease)}
+  .hero-copy.revealed h1 .w{opacity:1;transform:none}
+  .hero-copy .sub{opacity:0;transform:translateY(18px);
+    transition:opacity .9s var(--ease) .45s,transform .9s var(--ease) .45s}
+  .hero-copy.revealed .sub{opacity:1;transform:none}
   .hero-copy .sub{
     margin-top:26px;font-size:clamp(19px,min(1.5vw,2.4vh),24px);line-height:1.55;color:var(--ink-40);
     max-width:36ch;text-wrap:pretty;
@@ -462,12 +468,36 @@
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- scroll reveals + word splits (shared with V1) ---------- */
-document.querySelectorAll('[data-split]').forEach(el=>{
-  const words = el.textContent.trim().split(/\s+/);
-  el.innerHTML = words.map((w,i)=>
-    `<span class="w" style="transition-delay:${i*0.03}s">${w}</span>`
-  ).join(' ');
-});
+// split into word spans without flattening inline elements such as <em>
+function splitWords(el){
+  const out=[];
+  (function walk(node){
+    for(const child of [...node.childNodes]){
+      if(child.nodeType===3){
+        const frag=document.createDocumentFragment();
+        child.data.split(/(\s+)/).forEach(tok=>{
+          if(!tok) return;
+          if(/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+          const s=document.createElement('span'); s.className='w'; s.textContent=tok;
+          frag.appendChild(s); out.push(s);
+        });
+        node.replaceChild(frag, child);
+      } else if(child.nodeType===1) walk(child);
+    }
+  })(el);
+  out.forEach((s,i)=>s.style.transitionDelay=(i*0.03).toFixed(2)+'s');
+  return out;
+}
+document.querySelectorAll('[data-split]').forEach(splitWords);
+
+// the hero reveals on load, the same way the statements reveal on arrival
+(function(){
+  const copy=document.querySelector('.hero-copy'); if(!copy) return;
+  splitWords(copy.querySelector('h1'));
+  const sub=copy.querySelector('.sub');
+  const start=()=>requestAnimationFrame(()=>copy.classList.add('revealed'));
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+})();
 const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target);} });
 },{threshold:0.25});
@@ -552,6 +582,10 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
         L.panel.style.transform = '';
         L.panel.style.borderRadius = '';
       }
+
+      // a pinned panel can intersect the viewport long before it is the one
+      // being read, so reveal on its rise rather than on bare intersection
+      if(enter >= 0.55) L.panel.classList.add('in-view');
 
       for(const p of L.px){
         const y = stacked
@@ -1224,6 +1258,36 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   statePool = [...byState.keys()].filter(c=>byState.get(c).length>=12);
   idleReset();
   requestAnimationFrame(frame);
+})();
+
+/* No orphans: bind the last few words of body copy so a line is never left
+   with one or two stragglers. */
+(function(){
+  var SEL = '.section-body p, .hero-copy .sub';
+  function bind(el){
+    if(el.dataset.widowed) return;
+    el.dataset.widowed = '1';
+    (function walk(node){
+      for(var i=0;i<node.childNodes.length;i++){
+        var c=node.childNodes[i];
+        if(c.nodeType===1){ walk(c); }
+      }
+    })(el);
+    var last = null;
+    (function findLast(node){
+      for(var i=node.childNodes.length-1;i>=0;i--){
+        var c=node.childNodes[i];
+        if(c.nodeType===3 && c.data.trim()){ last=c; return true; }
+        if(c.nodeType===1 && findLast(c)) return true;
+      }
+      return false;
+    })(el);
+    if(!last) return;
+    // join the final three words with non-breaking spaces
+    last.data = last.data.replace(/\s+(\S+)\s+(\S+)\s*$/, '\u00A0$1\u00A0$2');
+  }
+  function run(){ document.querySelectorAll(SEL).forEach(bind); }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(run); else run();
 })();
 </script>
 </body>

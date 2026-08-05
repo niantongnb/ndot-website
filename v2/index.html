@@ -162,19 +162,27 @@ button{font:inherit}
 .mission-route{
   grid-column:1/5;
   align-self:end;
+  position:relative;
   padding-bottom:clamp(48px,8vh,92px);
-  display:grid;
-  grid-template-columns:auto 1fr;
-  gap:12px 16px;
+  padding-left:30px;
+  display:flex;
+  flex-direction:column;
+  gap:clamp(20px,2.6vh,32px);
   max-width:350px;
   transform:translate3d(0,var(--mission-route-shift,0px),0);
   will-change:transform;
 }
-.route-rail{grid-row:1/4;position:relative;width:11px;margin:3px 0}
-.route-rail::before{content:"";position:absolute;left:5px;top:5px;bottom:5px;width:1px;background:var(--ink)}
-.route-rail i{position:absolute;left:1px;width:9px;height:9px;border-radius:50%;border:1px solid var(--ink);background:var(--ice)}
-.route-rail i:nth-child(1){top:0}.route-rail i:nth-child(2){top:calc(50% - 4px);background:var(--signal)}.route-rail i:nth-child(3){bottom:0}
-.route-word{font-size:clamp(17px,1.4vw,22px);font-weight:700;letter-spacing:-.03em;text-transform:uppercase}
+/* the rail is measured in script so it runs exactly between the first and
+   last stop, whatever the labels wrap to */
+.route-rail{position:absolute;left:4px;top:var(--rail-top,0px);height:var(--rail-h,0px);width:1px;background:var(--ink)}
+.route-step{position:relative;display:flex;flex-direction:column;gap:4px}
+.route-word::before{
+  content:"";position:absolute;left:-30px;top:.5em;margin-top:-4.5px;
+  width:9px;height:9px;border-radius:50%;
+  border:1px solid var(--ink);background:var(--ice);
+}
+.route-step:nth-of-type(2) .route-word::before{background:var(--signal)}
+.route-word{position:relative;display:block;font-size:clamp(17px,1.4vw,22px);font-weight:700;letter-spacing:-.03em;text-transform:uppercase}
 .route-note{color:rgba(7,23,28,.57)}
 .vision{
   min-height:125svh;
@@ -361,10 +369,10 @@ a:focus-visible,.node:focus-visible{outline:3px solid var(--paper);outline-offse
       <span><i>decide, and get things done.</i></span>
     </h2>
     <div class="mission-route" aria-label="From information to action">
-      <div class="route-rail" aria-hidden="true"><i></i><i></i><i></i></div>
-      <span class="route-word">Information</span><span class="route-note micro">Find what matters</span>
-      <span class="route-word">Decision</span><span class="route-note micro">Make sense of it</span>
-      <span class="route-word">Action</span><span class="route-note micro">Get it done</span>
+      <span class="route-rail" aria-hidden="true"></span>
+      <div class="route-step"><span class="route-word">Information</span><span class="route-note micro">Find what matters</span></div>
+      <div class="route-step"><span class="route-word">Decision</span><span class="route-note micro">Make sense of it</span></div>
+      <div class="route-step"><span class="route-word">Action</span><span class="route-note micro">Get it done</span></div>
     </div>
     <p class="mission-copy">Local life touches nearly every part of our day, yet the information, services, and choices around us remain fragmented and difficult to navigate. We believe AI can make local experiences simpler, more useful, and easier to act on.</p>
   </section>
@@ -789,6 +797,58 @@ nodes.forEach(function(node){node.addEventListener("click",function(){
 function boot(){build();syncChrome();statePool=Object.keys(byState).filter(function(c){return byState[c].length>=12;});idleReset();requestAnimationFrame(frame);}
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(boot); else boot();
 })();
+
+/* No orphans: bind the last few words of body copy so a line is never left
+   with one or two stragglers. */
+(function(){
+  var SEL = '.mission-copy, .vision-copy p, .hero-thesis';
+  function bind(el){
+    if(el.dataset.widowed) return;
+    el.dataset.widowed = '1';
+    (function walk(node){
+      for(var i=0;i<node.childNodes.length;i++){
+        var c=node.childNodes[i];
+        if(c.nodeType===1){ walk(c); }
+      }
+    })(el);
+    var last = null;
+    (function findLast(node){
+      for(var i=node.childNodes.length-1;i>=0;i--){
+        var c=node.childNodes[i];
+        if(c.nodeType===3 && c.data.trim()){ last=c; return true; }
+        if(c.nodeType===1 && findLast(c)) return true;
+      }
+      return false;
+    })(el);
+    if(!last) return;
+    // join the final three words with non-breaking spaces
+    last.data = last.data.replace(/\s+(\S+)\s+(\S+)\s*$/, '\u00A0$1\u00A0$2');
+  }
+  function run(){ document.querySelectorAll(SEL).forEach(bind); }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(run); else run();
+})();
+
+// The rail runs between the first and last stop, measured so it always lines
+// up with the labels however they wrap.
+function sizeRoute(){
+  var route=document.querySelector(".mission-route"); if(!route) return;
+  var words=[].slice.call(route.querySelectorAll(".route-word"));
+  if(words.length<2) return;
+  var rr=route.getBoundingClientRect();
+  function centre(w){
+    var r=w.getBoundingClientRect();
+    return r.top-rr.top+parseFloat(getComputedStyle(w).fontSize)*0.5;
+  }
+  var top=centre(words[0]), bottom=centre(words[words.length-1]);
+  route.style.setProperty("--rail-top", top.toFixed(1)+"px");
+  route.style.setProperty("--rail-h", (bottom-top).toFixed(1)+"px");
+}
+addEventListener("resize", sizeRoute, {passive:true});
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(sizeRoute); else sizeRoute();
+if(window.ResizeObserver){
+  var _r=document.querySelector(".mission-route");
+  if(_r) new ResizeObserver(sizeRoute).observe(_r);
+}
 </script>
 </body>
 </html>

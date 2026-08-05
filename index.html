@@ -42,7 +42,7 @@
   }
 
   .legend{
-    font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+    font-family:var(--mono);font-size:13px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink-40);
   }
 
@@ -56,7 +56,7 @@
   /* the wordmark is drawn as halftone dots on a canvas */
   .wm{display:block;height:100%;aspect-ratio:929.11/316.84}
   .nav-links{display:flex;gap:28px;align-items:center;
-    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+    font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
   .nav-links a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px;transition:border-color .3s}
   .nav-links a:hover{border-color:var(--ink)}
 
@@ -99,20 +99,23 @@
   /* a county is under the cursor and clickable */
   .hero.targeting{cursor:pointer}
   #dots{position:absolute;inset:0;width:100%;height:100%}
+  /* centred by flex, not by transform: the parallax writes to `transform`,
+     which was silently cancelling a translateY(-50%) and dropping the block low */
   .hero-copy{
-    position:absolute;left:clamp(24px,4vw,56px);top:50%;transform:translateY(-50%);
-    z-index:3;pointer-events:none;max-width:700px;
+    position:absolute;left:clamp(24px,4vw,56px);top:0;bottom:0;
+    display:flex;flex-direction:column;justify-content:center;
+    z-index:3;pointer-events:none;max-width:min(92vw,960px);
   }
   h1{
     font-family:var(--serif);
     font-weight:400;
-    font-size:clamp(62px,min(8.4vw,12.5vh),132px);
-    line-height:0.98;letter-spacing:-0.025em;
-    max-width:11ch;
+    font-size:clamp(70px,min(10.5vw,17vh),180px);
+    line-height:0.94;letter-spacing:-0.028em;
+    max-width:5em;
   }
   h1 em{font-style:normal;color:var(--pin);letter-spacing:-0.02em}
   .hero-copy .sub{
-    margin-top:24px;font-size:clamp(17px,min(1.25vw,2vh),19px);line-height:1.6;color:var(--ink-40);
+    margin-top:26px;font-size:clamp(19px,min(1.5vw,2.4vh),24px);line-height:1.55;color:var(--ink-40);
     max-width:36ch;text-wrap:pretty;
   }
 
@@ -123,7 +126,7 @@
   }
   .phases button{
     all:unset;cursor:pointer;
-    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--ink-40);padding:2px 0;transition:color .25s;
   }
   .phases button:hover{color:var(--ink)}
@@ -139,7 +142,7 @@
   /* county tag: a boxed map label pinned beside the cursor */
   #tip{
     position:absolute;z-index:6;pointer-events:none;
-    font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+    font-family:var(--mono);font-size:13px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink);
     background:var(--paper);border:1px solid var(--ink);
     padding:8px 13px;
@@ -156,7 +159,7 @@
   }
   .kicker{
     display:flex;align-items:center;gap:14px;margin-bottom:clamp(24px,4vh,48px);
-    font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-40);
+    font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-40);
   }
   .kicker .rule{height:1px;flex:1;background:var(--ink-18);transform-origin:left;transform:scaleX(0);transition:transform 1.4s var(--ease) .2s}
   .in-view .kicker .rule{transform:scaleX(1)}
@@ -277,7 +280,7 @@
     border-top:1px solid rgba(233,234,228,.12);
     display:flex;justify-content:space-between;align-items:center;
     padding:24px clamp(24px,4vw,56px);
-    font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
   }
   footer .wordmark{height:18px;color:rgba(233,234,228,.4)}
 
@@ -937,8 +940,11 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     /* -- 1: the nation, Albers 975x610 fit -- */
     {
       const pad = Math.min(mapW,H)*0.07;
-      const s = Math.min((mapW-pad*2)/975,(H-pad*2)/610);
-      const ox = mapX0+(mapW-975*s)/2, oy=(H-610*s)/2;
+      // BLEED > 1 lets the country run past the right edge and under the copy,
+      // which is the intent: the map is a ground, not a boxed illustration
+      const BLEED = 1.45;
+      const s = Math.min((mapW-pad*2)/975,(H-pad*2)/610) * BLEED;
+      const ox = mapX0+(mapW-975*s)/2 + mapW*0.06, oy=(H-610*s)/2;
       for(let k=0;k<N;k++){
         const d = DATA[idx[k]];
         form[1].x[k]=ox+d[0]*s; form[1].y[k]=oy+d[1]*s;
@@ -949,7 +955,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     /* -- 3: the mark, rasterised brand N -- */
     {
       const {hits, step} = samplePoints(o=>{
-        const mh = Math.min(H*0.62, 560), ms = mh/861.96;
+        const mh = Math.min(H*0.78, 700), ms = mh/861.96;
         o.translate(mapX0+(mapW-656.58*ms)/2 - 472*ms, (H-mh)/2 - 369*ms);
         o.scale(ms,ms);
         o.fillStyle='#000';
@@ -1000,7 +1006,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     const spanX = Math.max(x1-x0, 1e-3), spanY = Math.max(y1-y0, 1e-3);
     const pad = Math.min(mapW,H)*0.13;
     // tiny states (and single-county DC) would otherwise scale to infinity
-    const s = Math.min((mapW-pad*2)/spanX, (H-pad*2)/spanY, 240);
+    const s = Math.min((mapW-pad*2)/spanX, (H-pad*2)/spanY, 240) * 1.16;
     const ox = mapX0+(mapW-spanX*s)/2 - x0*s, oy = (H-spanY*s)/2 - y0*s;
 
     const wsum = list.reduce((a,d)=>a+d[2]*d[2],0) || 1;

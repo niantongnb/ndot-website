@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NDot AI — Building the AI platform for local life</title>
+<title>NDot AI — V2 · original atlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
   }
 
   .legend{
-    font-family:var(--mono);font-size:13px;letter-spacing:.14em;
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink-40);
   }
 
@@ -56,7 +56,7 @@
   /* the wordmark is drawn as halftone dots on a canvas */
   .wm{display:block;height:100%;aspect-ratio:929.11/316.84}
   .nav-links{display:flex;gap:28px;align-items:center;
-    font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
   .nav-links a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px;transition:border-color .3s}
   .nav-links a:hover{border-color:var(--ink)}
 
@@ -80,9 +80,6 @@
     will-change:transform;
   }
   .stack.pinned > .panel .shell{padding-top:0;padding-bottom:0}
-  /* the marquee overlays the mission panel's foot, so reserve its height or the
-     centred content reads low by half of it (--verbs-h is measured in script) */
-  .stack.pinned > #mission .shell{padding-bottom:var(--verbs-h,0px)}
   .veil{
     position:absolute;inset:0;z-index:30;pointer-events:none;
     background:#0F1113;opacity:0;
@@ -99,23 +96,20 @@
   /* a county is under the cursor and clickable */
   .hero.targeting{cursor:pointer}
   #dots{position:absolute;inset:0;width:100%;height:100%}
-  /* centred by flex, not by transform: the parallax writes to `transform`,
-     which was silently cancelling a translateY(-50%) and dropping the block low */
   .hero-copy{
-    position:absolute;left:clamp(24px,4vw,56px);top:0;bottom:0;
-    display:flex;flex-direction:column;justify-content:center;
-    z-index:3;pointer-events:none;max-width:min(92vw,960px);
+    position:absolute;left:clamp(24px,4vw,56px);top:50%;transform:translateY(-50%);
+    z-index:3;pointer-events:none;max-width:620px;
   }
   h1{
     font-family:var(--serif);
     font-weight:400;
-    font-size:clamp(70px,min(10.5vw,17vh),180px);
-    line-height:0.94;letter-spacing:-0.028em;
-    max-width:5em;
+    font-size:clamp(54px,min(7.2vw,10vh),110px);
+    line-height:1.0;letter-spacing:-0.02em;
+    max-width:12ch;
   }
-  h1 em{font-style:normal;color:var(--pin);letter-spacing:-0.02em}
+  h1 em{font-style:italic;color:var(--pin);letter-spacing:-0.015em}
   .hero-copy .sub{
-    margin-top:26px;font-size:clamp(19px,min(1.5vw,2.4vh),24px);line-height:1.55;color:var(--ink-40);
+    margin-top:24px;font-size:clamp(17px,min(1.25vw,2vh),19px);line-height:1.6;color:var(--ink-40);
     max-width:36ch;text-wrap:pretty;
   }
 
@@ -126,7 +120,7 @@
   }
   .phases button{
     all:unset;cursor:pointer;
-    font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--ink-40);padding:2px 0;transition:color .25s;
   }
   .phases button:hover{color:var(--ink)}
@@ -142,7 +136,7 @@
   /* county tag: a boxed map label pinned beside the cursor */
   #tip{
     position:absolute;z-index:6;pointer-events:none;
-    font-family:var(--mono);font-size:13px;letter-spacing:.14em;
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink);
     background:var(--paper);border:1px solid var(--ink);
     padding:8px 13px;
@@ -159,18 +153,15 @@
   }
   .kicker{
     display:flex;align-items:center;gap:14px;margin-bottom:clamp(24px,4vh,48px);
-    font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-40);
+    font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-40);
   }
   .kicker .rule{height:1px;flex:1;background:var(--ink-18);transform-origin:left;transform:scaleX(0);transition:transform 1.4s var(--ease) .2s}
   .in-view .kicker .rule{transform:scaleX(1)}
-  /* one measure drives both the statement and the body copy, so their right
-     edges land on the same line */
-  .shell{--stmt:clamp(42px,min(5.6vw,6.6vh),76px);--measure:min(calc(var(--stmt)*12),62vw)}
   .statement{
     font-family:var(--serif);font-weight:400;
-    font-size:var(--stmt);
+    font-size:clamp(42px,min(5.6vw,6.6vh),76px);
     line-height:1.06;letter-spacing:-0.02em;
-    max-width:var(--measure);text-wrap:balance;
+    max-width:23ch;text-wrap:balance;
     position:relative;z-index:1;
   }
   /* ghost numeral behind each statement */
@@ -187,11 +178,12 @@
   }
   .in-view .statement .w{opacity:1;transform:translateY(0)}
   .section-body{
-    max-width:var(--measure);margin-top:clamp(28px,5vh,68px);
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:clamp(24px,4vw,64px);margin-top:clamp(28px,5vh,68px);
   }
   .section-body p{
     font-size:clamp(18px,min(1.55vw,2.3vh),21px);line-height:1.7;color:var(--ink);opacity:.78;
-    text-align:left;text-wrap:pretty;
+    max-width:52ch;text-wrap:pretty;
     opacity:0;transform:translateY(20px);
     transition:opacity .9s var(--ease) .3s,transform .9s var(--ease) .3s;
   }
@@ -225,25 +217,11 @@
   .route{
     position:absolute;inset:0;pointer-events:none;overflow:visible;
   }
-  .route .line{
+  .route path{
     fill:none;stroke:var(--ink-18);stroke-width:1.2;
     stroke-dasharray:2 7;stroke-linecap:round;
   }
-  /* a lit segment creeps along the route, like a leg being travelled */
-  .route .live{
-    fill:none;stroke:var(--pin);stroke-width:1.1;stroke-linecap:round;
-    opacity:.34;
-  }
   .route .runner{fill:var(--pin)}
-  .route .runner.trail{opacity:.4}
-  /* stops along the way: they hold, then ping */
-  .route .wp{fill:var(--paper);stroke:var(--ink-40);stroke-width:1.2}
-  .route .ping{fill:none;stroke:var(--pin);opacity:0;transform-box:fill-box;transform-origin:center}
-  @keyframes wpPing{
-    0%,72%   {r:3;  opacity:0}
-    78%      {r:4;  opacity:.85}
-    100%     {r:15; opacity:0}
-  }
 
   /* CTA halftone mark */
   #ctaMark{display:block;margin:0 auto clamp(28px,5vh,48px);width:clamp(120px,14vw,180px);height:auto}
@@ -282,15 +260,10 @@
     border-top:1px solid rgba(233,234,228,.12);
     display:flex;justify-content:space-between;align-items:center;
     padding:24px clamp(24px,4vw,56px);
-    font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+    font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
   }
   footer .wordmark{height:18px;color:rgba(233,234,228,.4)}
 
-  /* below this the copy fills the width and the route has no clear band to
-     run through, so it would cross the type: drop it rather than fight it */
-  @media (max-width:900px){
-    .route{display:none}
-  }
   @media (max-width:760px){
     .section-body{grid-template-columns:1fr}
     .hero-copy{max-width:82vw}
@@ -298,6 +271,7 @@
     .phases{flex-direction:row;gap:16px;left:clamp(24px,4vw,56px);right:auto;bottom:56px}
     .hint{bottom:24px}
     .ghost{font-size:34vw}
+    .mission .shell{padding-bottom:120px}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01s!important;transition-duration:.01s!important}
@@ -336,6 +310,7 @@
   <div class="phases" aria-label="Dot formations">
     <button data-phase="0">Signal field</button>
     <button data-phase="1" class="on">The nation</button>
+    <button data-phase="3">The mark</button>
   </div>
   <div class="hint legend">Click any county — the dots reform into its state</div>
 </header>
@@ -344,28 +319,6 @@
 <!-- ============ MISSION ============ -->
 <section class="reveal panel" id="mission" style="background:var(--paper)">
   <div class="ghost" aria-hidden="true" data-px="-0.3">01</div>
-  <svg class="route" viewBox="0 0 1440 700" preserveAspectRatio="none" aria-hidden="true">
-    <!-- sweeps below the statement, then climbs past the ghost numeral -->
-    <path id="routeMission" class="line"
-          d="M-60,700 C200,762 520,800 820,796 C1080,792 1232,772 1312,690 C1372,628 1420,420 1492,150"/>
-    <path class="live"
-          d="M-60,700 C200,762 520,800 820,796 C1080,792 1232,772 1312,690 C1372,628 1420,420 1492,150"
-          stroke-dasharray="150 1600" stroke-dashoffset="0">
-      <animate attributeName="stroke-dashoffset" from="0" to="-1750" dur="19s" repeatCount="indefinite"/>
-    </path>
-    <g>
-      <circle class="wp" cx="820" cy="796" r="3.4"/>
-      <circle class="ping" cx="820" cy="796" r="3" style="animation:wpPing 19s linear infinite 5.2s"/>
-      <circle class="wp" cx="1312" cy="690" r="3.4"/>
-      <circle class="ping" cx="1312" cy="690" r="3" style="animation:wpPing 19s linear infinite 11.8s"/>
-    </g>
-    <circle class="runner trail" r="2.6">
-      <animateMotion dur="19s" begin="-0.9s" repeatCount="indefinite" rotate="none"><mpath href="#routeMission"/></animateMotion>
-    </circle>
-    <circle class="runner" r="4">
-      <animateMotion dur="19s" repeatCount="indefinite" rotate="none"><mpath href="#routeMission"/></animateMotion>
-    </circle>
-  </svg>
   <svg class="mini-map" viewBox="0 0 400 400" aria-hidden="true" data-px="-0.36">
     <g fill="#15181A" opacity=".16">
       <circle cx="60" cy="80" r="3"/><circle cx="140" cy="50" r="2.2"/><circle cx="230" cy="90" r="3.4"/>
@@ -386,6 +339,7 @@
     <div class="kicker">01 / Mission <span class="rule"></span></div>
     <p class="statement" data-split data-px="0.18">Make local life easier to navigate, decide, and get things done.</p>
     <div class="section-body" data-px="0.4">
+      <div></div>
       <p>Local life touches nearly every part of our day, yet the information, services, and choices around us remain fragmented and difficult to navigate. We believe AI can make local experiences simpler, more useful, and easier to act on.</p>
     </div>
   </div>
@@ -404,31 +358,18 @@
 <section class="reveal alt graticule panel" id="vision">
   <div class="ghost" aria-hidden="true" data-px="-0.3">02</div>
   <svg class="route" viewBox="0 0 1440 700" preserveAspectRatio="none" aria-hidden="true">
-    <!-- runs under the copy, not across it: low along the left, then up the right -->
-    <path id="routeVision" class="line"
-          d="M-60,706 C200,776 520,822 820,826 C1100,836 1268,812 1348,716 C1402,648 1444,436 1512,196"/>
-    <path class="live"
-          d="M-60,706 C200,776 520,822 820,826 C1100,836 1268,812 1348,716 C1402,648 1444,436 1512,196"
-          stroke-dasharray="150 1600" stroke-dashoffset="0">
-      <animate attributeName="stroke-dashoffset" from="0" to="-1750" dur="17s" repeatCount="indefinite"/>
-    </path>
-    <g>
-      <circle class="wp" cx="820" cy="826" r="3.4"/>
-      <circle class="ping" cx="820" cy="826" r="3" style="animation:wpPing 17s linear infinite 4.6s"/>
-      <circle class="wp" cx="1348" cy="716" r="3.4"/>
-      <circle class="ping" cx="1348" cy="716" r="3" style="animation:wpPing 17s linear infinite 12.4s"/>
-    </g>
-    <circle class="runner trail" r="2.6">
-      <animateMotion dur="17s" begin="-0.9s" repeatCount="indefinite" rotate="none"><mpath href="#routeVision"/></animateMotion>
-    </circle>
+    <path id="routePath" d="M-40,640 C240,560 300,300 560,330 C820,360 880,120 1180,150 C1320,164 1420,90 1500,60"/>
     <circle class="runner" r="4">
-      <animateMotion dur="17s" repeatCount="indefinite" rotate="none"><mpath href="#routeVision"/></animateMotion>
+      <animateMotion dur="14s" repeatCount="indefinite" rotate="none">
+        <mpath href="#routePath"/>
+      </animateMotion>
     </circle>
   </svg>
   <div class="shell">
     <div class="kicker">02 / Vision <span class="rule"></span></div>
     <p class="statement" data-split data-px="0.18">Become the definitive AI platform for local life—uniting people, information, and commerce to build more connected, informed, and vibrant communities.</p>
     <div class="section-body" data-px="0.4">
+      <div></div>
       <p>We envision a future where AI does more than provide information. It helps people make better decisions, take meaningful action, and engage more easily with the communities and businesses around them.</p>
     </div>
   </div>
@@ -472,17 +413,6 @@ const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target);} });
 },{threshold:0.25});
 document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
-
-/* the marquee sits over the mission panel's foot; publish its height so the
-   panel can reserve that space and keep the copy optically centred */
-(function(){
-  const m = document.querySelector('#mission'), v = m && m.querySelector('.verbs');
-  if(!m || !v) return;
-  const sync = () => m.style.setProperty('--verbs-h', v.getBoundingClientRect().height.toFixed(1)+'px');
-  sync();
-  if(window.ResizeObserver) new ResizeObserver(sync).observe(v);
-  addEventListener('resize', sync);
-})();
 
 /* ---------- panel cover: each section pins while the next slides over ----------
    `enter` runs 0 -> 1 as a panel rises into place, `cover` runs 0 -> 1 as the
@@ -847,8 +777,8 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   const chips = [...document.querySelectorAll('.phases button')];
   const hint = document.querySelector('.hint');
   const countLine = document.getElementById('countLine');
-  const FIELD=0, NATION=1, STATE=2;
-  const PHASES = ['Signal field','The nation',''];
+  const FIELD=0, NATION=1, STATE=2, MARK=3;
+  const PHASES = ['Signal field','The nation','','The mark'];
   const STATE_NAME = {
     AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',
     CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',
@@ -878,7 +808,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   const seed = new Float32Array(N);
 
   // formation target sets, rebuilt on resize
-  const form = [0,1,2].map(()=>({x:new Float32Array(N),y:new Float32Array(N),r:new Float32Array(N)}));
+  const form = [0,1,2,3].map(()=>({x:new Float32Array(N),y:new Float32Array(N),r:new Float32Array(N)}));
   let names = [], order = [];
 
   // counties grouped by state postal code, for the drill-down
@@ -900,6 +830,32 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   // deterministic per-dot pseudo-random, so resize doesn't reshuffle the field
   const rand=(i,k)=>{const s=Math.sin(i*127.1+k*311.7)*43758.5453;return s-Math.floor(s);};
 
+  /* ---- N mark geometry (from the brand SVG, viewBox 472 369 656.58 861.96) ---- */
+  function markPath(){
+    const p = new Path2D();
+    p.rect(913.871,369,214.712,858.848);
+    p.rect(472,372.114,214.712,858.848);
+    const tri = new Path2D('M484.448 485.692L686.5 372L1115.99 1112.79L913.872 1229.48L484.448 485.692Z');
+    p.addPath(tri);
+    return p;
+  }
+
+  /* sample an offscreen raster into ~N points, sorted by x (west→east pairing) */
+  function samplePoints(draw, count){
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const o = off.getContext('2d');
+    draw(o);
+    const px = o.getImageData(0,0,W,H).data, hits=[];
+    const step = Math.max(1, Math.round(Math.sqrt((W*H)/(count*38))));
+    for(let yy=0; yy<H; yy+=step)
+      for(let xx=0; xx<W; xx+=step)
+        if(px[(yy*W+xx)*4+3] > 120) hits.push([xx,yy]);
+    if(!hits.length) hits.push([W/2,H/2]);
+    hits.sort((a,b)=>a[0]-b[0]);
+    return {hits, step};
+  }
+
   function build(){
     const rect = cv.getBoundingClientRect();
     W = Math.max(1, Math.round(rect.width));
@@ -913,23 +869,34 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     order = idx; names = idx.map(i=>DATA[i][3]);
 
     // right-of-copy region for the map (copy sits left)
-    mapX0 = W > 900 ? W*0.40 : 0; mapW = W - mapX0;
+    mapX0 = W > 900 ? W*0.34 : 0; mapW = W - mapX0;
 
     /* -- 1: the nation, Albers 975x610 fit -- */
     {
       const pad = Math.min(mapW,H)*0.07;
-      // The map is a ground, not a boxed illustration: it oversizes its column
-      // and runs under the copy on the LEFT. The right edge stays inside the
-      // frame — the east coast carries the silhouette, so never clip it.
-      const BLEED = 1.32;
-      const marginR = Math.max(20, W*0.025);
-      let s = Math.min((mapW-pad*2)/975,(H-pad*2)/610) * BLEED;
-      s = Math.min(s, (W-marginR-8)/975);        // whole country stays visible
-      const ox = W - marginR - 975*s, oy=(H-610*s)/2;
+      const s = Math.min((mapW-pad*2)/975,(H-pad*2)/610);
+      const ox = mapX0+(mapW-975*s)/2, oy=(H-610*s)/2;
       for(let k=0;k<N;k++){
         const d = DATA[idx[k]];
         form[1].x[k]=ox+d[0]*s; form[1].y[k]=oy+d[1]*s;
         form[1].r[k]=clamp(0.55+Math.sqrt(d[2])*0.16*Math.min(s*1.3,1.4),0.55,2.4);
+      }
+    }
+
+    /* -- 3: the mark, rasterised brand N -- */
+    {
+      const {hits, step} = samplePoints(o=>{
+        const mh = Math.min(H*0.62, 560), ms = mh/861.96;
+        o.translate(mapX0+(mapW-656.58*ms)/2 - 472*ms, (H-mh)/2 - 369*ms);
+        o.scale(ms,ms);
+        o.fillStyle='#000';
+        o.fill(markPath());
+      }, N);
+      for(let k=0;k<N;k++){
+        const h = hits[Math.floor(k*hits.length/N)];
+        form[3].x[k]=h[0]+(rand(k,6)-.5)*step*0.8;
+        form[3].y[k]=h[1]+(rand(k,7)-.5)*step*0.8;
+        form[3].r[k]=1.5;
       }
     }
 
@@ -970,7 +937,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     const spanX = Math.max(x1-x0, 1e-3), spanY = Math.max(y1-y0, 1e-3);
     const pad = Math.min(mapW,H)*0.13;
     // tiny states (and single-county DC) would otherwise scale to infinity
-    const s = Math.min((mapW-pad*2)/spanX, (H-pad*2)/spanY, 240) * 1.16;
+    const s = Math.min((mapW-pad*2)/spanX, (H-pad*2)/spanY, 240);
     const ox = mapX0+(mapW-spanX*s)/2 - x0*s, oy = (H-spanY*s)/2 - y0*s;
 
     const wsum = list.reduce((a,d)=>a+d[2]*d[2],0) || 1;

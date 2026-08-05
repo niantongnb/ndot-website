@@ -222,26 +222,6 @@
   .orbit .ring2{animation:spin 64s linear infinite reverse;transform-origin:50% 50%}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ---------- verbs strip: sits along the foot of the mission panel ---------- */
-  .verbs{
-    position:absolute;left:0;right:0;bottom:0;z-index:5;
-    border-top:1px solid var(--line);
-    background:var(--cream-dim);
-    overflow:hidden;white-space:nowrap;
-    padding:18px 0;
-  }
-  .verbs .track{
-    display:inline-flex;gap:0;
-    animation:marquee 30s linear infinite;
-  }
-  .verbs span{
-    font-family:var(--serif);font-style:italic;font-weight:400;
-    font-size:clamp(19px,2.1vw,28px);color:var(--grey-dark);
-    letter-spacing:-0.01em;
-    padding:0 18px;display:inline-flex;align-items:center;gap:36px;
-  }
-  .verbs .d{width:6px;height:6px;border-radius:50%;background:var(--dot);display:inline-block;flex:none}
-  @keyframes marquee{to{transform:translateX(-50%)}}
 
   /* ---------- CTA ---------- */
   .cta{text-align:center}
@@ -297,7 +277,6 @@
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}
-    .verbs .track{animation:none}
   }
 </style>
 </head>
@@ -359,13 +338,6 @@
       <div class="spacer"></div>
       <p>Local life touches nearly every part of our day, yet the information, services, and choices around us remain fragmented and difficult to navigate. We believe AI can make local experiences simpler, more useful, and easier to act on.</p>
     </div>
-  </div>
-  <div class="verbs" aria-hidden="true">
-  <div class="track">
-    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
-    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
-    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
-    <span>navigate <i class="d"></i></span><span>decide <i class="d"></i></span><span>get things done <i class="d"></i></span>
   </div>
   </div>
 </section>
@@ -770,19 +742,8 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     });
   }
   measure();
-  /* the verb marquee picks up speed with the scroll, then settles */
-  const track = document.querySelector('.verbs .track');
-  let lastY = scrollY, vel = 0;
-  function marquee(){
-    vel *= 0.92;
-    if(track) track.style.animationDuration = (30 / (1 + Math.min(vel/9, 3.2))).toFixed(2) + 's';
-    requestAnimationFrame(marquee);
-  }
-  if(track) requestAnimationFrame(marquee);
 
   addEventListener('scroll',()=>{
-    vel = Math.min(120, vel + Math.abs(scrollY - lastY));
-    lastY = scrollY;
     if(!ticking){ ticking = true; requestAnimationFrame(update); }
   },{passive:true});
   const remeasure = ()=>{ measure(); update(); };

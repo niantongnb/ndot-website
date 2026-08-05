@@ -1004,6 +1004,36 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     return true;
   }
 
+
+  /* ---- idle drift ----------------------------------------------------
+     With no input the canvas keeps moving on its own: it wanders between the
+     loose field, the nation, and a random state. Any click hands control back
+     to the visitor and restarts the countdown. */
+  const AUTO_WAIT = 8000, AUTO_EVERY = 4600;
+  let autoTimer = null, autoOn = false, statePool = [];
+  function autoStep(){
+    if(!autoOn) return;
+    const spot = [W*(0.25+Math.random()*0.5), H*(0.25+Math.random()*0.5)];
+    const options = [];
+    if(phase!==FIELD) options.push('field');
+    if(phase!==NATION) options.push('nation');
+    options.push('state','state');                 // weight the states
+    const pick = options[(Math.random()*options.length)|0];
+    if(pick==='field'){ activeState=null; setPhase(FIELD, spot[0], spot[1]); }
+    else if(pick==='nation'){ activeState=null; setPhase(NATION, spot[0], spot[1]); }
+    else if(statePool.length){
+      const st = statePool[(Math.random()*statePool.length)|0];
+      if(buildStateForm(st)){ activeState = st; setPhase(STATE, spot[0], spot[1], true); }
+    }
+    autoTimer = setTimeout(autoStep, AUTO_EVERY);
+  }
+  function idleReset(){
+    autoOn = false;
+    clearTimeout(autoTimer);
+    if(REDUCED) return;
+    autoTimer = setTimeout(()=>{ autoOn = true; autoStep(); }, AUTO_WAIT);
+  }
+
   /* ---- chrome that reflects where you are ---- */
   function syncChrome(){
     const inState = phase===STATE && activeState;
@@ -1148,6 +1178,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   hero.addEventListener('pointerleave',()=>{pointerIn=false;});
   hero.addEventListener('click',e=>{
     if(e.target.closest('.phases')||e.target.closest('a')) return;
+    idleReset();
     const rc=cv.getBoundingClientRect();
     const px=e.clientX-rc.left, py=e.clientY-rc.top;
 
@@ -1169,6 +1200,7 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   });
 
   chips.forEach(c=>c.addEventListener('click',()=>{
+    idleReset();
     const p = +c.dataset.phase;
     if(p===phase) return;
     activeState = null;
@@ -1189,6 +1221,8 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   if(document.fonts && document.fonts.ready) await document.fonts.ready;
   build();
   syncChrome();
+  statePool = [...byState.keys()].filter(c=>byState.get(c).length>=12);
+  idleReset();
   requestAnimationFrame(frame);
 })();
 </script>

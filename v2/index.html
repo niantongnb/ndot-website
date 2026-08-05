@@ -85,12 +85,13 @@ button{font:inherit}
   z-index:3;
   left:var(--pad);
   top:clamp(104px,15vh,170px);
-  width:min(11.2ch,90vw);
+  width:min(12.4ch,92vw);
   font-size:clamp(66px,11.8vw,178px);
   font-weight:800;
-  /* .76/-.082em collided the two lines and crowded the letterforms */
-  letter-spacing:-.05em;
-  line-height:.9;
+  /* .747em of ink per line, so anything under that overlaps; -.03em is where
+     the glyphs themselves start colliding */
+  letter-spacing:-.025em;
+  line-height:.94;
   text-transform:uppercase;
   pointer-events:none;
   transform:translate3d(0,var(--hero-title-shift,0px),0);
@@ -131,7 +132,7 @@ button{font:inherit}
   transform:translate3d(0,var(--hero-foot-shift,0px),0);
   will-change:transform;
 }
-.hero-thesis{width:min(44ch,58vw);font-size:clamp(15px,1.45vw,23px);font-weight:650;line-height:1.15;letter-spacing:-.025em}
+.hero-thesis{width:min(44ch,58vw);font-size:clamp(19px,2vw,30px);font-weight:650;line-height:1.15;letter-spacing:-.025em}
 .hero-instruction{display:grid;grid-template-columns:7px auto;gap:10px;max-width:29ch;line-height:1.5}
 .hero-instruction::before{content:"";width:7px;height:7px;margin-top:3px;border-radius:50%;background:var(--signal);animation:pulse 1.7s ease-in-out infinite}
 #phase{font-weight:700}
@@ -189,7 +190,7 @@ button{font:inherit}
   padding:clamp(56px,9vh,110px) 0 50px;
   font-size:clamp(42px,6.4vw,98px);
   font-weight:680;
-  line-height:.91;
+  line-height:.94;
   letter-spacing:-.064em;
   transform:translate3d(0,var(--vision-lead-shift,0px),0);
   will-change:transform;
@@ -233,7 +234,7 @@ button{font:inherit}
 .node{transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px)))}
 .node:hover,.node.active{background:var(--signal);color:var(--ink);scale:1.07}
 .node-a{left:16%;top:25%}.node-b{left:82%;top:25%}.node-c{left:50%;top:82%}
-.node-center{left:50%;top:45%;width:clamp(128px,17vw,230px);background:var(--paper);color:var(--ink);border-color:var(--paper);font-size:clamp(12px,1.2vw,17px)}
+.node-center{left:50%;top:41%;width:clamp(118px,15vw,200px);background:var(--paper);color:var(--ink);border-color:var(--paper);font-size:clamp(12px,1.2vw,17px)}
 .vision-copy{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;align-items:start;transform:translate3d(0,var(--vision-copy-shift,0px),0);will-change:transform}
 .vision-copy p{grid-column:7/12;font-size:clamp(18px,1.65vw,27px);line-height:1.28;letter-spacing:-.023em;color:rgba(244,243,237,.78)}
 .vision-copy .micro{grid-column:1/4;color:rgba(244,243,237,.52);line-height:1.55}
@@ -246,11 +247,11 @@ button{font:inherit}
   border-bottom:0;
 }
 .careers h2{
-  max-width:11ch;
+  max-width:16ch;
   padding:clamp(74px,12vh,150px) 0 40px;
   font-size:clamp(62px,11vw,168px);
-  line-height:.78;
-  letter-spacing:-.082em;
+  line-height:.94;
+  letter-spacing:-.025em;
   text-transform:uppercase;
   transform:translate3d(0,var(--careers-title-shift,0px),0);
   will-change:transform;
@@ -300,7 +301,7 @@ button{font:inherit}
   html{scroll-behavior:smooth}
   body{overflow-x:hidden}
   .site-header{padding-top:18px;padding-bottom:18px}
-  .hero-title{top:112px;font-size:clamp(62px,20vw,108px);line-height:.79;width:5.8ch}
+  .hero-title{top:112px;font-size:clamp(62px,20vw,108px);line-height:.94;width:6.4ch}
   #map-stage{inset:65px -28% 45px -28%;opacity:.82}
   .hero-foot{align-items:flex-start;flex-direction:column}.hero-thesis{width:min(31ch,88vw)}
   .hero-instruction{max-width:25ch}
@@ -308,7 +309,7 @@ button{font:inherit}
   .mission .section-kicker,.mission-title{grid-column:1/-1}.mission-title{padding:84px 0 110px;font-size:clamp(54px,15vw,88px)}
   .mission-route{grid-column:1/-1;grid-row:3;padding-bottom:64px}.mission-copy{grid-column:1/-1;grid-row:4;padding-bottom:70px}
   .vision{min-height:auto}.vision-lead{font-size:clamp(48px,13vw,74px)}
-  .constellation{width:100%;aspect-ratio:4/5;margin-bottom:80px}.node-a{left:20%;top:20%}.node-b{left:80%;top:20%}.node-c{left:50%;top:82%}.node-center{top:48%}
+  .constellation{width:100%;aspect-ratio:4/5;margin-bottom:80px}.node-a{left:18%;top:16%}.node-b{left:82%;top:16%}.node-c{left:50%;top:84%}.node-center{top:46%;width:clamp(104px,15vw,200px)}
   .vision-copy{grid-template-columns:1fr}.vision-copy p,.vision-copy .micro{grid-column:1}
   .vision-copy p{margin-top:28px}.careers h2{padding-top:100px;font-size:clamp(68px,19vw,110px)}
   .email-link{font-size:clamp(22px,7vw,38px)}.footer-row{align-items:flex-start;flex-direction:column}
@@ -427,8 +428,8 @@ var txp=new Float32Array(N),typ=new Float32Array(N);        // target
 var sr=new Float32Array(N),tr=new Float32Array(N),rr=new Float32Array(N);
 var prox=new Float32Array(N),delay=new Float32Array(N),seed=new Float32Array(N);
 
-var NATION=0,STATE=1;
-var form=[0,1].map(function(){return {x:new Float32Array(N),y:new Float32Array(N),r:new Float32Array(N)};});
+var NATION=0,STATE=1,FIELD=2;
+var form=[0,1,2].map(function(){return {x:new Float32Array(N),y:new Float32Array(N),r:new Float32Array(N)};});
 var names=[],codes=[],byState={};
 var view=NATION,transT0=-1e9,DUR=1150;
 var activeState=null,nearIdx=-1;
@@ -456,6 +457,10 @@ function build(){
     if(!byState[code])byState[code]=[];
     byState[code].push(d);
     seed[i]=rand(i,12);
+    // loose scatter across the whole frame
+    form[FIELD].x[i]=rand(i,8)*W;
+    form[FIELD].y[i]=rand(i,9)*H;
+    form[FIELD].r[i]=.6+rand(i,10)*1.3;
   }
   if(activeState&&buildStateForm(activeState)&&view===STATE){
     for(var k=0;k<N;k++){px[k]=txp[k]=form[STATE].x[k];py[k]=typ[k]=form[STATE].y[k];rr[k]=tr[k]=form[STATE].r[k];}
@@ -508,11 +513,40 @@ function buildStateForm(code){
   return true;
 }
 
+
+// Idle drift: with no input the canvas keeps moving between the loose field,
+// the nation, and a random state. A click hands control back to the visitor.
+var AUTO_WAIT=8000,AUTO_EVERY=4600,autoTimer=null,autoOn=false,statePool=[];
+function autoStep(){
+  if(!autoOn)return;
+  var sxp2=W*(.25+Math.random()*.5),syp2=H*(.25+Math.random()*.5);
+  var options=[];
+  if(view!==FIELD)options.push("field");
+  if(view!==NATION)options.push("nation");
+  options.push("state","state");
+  var pick=options[(Math.random()*options.length)|0];
+  if(pick==="field"){activeState=null;setPhase(FIELD,sxp2,syp2);}
+  else if(pick==="nation"){activeState=null;setPhase(NATION,sxp2,syp2);}
+  else if(statePool.length){
+    var st=statePool[(Math.random()*statePool.length)|0];
+    if(buildStateForm(st)){activeState=st;setPhase(STATE,sxp2,syp2,true);}
+  }
+  autoTimer=setTimeout(autoStep,AUTO_EVERY);
+}
+function idleReset(){
+  autoOn=false;clearTimeout(autoTimer);
+  if(reduce)return;
+  autoTimer=setTimeout(function(){autoOn=true;autoStep();},AUTO_WAIT);
+}
+
 function syncChrome(){
   if(view===STATE&&activeState){
     var label=STATE_NAMES[activeState]||activeState,count=byState[activeState].length;
     phase.textContent=label;
     mapDetail.textContent=count+" "+(count===1?"county":"counties")+" · Click anywhere to return.";
+  }else if(view===FIELD){
+    phase.textContent="Signal field";
+    mapDetail.textContent="Click anywhere for the national map.";
   }else{
     phase.textContent="National view";
     mapDetail.textContent="Click any county. Its dots reform into that state.";
@@ -620,6 +654,7 @@ addEventListener("pointerleave",function(){active=false;});
 
 cv.addEventListener("click",function(e){
   var r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  idleReset();
   if(view===NATION){
     if(nearIdx<0)return;                        // empty space: ignore
     var code=codes[nearIdx];
@@ -751,8 +786,8 @@ nodes.forEach(function(node){node.addEventListener("click",function(){
   node.setAttribute("aria-pressed",activeNow?"true":"false");
 });});
 
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){build();syncChrome();requestAnimationFrame(frame);});
-else { build(); syncChrome(); requestAnimationFrame(frame); }
+function boot(){build();syncChrome();statePool=Object.keys(byState).filter(function(c){return byState[c].length>=12;});idleReset();requestAnimationFrame(frame);}
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(boot); else boot();
 })();
 </script>
 </body>

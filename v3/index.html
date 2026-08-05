@@ -565,37 +565,59 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
     }
   }
 
+  // Smoothing lives in the animation, not the scroll input: the wheel stays
+  // native (nothing is hijacked or damped) while the cover, scale and parallax
+  // ease toward their scroll-derived targets, so transitions glide and settle
+  // instead of snapping frame to frame.
+  const SMOOTH = 0.2, EPS = 0.0015;
+  const disp = layers.map(()=>({enter:0, cover:0, primed:false}));
+
+  function paint(L, i, enter, cover, r, vh){
+    if(stacked){
+      L.veil.style.opacity = (cover*0.72).toFixed(3);
+      L.panel.style.transform = cover ? `scale(${(1-cover*0.06).toFixed(4)})` : '';
+      L.panel.style.borderRadius = cover ? (cover*26).toFixed(1)+'px' : '';
+    } else {
+      L.veil.style.opacity = '0';
+      L.panel.style.transform = '';
+      L.panel.style.borderRadius = '';
+    }
+
+    // a pinned panel can intersect the viewport long before it is the one
+    // being read, so reveal on its rise rather than on bare intersection
+    if(enter >= 0.55) L.panel.classList.add('in-view');
+
+    for(const p of L.px){
+      const y = stacked
+        ? (1-enter)*p.sp*200 - cover*p.sp*160
+        : ((r.top + r.height/2 - vh/2)/vh) * p.sp * 100;
+      p.el.style.transform = `translate3d(0,${y.toFixed(2)}px,0)`;
+      if(p.fade) p.el.style.opacity = (1 - cover*0.8).toFixed(3);
+    }
+  }
+
   function update(){
     ticking = false;
     const vh = innerHeight;
+    let moving = false;
     layers.forEach((L,i)=>{
       const r = L.panel.getBoundingClientRect();
-      const enter = clamp(1 - Math.max(0, r.top)/vh);
+      const tEnter = clamp(1 - Math.max(0, r.top)/vh);
       const next = layers[i+1];
-      const cover = next ? clamp(1 - Math.max(0, next.panel.getBoundingClientRect().top)/vh) : 0;
+      const tCover = next ? clamp(1 - Math.max(0, next.panel.getBoundingClientRect().top)/vh) : 0;
 
-      if(stacked){
-        L.veil.style.opacity = (cover*0.72).toFixed(3);
-        L.panel.style.transform = cover ? `scale(${(1-cover*0.06).toFixed(4)})` : '';
-        L.panel.style.borderRadius = cover ? (cover*26).toFixed(1)+'px' : '';
-      } else {
-        L.veil.style.opacity = '0';
-        L.panel.style.transform = '';
-        L.panel.style.borderRadius = '';
-      }
+      const d = disp[i];
+      const ease = (REDUCED || !stacked || !d.primed) ? 1 : SMOOTH;
+      d.primed = true;
+      d.enter += (tEnter - d.enter)*ease;
+      d.cover += (tCover - d.cover)*ease;
+      if(Math.abs(tEnter-d.enter) > EPS || Math.abs(tCover-d.cover) > EPS) moving = true;
+      else { d.enter = tEnter; d.cover = tCover; }
 
-      // a pinned panel can intersect the viewport long before it is the one
-      // being read, so reveal on its rise rather than on bare intersection
-      if(enter >= 0.55) L.panel.classList.add('in-view');
-
-      for(const p of L.px){
-        const y = stacked
-          ? (1-enter)*p.sp*200 - cover*p.sp*160
-          : ((r.top + r.height/2 - vh/2)/vh) * p.sp * 100;
-        p.el.style.transform = `translate3d(0,${y.toFixed(2)}px,0)`;
-        if(p.fade) p.el.style.opacity = (1 - cover*0.8).toFixed(3);
-      }
+      paint(L, i, d.enter, d.cover, r, vh);
     });
+    // keep easing after the wheel stops so the motion settles rather than halts
+    if(moving && !ticking){ ticking = true; requestAnimationFrame(update); }
   }
   measure();
 

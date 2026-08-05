@@ -200,15 +200,21 @@ button{font:inherit}
 .route-word{position:relative;display:block;font-size:clamp(17px,1.4vw,22px);font-weight:700;letter-spacing:-.03em;text-transform:uppercase}
 .route-note{color:rgba(7,23,28,.57)}
 .vision{
-  min-height:125svh;
+  min-height:105svh;
   background:var(--ink);
   color:var(--paper);
   overflow:hidden;
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  column-gap:clamp(24px,3vw,56px);
+  align-content:start;
 }
+.vision > .section-kicker,.vision > .constellation{grid-column:1/-1}
 .vision .section-kicker{border-color:rgba(244,243,237,.38)}
 .vision-lead{
   position:relative;
   z-index:3;
+  grid-column:1/8;
   max-width:18ch;
   padding:clamp(56px,9vh,110px) 0 50px;
   font-size:clamp(42px,6.4vw,98px);
@@ -258,9 +264,8 @@ button{font:inherit}
 .node:hover,.node.active{background:var(--signal);color:var(--ink);scale:1.07}
 .node-a{left:16%;top:25%}.node-b{left:82%;top:25%}.node-c{left:50%;top:82%}
 .node-center{left:50%;top:41%;width:clamp(118px,15vw,200px);background:var(--paper);color:var(--ink);border-color:var(--paper);font-size:clamp(12px,1.2vw,17px)}
-.vision-copy{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;align-items:start;transform:translate3d(0,var(--vision-copy-shift,0px),0);will-change:transform}
-.vision-copy p{grid-column:7/12;font-size:clamp(18px,1.65vw,27px);line-height:1.28;letter-spacing:-.023em;color:rgba(244,243,237,.78)}
-.vision-copy .micro{grid-column:1/4;color:rgba(244,243,237,.52);line-height:1.55}
+.vision-copy{grid-column:8/13;align-self:end;padding-bottom:56px;text-align:right;transform:translate3d(0,var(--vision-copy-shift,0px),0);will-change:transform}
+.vision-copy p{font-size:clamp(18px,1.65vw,27px);line-height:1.28;letter-spacing:-.023em;color:rgba(244,243,237,.78)}
 .careers{
   min-height:100svh;
   display:flex;
@@ -331,10 +336,10 @@ button{font:inherit}
   .mission{grid-template-columns:repeat(6,1fr);min-height:auto}
   .mission .section-kicker,.mission-title{grid-column:1/-1}.mission-title{padding:84px 0 110px;font-size:clamp(54px,15vw,88px)}
   .mission-route{grid-column:1/-1;grid-row:3;padding-bottom:64px}.mission-copy{grid-column:1/-1;grid-row:4;padding-bottom:70px}
-  .vision{min-height:auto}.vision-lead{font-size:clamp(48px,13vw,74px)}
+  .vision{min-height:auto;display:block}.vision-lead{font-size:clamp(48px,13vw,74px)}
   .constellation{width:100%;aspect-ratio:4/5;margin-bottom:80px}.node-a{left:18%;top:16%}.node-b{left:82%;top:16%}.node-c{left:50%;top:84%}.node-center{top:46%;width:clamp(104px,15vw,200px)}
-  .vision-copy{grid-template-columns:1fr}.vision-copy p,.vision-copy .micro{grid-column:1}
-  .vision-copy p{margin-top:28px}.careers h2{padding-top:100px;font-size:clamp(68px,19vw,110px)}
+  .vision-copy{text-align:left;padding-bottom:0}
+  .vision-copy p{margin-top:24px}.careers h2{padding-top:100px;font-size:clamp(68px,19vw,110px)}
   .email-link{font-size:clamp(22px,7vw,38px)}.footer-row{align-items:flex-start;flex-direction:column}
   .site-header,.hero-title,#map-stage,.hero-foot,.mission .section-kicker,.mission-title,.mission-route,.mission-copy,.vision-lead,.constellation,.vision-copy,.careers h2,.email-link,.footer-row{transform:none;will-change:auto}
 }
@@ -397,6 +402,9 @@ a:focus-visible,.node:focus-visible{outline:3px solid var(--paper);outline-offse
   <section class="section vision" id="vision" aria-labelledby="vision-title">
     <div class="section-kicker micro"><span>02 / Vision</span><span>One connected local layer</span></div>
     <h2 class="vision-lead" id="vision-title">Unite <em>people</em>, information, and commerce.</h2>
+    <div class="vision-copy">
+      <p>We envision a future where AI does more than provide information. It helps people make better decisions, take meaningful action, and engage more easily with the communities and businesses around them.</p>
+    </div>
     <div class="constellation" id="constellation" aria-label="People, information, and commerce connected around local life">
       <svg viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
         <line x1="160" y1="125" x2="500" y2="225"/><line x1="820" y1="125" x2="500" y2="225"/><line x1="500" y1="410" x2="500" y2="225"/>
@@ -405,10 +413,6 @@ a:focus-visible,.node:focus-visible{outline:3px solid var(--paper);outline-offse
       <button class="node node-b" type="button" aria-pressed="false">Information</button>
       <button class="node node-c" type="button" aria-pressed="false">Commerce</button>
       <div class="node node-center">Local life</div>
-    </div>
-    <div class="vision-copy">
-      <span class="micro">The definitive AI platform for local life—built around the places people actually live.</span>
-      <p>We envision a future where AI does more than provide information. It helps people make better decisions, take meaningful action, and engage more easily with the communities and businesses around them.</p>
     </div>
   </section>
   </div>

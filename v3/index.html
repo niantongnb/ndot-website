@@ -1312,6 +1312,28 @@ document.querySelectorAll('.reveal').forEach(s=>io.observe(s));
   function run(){ document.querySelectorAll(SEL).forEach(bind); }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(run); else run();
 })();
+
+/* The kicker rule ran full width and crossed the ghost numeral. Stop it short
+   of wherever the numeral actually starts, measured rather than guessed, since
+   the numeral's width tracks the viewport. */
+(function(){
+  const GAP = 36;
+  function fitRules(){
+    document.querySelectorAll('.panel').forEach(panel=>{
+      const ghost = panel.querySelector('.ghost');
+      const kicker = panel.querySelector('.kicker');
+      if(!ghost || !kicker) return;
+      kicker.style.paddingRight = '0px';                 // measure unclipped
+      const k = kicker.getBoundingClientRect();
+      const g = ghost.getBoundingClientRect();
+      const need = Math.max(0, k.right - (g.left - GAP));
+      kicker.style.paddingRight = need.toFixed(0) + 'px';
+    });
+  }
+  addEventListener('resize', fitRules, {passive:true});
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitRules); else fitRules();
+  requestAnimationFrame(fitRules);
+})();
 </script>
 </body>
 </html>

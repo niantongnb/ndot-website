@@ -6,13 +6,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="NDot AI is building the AI platform for local life.">
 <meta name="theme-color" content="#ffffff">
-<title>NDot AI — V4 · still</title>
+<title>NDot AI — V4 · static hero</title>
 <style>
 /* ==========================================================================
    V4 — Rebecca's version.
-   v2's editorial system, held still. No animation, no transitions, no
-   keyframes, no JavaScript. One page. The message does the work; the
-   typography just gets out of its way.
+
+   v2's editorial system with v2's HERO ANIMATION removed, and only that.
+   The county map is a static baked SVG: no canvas, no click-to-explode, no
+   idle drift, no cursor tooltip, no node chips, no "click a county" pulse.
+   Everything else v2 animated is still here — the scroll reveals, the
+   progress bar, the hover states. One page. The message does the work.
+
+   Two of v2's motions are deliberately NOT carried over:
+   - Lenis scroll damping. It drew the only negative review note we have
+     ("a lot of scroll effort to cycle through"), and it is a CDN script,
+     which would cost v4 its run-straight-from-file:// self-containment.
+   - The vision constellation. That is a decorative graphic v4 does not
+     have, not an animation that was stripped off one it does.
    ========================================================================== */
 :root{
   --signal:#e3422c;
@@ -227,6 +237,58 @@ footer p{max-width:32ch;line-height:1.6}
 
 a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
 
+/* ==========================================================================
+   MOTION — v2's, minus the hero's
+   ========================================================================== */
+
+/* Scroll reveal. v2 stepped this per line of the mission headline, using
+   hardcoded <span><i> line wrappers. v4 sets its headlines with
+   text-wrap:balance and lets the browser choose the breaks, so there are no
+   line elements to stagger. The stagger runs across each section's blocks
+   instead — kicker, then statement, then body — which reads the same and
+   survives a reflow.
+
+   The hidden state is gated behind html.js, which the script sets. With no
+   JavaScript nothing is ever hidden, so the page degrades to the still
+   version rather than to a blank one. */
+.js .reveal > *{
+  opacity:0;
+  transform:translate3d(0,.32em,0);
+  transition:transform .85s cubic-bezier(.2,.7,.2,1),opacity .55s ease;
+}
+.js .reveal.in-view > *{opacity:1;transform:translate3d(0,0,0)}
+.js .reveal.in-view > :nth-child(2){transition-delay:.08s}
+.js .reveal.in-view > :nth-child(3){transition-delay:.16s}
+
+/* The lede is above the fold, so its observer fires immediately and it reads
+   as revealing on load. The atlas is exempt: 3,142 circles under an
+   opacity+transform transition is a needless compositing cost, and the map
+   reading as already-there is what makes the page feel settled, not staged. */
+.js .lede > .atlas{opacity:1;transform:none;transition:none}
+
+.scroll-progress{
+  position:fixed;z-index:30;left:0;top:0;width:100%;height:3px;
+  transform-origin:left;transform:scaleX(0);
+  background:var(--ink);
+  pointer-events:none;
+}
+
+/* hover: instant colour was the old rule. These are v2's timings. */
+.masthead-cta{transition:color .2s ease}
+.masthead-cta::after{display:inline-block;transition:transform .2s ease}
+.masthead-cta:hover::after{transform:translate(3px,-3px)}
+.email-link{transition:color .25s ease}
+.email-link .arrow{transition:transform .25s ease,color .25s ease}
+.email-link:hover .arrow{transform:translate(7px,-7px)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal > *{opacity:1;transform:none;transition:none}
+  .masthead-cta,.masthead-cta::after,.email-link,.email-link .arrow{transition:none}
+  .masthead-cta:hover::after,.email-link:hover .arrow{transform:none}
+  .scroll-progress{display:none}
+}
+
 /* ---------- narrow ---------- */
 @media (max-width:900px){
   .mission-copy,.route{grid-column:1/-1}
@@ -254,8 +316,15 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
   footer{flex-direction:column;align-items:flex-start;gap:16px}
 }
 </style>
+<!-- Sets the flag the reveal's hidden state is gated behind. This has to run
+     before first paint, or the copy renders visible and then snaps to hidden
+     as the stylesheet's .js rules start matching. In <head>, not at the end
+     of <body>, for exactly that reason. -->
+<script>document.documentElement.className+=" js";</script>
 </head>
 <body>
+
+<div class="scroll-progress" aria-hidden="true"></div>
 
 <header class="masthead">
   <a class="brand" href="#top" aria-label="NDot AI home">
@@ -272,7 +341,7 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
 <main id="top">
 
   <!-- ============ LEDE ============ -->
-  <section class="lede wrap">
+  <section class="lede wrap reveal observe">
     <!-- the headline leads in source order: at narrow widths the atlas drops out
          of absolute positioning and into the flow, and must land beneath it -->
     <h1 class="lede-title"><span>AI for</span><span class="outline">local life.</span></h1>
@@ -286,7 +355,7 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
   </section>
 
   <!-- ============ MISSION ============ -->
-  <section class="section mission wrap" id="mission" aria-labelledby="mission-title">
+  <section class="section mission wrap reveal observe" id="mission" aria-labelledby="mission-title">
     <div class="kicker micro"><span>01 / Mission</span><span>Navigate &middot; Decide &middot; Do</span></div>
     <h2 class="statement" id="mission-title">Make local life easier to navigate, decide, and get things done.</h2>
     <div class="mission-grid">
@@ -301,14 +370,14 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
   </section>
 
   <!-- ============ VISION ============ -->
-  <section class="section vision wrap" id="vision" aria-labelledby="vision-title">
+  <section class="section vision wrap reveal observe" id="vision" aria-labelledby="vision-title">
     <div class="kicker micro"><span>02 / Vision</span><span>One connected local layer</span></div>
     <h2 class="statement" id="vision-title">Become the definitive AI platform for local life&mdash;uniting <em>people</em>, <em>information</em>, and <em>commerce</em> to build more connected, informed, and vibrant communities.</h2>
     <p class="copy vision-copy">We envision a future where AI does more than provide information. It helps people make better decisions, take meaningful action, and engage more easily with the communities and businesses around them.</p>
   </section>
 
   <!-- ============ CAREERS ============ -->
-  <section class="section careers wrap" id="careers" aria-labelledby="careers-title">
+  <section class="section careers wrap reveal observe" id="careers" aria-labelledby="careers-title">
     <div class="kicker micro"><span>03 / Careers</span><span>The work starts here</span></div>
     <h2 id="careers-title">Apply to <span>build</span> with us.</h2>
     <a class="email-link" href="mailto:career@ndotai.com"><span>career@ndotai.com</span><span class="arrow" aria-hidden="true">&#8599;</span></a>
@@ -320,6 +389,66 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
   <p>NDot AI<br>Building the AI platform for local life.</p>
   <p>People &middot; Information &middot; Commerce<br>Connected locally.</p>
 </footer>
+
+<script>
+/* ---------------------------------------------------------------------------
+   The only script that drives anything on this page, and it drives no part of
+   the map. The atlas is 3,142 baked <circle> elements and nothing here reads
+   or touches them: v2's hero engine is gone, not merely idle.
+   --------------------------------------------------------------------------- */
+(function(){
+  "use strict";
+
+  /* ---------- scroll reveal ----------
+     The lede is observed like every other section rather than being revealed
+     off a requestAnimationFrame tick. rAF is suspended outright in a hidden or
+     throttled tab, and that left the headline pinned at opacity 0 with only
+     the map showing — the whole message gone, which is the one failure this
+     page cannot afford. IntersectionObserver still delivers in that state. */
+  var targets = document.querySelectorAll(".observe");
+  var show = function(el){ el.classList.add("in-view"); };
+
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (!entry.isIntersecting) return;
+        show(entry.target);
+        io.unobserve(entry.target);        // reveal is one-way; stop watching
+      });
+    }, {threshold:.22});
+    targets.forEach(function(el){ io.observe(el); });
+  } else {
+    /* No observer: show everything rather than leave the page blank. */
+    targets.forEach(show);
+  }
+
+  /* Backstop. Whatever else fails, nothing on screen stays invisible: after a
+     beat, reveal anything already in the viewport. setTimeout is clamped in a
+     background tab but, unlike rAF, it does still fire. */
+  setTimeout(function(){
+    targets.forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.top < innerHeight && r.bottom > 0) show(el);
+    });
+  }, 1200);
+
+  /* ---------- scroll progress ---------- */
+  var bar = document.querySelector(".scroll-progress");
+  if (bar) {
+    var queued = 0;
+    var draw = function(){
+      queued = 0;
+      var max = document.documentElement.scrollHeight - innerHeight;
+      var p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+      bar.style.transform = "scaleX(" + p.toFixed(4) + ")";
+    };
+    var onScroll = function(){ if (!queued) queued = requestAnimationFrame(draw); };
+    addEventListener("scroll", onScroll, {passive:true});
+    addEventListener("resize", onScroll, {passive:true});
+    draw();
+  }
+})();
+</script>
 
 </body>
 </html>

@@ -8,7 +8,7 @@ step: every page is one self-contained HTML file plus the county dataset.
 | URL | What |
 |---|---|
 | https://niantongnb.github.io/ndot-website/ | Current design. Same file as `/v3/`. |
-| https://niantongnb.github.io/ndot-website/v4/ | **New.** Still, no-animation, one page. The one Rebecca picked the direction for. |
+| https://niantongnb.github.io/ndot-website/v4/ | **New.** Static hero, one page. The one Rebecca picked the direction for. |
 | https://niantongnb.github.io/ndot-website/v3/ | Street-atlas treatment on paper. |
 | https://niantongnb.github.io/ndot-website/v2/ | Black and white editorial build, from a Codex handoff. v4's parent. |
 | https://niantongnb.github.io/ndot-website/v1/ | First take: dark, cinematic, typewriter headline. |
@@ -39,7 +39,7 @@ v3/index.html   a copy of index.html. See the sync trap.
 v2/index.html   editorial build, self-contained
 v1/index.html   copy of v1.html
 v1.html         dark build, source of truth for v1
-v4/index.html   the still build. Fully self-contained — no assets, no script.
+v4/index.html   static-hero build. Self-contained: no assets, no CDN, no fetch.
 assets/counties.json   3,142 records: [x, y, sqrt(land_area), "County, ST"]
                        Albers USA space, 975 x 610. v2 and v3 each keep their
                        own copy because the fetch path is relative.
@@ -48,7 +48,7 @@ serve.py        local dev server, no-store
 
 ---
 
-## v4 — the still build
+## v4 — the static-hero build
 
 Built to review feedback picking v2 as the direction, asking for a **simple site
 with no animation and one front page**, that looks intelligent and carries the
@@ -56,18 +56,42 @@ audience on the message rather than on design flare.
 
 It keeps v2's editorial system — pure black on white, one signal red (`#e3422c`),
 Helvetica at heavy weights with tight negative tracking, Courier micro labels at
-`.16em`, hairline rules between sections — and holds all of it still.
+`.16em`, hairline rules between sections.
 
-**It is inert on purpose. Preserve that.** Before shipping any change to v4, these
-counts must all still read zero:
+**Scope of "no animation": it means v2's hero animation, and only that.** v4 was
+first built with every trace of motion stripped out, which over-read the brief.
+Nian's reading, which is the operative one: v4 is v2 with the hero animation
+removed totally, and v2's other motion is wanted. It was restored.
+
+So the invariant is no longer "nothing moves." It is:
+
+- **The hero is static and stays static.** The county map is baked SVG. No
+  canvas, no click-to-explode, no state drill-down, no idle drift, no cursor
+  tooltip, no node chips, no "click a county" pulse. Nothing in the page's
+  script reads or touches the map.
+- **The page stays self-contained.** No CDN, no fetch, no external assets, so
+  it still opens straight from `file://`.
 
 ```
-grep -c '<script' v4/index.html                 # 0
-# and inside the <style> block: @keyframes, transition:, animation:   # 0, 0, 0
+grep -c '<canvas' v4/index.html                          # 0
+grep -c -E 'fetch\(|XMLHttpRequest' v4/index.html        # 0
+grep -o -E '(src|href)="[^"]*"' v4/index.html \
+  | grep -v -E '^href="#|mailto:' | wc -l                # 0
 ```
 
-Hover states change colour instantly, with no transition. That was a deliberate
-reading of "no animation" rather than an oversight.
+What v4 does animate, all of it inherited from v2: the staggered scroll reveal,
+the scroll progress bar, and the hover states on the masthead CTA and the email
+link. A `prefers-reduced-motion` block turns the lot off.
+
+Two of v2's motions are deliberately **not** carried over, and both should stay out
+unless someone decides otherwise:
+
+- **Lenis scroll damping.** It is the one thing in this project that drew a
+  negative review note ("a lot of scroll effort to cycle through"), and it is a
+  CDN script, which would cost v4 its run-from-`file://` property.
+- **The vision constellation.** That is a decorative graphic v4 does not have,
+  not an animation stripped off one it does. Re-adding it is a design decision,
+  not a restoration.
 
 **The county map is a static inline SVG** — 3,142 `<circle>` elements in the same
 Albers `975 x 610` space the other versions use, generated once from
@@ -75,11 +99,11 @@ Albers `975 x 610` space the other versions use, generated once from
 sub-linear, so land area still reads as information without shouting. Sixteen
 distinct radii result.
 
-Inlining rather than fetching is what buys zero JavaScript, and it also means v4
-has no network or filesystem dependency — it works from `file://`, unlike v2 and
-v3. The cost is that the dots are baked in. To regenerate, rebuild the contents
-of `<svg viewBox="0 0 975 610">` from `counties.json`; nothing else in the page
-touches that data.
+Inlining rather than fetching is what keeps the map out of the script entirely,
+and it also means v4 has no network or filesystem dependency — it works from
+`file://`, unlike v2 and v3. The cost is that the dots are baked in. To
+regenerate, rebuild the contents of `<svg viewBox="0 0 975 610">` from
+`counties.json`; nothing else in the page touches that data.
 
 ### Deliberate decisions in v4
 
@@ -106,11 +130,12 @@ touches that data.
 Verified at 1440 / 900 / 760 / 390: horizontal overflow is 0 at every width, and
 the route and copy never collide.
 
-**Open question for the reviewer.** Keeping the map at all was a judgment call.
-"No animation, not design flare" could reasonably be read as "no map either"; it
-was kept on the argument that the map is information rather than decoration, and
-is the thing that makes the page look like it knows something. If that call goes
-the other way, deleting the `.atlas` div is a clean one-block removal.
+**The map stays.** This was briefly an open question, on the reading that "no
+animation, not design flare" might extend to "no map either." It does not: the
+brief is about the hero *animation*, not the hero. The map is information rather
+than decoration, and it is the thing that makes the page look like it knows
+something. If that is ever revisited, deleting the `.atlas` div is a clean
+one-block removal.
 
 ---
 
@@ -192,7 +217,8 @@ v4 does not use this engine at all. Its map is baked SVG. See above.
   body copy is word for word from the mission and vision document.
 - "Platform" is capitalised in v3's headline on purpose.
 - v1 has no marquee and no travelling routes. That was a removal, not an oversight.
-- v4 has no transitions at all, including on hover. See above.
+- v4's **hero** is static and its other motion is not. Do not "restore" the county
+  engine to v4, and do not strip its reveals back out. See above.
 
 ## Traps worth knowing
 
@@ -224,7 +250,15 @@ These all cost a debugging cycle at least once.
   and 820px pinned, which can flip-flop.
 - **Scroll is smoothed, so scripted scrolling lags.** `scrollTo` then sampling a
   frame later reads the old layout. Poll until the rects settle. See the nav fix
-  section.
+  section. (v1 and v3 only. v4 has no smoothing, so its scroll is immediate.)
+- **Never gate visible copy behind `requestAnimationFrame`.** v4's lede reveal
+  was first triggered from a double rAF. rAF is *suspended*, not merely
+  throttled, in a hidden or backgrounded tab, so the headline sat at opacity 0
+  and the page rendered as a map with no message. It is driven by
+  IntersectionObserver now, which still delivers in that state, with a
+  `setTimeout` backstop that reveals anything on screen after 1.2s. The reveal's
+  hidden state is also gated behind `html.js`, set by an inline script in
+  `<head>`, so a page with no JavaScript shows everything rather than nothing.
 - **The Claude browser pane reports `visibilityState: "hidden"`** while being
   inspected, which throttles rAF and makes scroll-driven state look frozen. The
   nav tone is scroll-driven, so verify it in a real browser or headless Chromium,
@@ -253,10 +287,14 @@ eye on a scaled image.
 - **Rebecca:** picks **v2** as the direction, and wants "a simple website without
   animation and only one front page to look intelligent and intrigue our audience
   with our message, not design flare." That brief produced v4.
+- **Nian, on what that brief means:** the animation to remove is v2's *hero*
+  animation, removed totally, and that is what makes it v4. v2's other motion is
+  wanted. The first cut of v4 stripped everything and over-read it; the reveals,
+  progress bar and hover states are back.
 
 ## Open items
 
-1. **Get Rebecca's read on v4**, especially the map question above.
+1. **Get Rebecca's read on v4** now that its motion matches the brief as read.
 2. **Collapse `/` and `/v3/` to one file plus a redirect**, to kill the sync trap.
    Now is the moment: v4 has no mirror, so the duplication is inconsistent as well
    as error-prone.

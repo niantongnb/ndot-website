@@ -250,21 +250,37 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
 
    The hidden state is gated behind html.js, which the script sets. With no
    JavaScript nothing is ever hidden, so the page degrades to the still
-   version rather than to a blank one. */
+   version rather than to a blank one.
+
+   The reveal offset and the parallax share one transform, composed through
+   --px, because two rules writing transform on one element is how the
+   parallax silently cancels the other thing (see HANDOFF.md). --px defaults
+   to 0px, so elements that never parallax are unaffected. */
 .js .reveal > *{
   opacity:0;
-  transform:translate3d(0,.32em,0);
+  transform:translate3d(0,calc(var(--px,0px) + .32em),0);
   transition:transform .85s cubic-bezier(.2,.7,.2,1),opacity .55s ease;
 }
-.js .reveal.in-view > *{opacity:1;transform:translate3d(0,0,0)}
+.js .reveal.in-view > *{opacity:1;transform:translate3d(0,var(--px,0px),0)}
 .js .reveal.in-view > :nth-child(2){transition-delay:.08s}
 .js .reveal.in-view > :nth-child(3){transition-delay:.16s}
+/* Once the reveal has played, drop the transition. From here the same
+   transform carries the parallax, which has to track the scroll exactly;
+   left easing through an .85s curve it lags the wheel and rubber-bands. */
+.js .reveal.settled > *{transition:none;transition-delay:0s}
 
 /* The lede is above the fold, so its observer fires immediately and it reads
-   as revealing on load. The atlas is exempt: 3,142 circles under an
-   opacity+transform transition is a needless compositing cost, and the map
-   reading as already-there is what makes the page feel settled, not staged. */
-.js .lede > .atlas{opacity:1;transform:none;transition:none}
+   as revealing on load. The atlas is exempt from the reveal offset: 3,142
+   circles under an opacity+transform transition is a needless compositing
+   cost, and the map reading as already-there is what makes the page feel
+   settled, not staged. It still parallaxes. */
+.js .lede > .atlas{opacity:1;transition:none;transform:translate3d(0,var(--px,0px),0)}
+
+/* Parallax on the elements that sit outside a .reveal child, so they need
+   their own transform rather than the composed one above. */
+.js .masthead,.js footer,.js .route,.js .mission-copy{
+  transform:translate3d(0,var(--px,0px),0);
+}
 
 .scroll-progress{
   position:fixed;z-index:30;left:0;top:0;width:100%;height:3px;
@@ -284,6 +300,9 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .js .reveal > *{opacity:1;transform:none;transition:none}
+  /* the parallaxed elements outside a .reveal child, plus the atlas */
+  .js .masthead,.js footer,.js .route,.js .mission-copy,
+  .js .lede > .atlas{transform:none}
   .masthead-cta,.masthead-cta::after,.email-link,.email-link .arrow{transition:none}
   .masthead-cta:hover::after,.email-link:hover .arrow{transform:none}
   .scroll-progress{display:none}
@@ -432,21 +451,95 @@ a:focus-visible{outline:3px solid var(--signal);outline-offset:4px}
     });
   }, 1200);
 
-  /* ---------- scroll progress ---------- */
+  /* Once a section's reveal has played out, let it stop transitioning so the
+     parallax below can move it frame-accurately. .85s + the .16s stagger on
+     the last child, plus a little slack. */
+  var settle = function(el){ setTimeout(function(){ el.classList.add("settled"); }, 1150); };
+  targets.forEach(function(el){
+    if (el.classList.contains("in-view")) return settle(el);
+    var watch = new MutationObserver(function(){
+      if (el.classList.contains("in-view")) { watch.disconnect(); settle(el); }
+    });
+    watch.observe(el, {attributes:true, attributeFilter:["class"]});
+  });
+
+  /* ---------- parallax ----------
+     v2's, element for element and range for range. Sections travel at
+     different rates against the scroll, which is what gives the page depth
+     without anything animating on its own — it is all scroll position.
+
+     Desktop only and off under reduced motion, both matching v2: below 760px
+     the columns stack and the offsets only fight the layout. */
+  var reduceMQ = matchMedia("(prefers-reduced-motion: reduce)");
+  var lede    = document.querySelector(".lede");
+  var mission = document.querySelector("#mission");
+  var vision  = document.querySelector("#vision");
+  var careers = document.querySelector("#careers");
+  var pick = function(root, sel){ return root ? root.querySelector(sel) : null; };
+
+  /* [element, range, driver]. "hero" rides raw scroll depth the way v2's hero
+     does; everything else rides distance from the viewport centre. */
+  var pxTargets = [
+    [document.querySelector(".masthead"), .18,  "hero"],
+    [pick(lede, ".lede-title"),           .30,  "hero"],
+    [pick(lede, ".atlas"),                .105, "hero"],
+    [pick(lede, ".lede-foot"),            .045, "hero"],
+    [pick(mission, ".kicker"),        12, mission],
+    [pick(mission, ".statement"),     52, mission],
+    [pick(mission, ".route"),         22, mission],
+    [pick(mission, ".mission-copy"),  68, mission],
+    [pick(vision,  ".kicker"),        12, vision],
+    [pick(vision,  ".statement"),     58, vision],
+    [pick(vision,  ".vision-copy"),   72, vision],
+    [pick(careers, ".kicker"),        12, careers],
+    [pick(careers, "h2"),             62, careers],
+    [pick(careers, ".email-link"),    27, careers],
+    [document.querySelector("footer"),11, careers]
+  ].filter(function(t){ return t[0] && t[2]; });
+  pxTargets.forEach(function(t){ t[0].style.willChange = "transform"; });
+
+  var clamp = function(v, a, b){ return v < a ? a : v > b ? b : v; };
+  var sectionShift = function(section, range){
+    var r = section.getBoundingClientRect();
+    return clamp((r.top + r.height * .5 - innerHeight * .5) / innerHeight, -1.2, 1.2) * range;
+  };
+
+  /* ---------- one scroll pass: progress bar + parallax ---------- */
   var bar = document.querySelector(".scroll-progress");
-  if (bar) {
-    var queued = 0;
-    var draw = function(){
-      queued = 0;
+  var queued = 0, parked = false;
+
+  var draw = function(){
+    queued = 0;
+
+    if (bar) {
       var max = document.documentElement.scrollHeight - innerHeight;
       var p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
       bar.style.transform = "scaleX(" + p.toFixed(4) + ")";
-    };
-    var onScroll = function(){ if (!queued) queued = requestAnimationFrame(draw); };
-    addEventListener("scroll", onScroll, {passive:true});
-    addEventListener("resize", onScroll, {passive:true});
-    draw();
-  }
+    }
+
+    if (reduceMQ.matches || innerWidth <= 760) {
+      /* Zero the offsets on the way out, or the last desktop values stay
+         baked in after a resize down and the layout sits visibly askew. */
+      if (!parked) {
+        pxTargets.forEach(function(t){ t[0].style.setProperty("--px", "0px"); });
+        parked = true;
+      }
+      return;
+    }
+    parked = false;
+
+    var heroTravel = lede ? clamp(scrollY, 0, lede.offsetHeight) : 0;
+    pxTargets.forEach(function(t){
+      var v = t[2] === "hero" ? heroTravel * t[1] : sectionShift(t[2], t[1]);
+      t[0].style.setProperty("--px", v.toFixed(2) + "px");
+    });
+  };
+
+  var onScroll = function(){ if (!queued) queued = requestAnimationFrame(draw); };
+  addEventListener("scroll", onScroll, {passive:true});
+  addEventListener("resize", onScroll, {passive:true});
+  if (reduceMQ.addEventListener) reduceMQ.addEventListener("change", onScroll);
+  draw();
 })();
 </script>
 

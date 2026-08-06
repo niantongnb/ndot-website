@@ -79,9 +79,32 @@ grep -o -E '(src|href)="[^"]*"' v4/index.html \
   | grep -v -E '^href="#|mailto:' | wc -l                # 0
 ```
 
-What v4 does animate, all of it inherited from v2: the staggered scroll reveal,
-the scroll progress bar, and the hover states on the masthead CTA and the email
-link. A `prefers-reduced-motion` block turns the lot off.
+What v4 does animate, all of it inherited from v2: the **parallax**, the
+staggered scroll reveal, the scroll progress bar, and the hover states on the
+masthead CTA and the email link. A `prefers-reduced-motion` block turns the lot
+off.
+
+The parallax is v2's, element for element and range for range: 15 targets, the
+masthead/headline/atlas/foot riding raw scroll depth (`.18 / .30 / .105 / .045`
+of it) and the rest riding distance from the viewport centre (mission 12/52/22/68,
+vision 12/58/72, careers 12/62/27, footer 11). Like v2 it is **desktop only and
+off under reduced motion** — below 760px the columns stack and the offsets only
+fight the layout. When it switches off it explicitly writes every offset back to
+`0px`; without that the last desktop values stay baked in after a resize down and
+the page sits visibly askew.
+
+Two things about it are easy to break:
+
+- **The reveal offset and the parallax share one transform**, composed through a
+  `--px` custom property: `translate3d(0, calc(var(--px,0px) + .32em), 0)`. Two
+  separate rules writing `transform` on one element is precisely how the parallax
+  silently cancels the other thing (see the trap below). `--px` defaults to `0px`,
+  so elements that never parallax are unaffected.
+- **A revealed section gets `.settled` 1.15s later, which sets `transition:none`.**
+  It has to: the reveal's `.85s` curve is on `transform`, and while it is still
+  attached every parallax update eases through it, so the parallax lags the wheel
+  and rubber-bands. Measured after settling, a 200px scroll moves the mission
+  statement within 60ms rather than over 850ms.
 
 Two of v2's motions are deliberately **not** carried over, and both should stay out
 unless someone decides otherwise:
@@ -233,7 +256,10 @@ These all cost a debugging cycle at least once.
   CSS written as `.mission ...` does nothing at all in v1/v2/v3. Note the nav
   tone script keys off `.light` / `.cta` / `footer`, which *are* real classes.
 - **Parallax writes `transform`.** Never centre a `data-px` element with
-  `transform: translateY(-50%)`; the parallax cancels it. Use flex.
+  `transform: translateY(-50%)`; the parallax cancels it. Use flex. In v4 the
+  same hazard shows up as the reveal offset and the parallax both wanting the
+  property; they are composed into one `translate3d` through `--px` rather than
+  written by two rules.
 - **`ch` is only 0.432em in Instrument Serif.** ch-based measures misbreak
   headlines. Set display measures in `em`. (v4 uses Helvetica, where `ch` behaves
   normally, so v2/v4 ch measures are fine.)

@@ -28,8 +28,9 @@ and strips `Last-Modified`. Without that, browsers hold a stale copy and edits
 look like they did nothing. This wasted real time twice. When a change seems not
 to apply, verify with `curl` before debugging the code.
 
-v4 is the exception: it inlines its data instead of fetching, so it opens
-correctly straight from `file://` with no server at all.
+All four need the server. v4 inlines its map rather than fetching it, but it is
+v2 underneath and so still pulls Lenis from a CDN, which `file://` will not do.
+The scrapped v4 ran from `file://`; this one does not.
 
 ## Files
 
@@ -39,7 +40,7 @@ v3/index.html   a copy of index.html. See the sync trap.
 v2/index.html   editorial build, self-contained
 v1/index.html   copy of v1.html
 v1.html         dark build, source of truth for v1
-v4/index.html   static-hero build. Self-contained: no assets, no CDN, no fetch.
+v4/index.html   v2 with a still hero. Map inlined; Lenis still from CDN.
 assets/counties.json   3,142 records: [x, y, sqrt(land_area), "County, ST"]
                        Albers USA space, 975 x 610. v2 and v3 each keep their
                        own copy because the fetch path is relative.
@@ -48,119 +49,68 @@ serve.py        local dev server, no-store
 
 ---
 
-## v4 — the static-hero build
+## v4 — v2 with the hero held still
 
-Built to review feedback picking v2 as the direction, asking for a **simple site
-with no animation and one front page**, that looks intelligent and carries the
-audience on the message rather than on design flare.
+**v4 is `v2/index.html` with exactly one change:** the hero's county-dot map is a
+static inline SVG instead of the animated canvas. Nothing else differs.
 
-It keeps v2's editorial system — pure black on white, one signal red (`#e3422c`),
-Helvetica at heavy weights with tight negative tracking, Courier micro labels at
-`.16em`, hairline rules between sections.
+That is the whole brief. Rebecca picked v2 and asked for it without the animation;
+the animation she means is the hero's, removed totally, and everything else v2
+does is wanted. Two earlier attempts got this wrong in opposite directions: the
+first stripped every trace of motion from the page, and the second rebuilt the
+layout from scratch and then tried to re-add v2's motion piece by piece. Both
+were more work than the real job and neither matched v2. Keep the diff small and
+it stays easy to re-derive.
 
-**Scope of "no animation": it means v2's hero animation, and only that.** v4 was
-first built with every trace of motion stripped out, which over-read the brief.
-Nian's reading, which is the operative one: v4 is v2 with the hero animation
-removed totally, and v2's other motion is wanted. It was restored.
+### Re-deriving it from a newer v2
 
-So the invariant is no longer "nothing moves." It is:
+- `#map-stage`: swap `<canvas id="cv">` and `<div id="tip">` for the baked
+  `<svg viewBox="0 0 975 610">` of 3,142 `<circle>`s.
+- Delete the county engine from the script: the `DATA` array, the `cv`/`ctx`/
+  `tip`/`phase`/`mapDetail` handles, `STATE_NAMES`, `ease`, `rand`, and the whole
+  block from `build()` through `addEventListener("resize",build)`. **Keep `clamp`,
+  `lerp` and `reduce`** — the scroll code below still uses them.
+- `boot()` becomes `sizeStackScenes(); requestScrollEffects();`.
+- CSS: drop the `#tip` rules, drop `cursor:crosshair` from `#map-stage` (it is no
+  longer clickable, so the affordance would be a lie), and drop the
+  `animation:pulse` on `.hero-instruction::before` plus `@keyframes pulse`.
+- The hero foot's "Click a state. Its dots reform into local blocks." becomes the
+  static counties caption. Nothing on the page should still invite a click.
 
-- **The hero is static and stays static.** The county map is baked SVG. No
-  canvas, no click-to-explode, no state drill-down, no idle drift, no cursor
-  tooltip, no node chips, no "click a county" pulse. Nothing in the page's
-  script reads or touches the map.
-- **The page stays self-contained.** No CDN, no fetch, no external assets, so
-  it still opens straight from `file://`.
+### What stays, because it is v2
+
+The parallax, the staggered mission-title reveal, the scroll progress bar, the
+stacked scenes, Lenis, the vision constellation with its travelling dashes and
+its four nodes, every hover state, and all the copy. **Do not strip any of it.**
+`grep -c` against v2 is the check: constellation 18, lenis 13, scroll-progress 3,
+sectionShift 11, stack-scene 10, node 28. v4 should match v2 on all of them.
+
+The hero is the only thing that should differ:
 
 ```
-grep -c '<canvas' v4/index.html                          # 0
-grep -c -E 'fetch\(|XMLHttpRequest' v4/index.html        # 0
-grep -o -E '(src|href)="[^"]*"' v4/index.html \
-  | grep -v -E '^href="#|mailto:' | wc -l                # 0
+grep -c '<canvas' v4/index.html                 # 0
+grep -o '<circle cx=' v4/index.html | wc -l     # 3142
+grep -c -iE 'click a state|cursor:crosshair'    # 0 (comments aside)
 ```
 
-What v4 does animate, all of it inherited from v2: the **parallax**, the
-staggered scroll reveal, the scroll progress bar, and the hover states on the
-masthead CTA and the email link. A `prefers-reduced-motion` block turns the lot
-off.
+**The map itself** is 3,142 `<circle>` elements in the Albers `975 x 610` space
+the other versions use, generated once from `assets/counties.json`. Radius is
+`1.05 + (sqrt_land_area / 47) ** 0.62 * 1.55`: sub-linear, so land area still
+reads as information without shouting. Sixteen distinct radii result. To
+regenerate, rebuild the contents of `<svg viewBox="0 0 975 610">`; nothing else
+in the page touches that data.
 
-The parallax is v2's, element for element and range for range: 15 targets, the
-masthead/headline/atlas/foot riding raw scroll depth (`.18 / .30 / .105 / .045`
-of it) and the rest riding distance from the viewport centre (mission 12/52/22/68,
-vision 12/58/72, careers 12/62/27, footer 11). Like v2 it is **desktop only and
-off under reduced motion** — below 760px the columns stack and the offsets only
-fight the layout. When it switches off it explicitly writes every offset back to
-`0px`; without that the last desktop values stay baked in after a resize down and
-the page sits visibly askew.
+### Two consequences worth knowing
 
-Two things about it are easy to break:
-
-- **The reveal offset and the parallax share one transform**, composed through a
-  `--px` custom property: `translate3d(0, calc(var(--px,0px) + .32em), 0)`. Two
-  separate rules writing `transform` on one element is precisely how the parallax
-  silently cancels the other thing (see the trap below). `--px` defaults to `0px`,
-  so elements that never parallax are unaffected.
-- **A revealed section gets `.settled` 1.15s later, which sets `transition:none`.**
-  It has to: the reveal's `.85s` curve is on `transform`, and while it is still
-  attached every parallax update eases through it, so the parallax lags the wheel
-  and rubber-bands. Measured after settling, a 200px scroll moves the mission
-  statement within 60ms rather than over 850ms.
-
-Two of v2's motions are deliberately **not** carried over, and both should stay out
-unless someone decides otherwise:
-
-- **Lenis scroll damping.** It is the one thing in this project that drew a
-  negative review note ("a lot of scroll effort to cycle through"), and it is a
-  CDN script, which would cost v4 its run-from-`file://` property.
-- **The vision constellation.** That is a decorative graphic v4 does not have,
-  not an animation stripped off one it does. Re-adding it is a design decision,
-  not a restoration.
-
-**The county map is a static inline SVG** — 3,142 `<circle>` elements in the same
-Albers `975 x 610` space the other versions use, generated once from
-`assets/counties.json`. Radius is `1.05 + (sqrt_land_area / 47) ** 0.62 * 1.55`:
-sub-linear, so land area still reads as information without shouting. Sixteen
-distinct radii result.
-
-Inlining rather than fetching is what keeps the map out of the script entirely,
-and it also means v4 has no network or filesystem dependency — it works from
-`file://`, unlike v2 and v3. The cost is that the dots are baked in. To
-regenerate, rebuild the contents of `<svg viewBox="0 0 975 610">` from
-`counties.json`; nothing else in the page touches that data.
-
-### Deliberate decisions in v4
-
-- Body copy is **verbatim** from the mission and vision document, em dash
-  included. v4 uses the **full** vision sentence, not v2's shortened "Unite
-  people, information, and commerce" lead — the message is the point.
-- Red is a punctuation mark, used twice on the whole page: the middle route stop
-  and the email arrow. It was briefly on all three of "people / information /
-  commerce" in the vision statement and read like a highlighter. That was pulled
-  back deliberately; do not reinstate it. (`var(--signal)` also appears on
-  selection, hover and focus rings; those are states, not resting marks.)
-- `.route-step:nth-of-type(2)` is the red stop. `nth-of-type` counts `div`s, so
-  the sibling `<span class="route-rail">` does not shift the count. `nth-child`
-  lands on the wrong step — that bug shipped once and was caught in a screenshot.
-- **The headline precedes the atlas in source order.** At `<=760px` the atlas
-  drops out of absolute positioning into the flow; when it came first in the
-  markup the map rendered *above* the headline and buried the message.
-- On mobile the atlas is centred on the **viewport**, not the text column:
-  `width:124vw; margin-left:calc(var(--pad) * -1 - 12vw)`.
-- `.mission-grid` carries a `row-gap` that does nothing on desktop, where the
-  route and copy share a row, and opens the gap once they stack. Without it they
-  sat exactly flush — measured at 0px between them — and read as overlapping.
-
-Verified at 1440 / 900 / 760 / 390: horizontal overflow is 0 at every width, and
-the route and copy never collide.
-
-**The map stays.** This was briefly an open question, on the reading that "no
-animation, not design flare" might extend to "no map either." It does not: the
-brief is about the hero *animation*, not the hero. The map is information rather
-than decoration, and it is the thing that makes the page look like it knows
-something. If that is ever revisited, deleting the `.atlas` div is a clean
-one-block removal.
-
----
+- **The copy is v2's, not the old v4's.** In particular the vision lead is v2's
+  shortened "Unite people, information, and commerce." The scrapped v4 used the
+  full vision sentence from the source document on the argument that the message
+  is the point. If that reading is preferred, it is a one-line change, but it is
+  a change *to v2's copy* and should be made in v2 as well.
+- **Mobile is v2's mobile.** The scrapped v4 was the only version actually
+  composed at 390px. v4 now inherits v2's posture there: horizontal overflow is 0
+  at every scroll position, but the layout was designed at desktop widths. See
+  open item 4.
 
 ## The nav fix (v1 and v3)
 
@@ -240,8 +190,9 @@ v4 does not use this engine at all. Its map is baked SVG. See above.
   body copy is word for word from the mission and vision document.
 - "Platform" is capitalised in v3's headline on purpose.
 - v1 has no marquee and no travelling routes. That was a removal, not an oversight.
-- v4's **hero** is static and its other motion is not. Do not "restore" the county
-  engine to v4, and do not strip its reveals back out. See above.
+- v4 is v2 with a still hero, and that is the entire difference. Do not restore
+  the county engine to it, and do not strip out any of v2's other motion. See
+  above.
 
 ## Traps worth knowing
 
@@ -256,10 +207,10 @@ These all cost a debugging cycle at least once.
   CSS written as `.mission ...` does nothing at all in v1/v2/v3. Note the nav
   tone script keys off `.light` / `.cta` / `footer`, which *are* real classes.
 - **Parallax writes `transform`.** Never centre a `data-px` element with
-  `transform: translateY(-50%)`; the parallax cancels it. Use flex. In v4 the
-  same hazard shows up as the reveal offset and the parallax both wanting the
-  property; they are composed into one `translate3d` through `--px` rather than
-  written by two rules.
+  `transform: translateY(-50%)`; the parallax cancels it. Use flex. If you ever
+  add a second transform-based effect to an element that already parallaxes,
+  compose both into one `translate3d` through a custom property rather than
+  letting two rules fight over the property.
 - **`ch` is only 0.432em in Instrument Serif.** ch-based measures misbreak
   headlines. Set display measures in `em`. (v4 uses Helvetica, where `ch` behaves
   normally, so v2/v4 ch measures are fine.)
@@ -274,17 +225,16 @@ These all cost a debugging cycle at least once.
   extent of the shell's children, not `scrollHeight` minus padding: `scrollHeight`
   counts padding inconsistently and made the same content measure 709px unpinned
   and 820px pinned, which can flip-flop.
-- **Scroll is smoothed, so scripted scrolling lags.** `scrollTo` then sampling a
-  frame later reads the old layout. Poll until the rects settle. See the nav fix
-  section. (v1 and v3 only. v4 has no smoothing, so its scroll is immediate.)
-- **Never gate visible copy behind `requestAnimationFrame`.** v4's lede reveal
-  was first triggered from a double rAF. rAF is *suspended*, not merely
-  throttled, in a hidden or backgrounded tab, so the headline sat at opacity 0
-  and the page rendered as a map with no message. It is driven by
-  IntersectionObserver now, which still delivers in that state, with a
-  `setTimeout` backstop that reveals anything on screen after 1.2s. The reveal's
-  hidden state is also gated behind `html.js`, set by an inline script in
-  `<head>`, so a page with no JavaScript shows everything rather than nothing.
+- **Scroll is smoothed everywhere, so scripted scrolling lags.** `scrollTo` then
+  sampling a frame later reads the old layout. Poll until the rects settle. See
+  the nav fix section. v1 and v3 use the `SMOOTH` constant; v2 and v4 use Lenis.
+- **Never gate visible copy behind `requestAnimationFrame`.** Learned on a
+  scrapped build of v4 whose headline reveal fired from a double rAF: rAF is
+  *suspended*, not merely throttled, in a hidden or backgrounded tab, so the
+  headline sat at opacity 0 and the page rendered as a map with no message.
+  Reveal copy from an IntersectionObserver, which still delivers in that state.
+  v2's `.observe` reveal already does this, which is one more reason v4 simply
+  inherits it.
 - **The Claude browser pane reports `visibilityState: "hidden"`** while being
   inspected, which throttles rAF and makes scroll-driven state look frozen. The
   nav tone is scroll-driven, so verify it in a real browser or headless Chromium,
@@ -314,9 +264,12 @@ eye on a scaled image.
   animation and only one front page to look intelligent and intrigue our audience
   with our message, not design flare." That brief produced v4.
 - **Nian, on what that brief means:** the animation to remove is v2's *hero*
-  animation, removed totally, and that is what makes it v4. v2's other motion is
-  wanted. The first cut of v4 stripped everything and over-read it; the reveals,
-  progress bar and hover states are back.
+  animation — the county-dot map animation — removed totally, and that is the
+  whole of it. "It's a simple change on v2." v4 is therefore a copy of v2 with a
+  still hero, not a new page built in v2's style. Two attempts missed this: one
+  stripped all motion from the page, the next rebuilt the layout and re-added
+  v2's motion piecemeal, which still did not match v2 and cost a round trip per
+  missing piece. The third just copied v2.
 
 ## Open items
 

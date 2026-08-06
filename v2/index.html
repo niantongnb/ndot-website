@@ -22,12 +22,7 @@
   --pad:clamp(20px,4vw,64px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
-.lenis.lenis-stopped{overflow:clip}
-.lenis.lenis-smooth iframe{pointer-events:none}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   background:var(--ice);
   color:var(--ink);
@@ -428,7 +423,6 @@ a:focus-visible,.node:focus-visible{outline:3px solid var(--paper);outline-offse
   </section>
   </div>
 </main>
-<script src="https://unpkg.com/lenis@1.3.23/dist/lenis.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -767,29 +761,10 @@ function updateStackScenes(){
 sizeStackScenes();
 addEventListener("resize",sizeStackScenes,{passive:true});
 
-// Lenis owns desktop wheel interpolation; native touch scrolling stays intact.
-// Keeping one motion source avoids the delay caused by combining Lenis with
-// CSS smooth scrolling.
-var lenisInstance=null,desktopScroll=matchMedia("(min-width:761px)");
-function configureLenis(){
-  var shouldRun=!reduce&&desktopScroll.matches&&typeof window.Lenis==="function";
-  if(shouldRun&&!lenisInstance){
-    lenisInstance=new window.Lenis({
-      autoRaf:true,
-      anchors:{lerp:.24},
-      lerp:.26,
-      smoothWheel:true,
-      wheelMultiplier:1.15,
-      overscroll:true
-    });
-    lenisInstance.on("scroll",requestScrollEffects);
-  }else if(!shouldRun&&lenisInstance){
-    lenisInstance.destroy();
-    lenisInstance=null;
-  }
-}
-configureLenis();
-addEventListener("resize",configureLenis,{passive:true});
+// Wheel smoothing was Lenis and is gone: the wheel is native now, and
+// requestScrollEffects is driven by the plain scroll listener above.
+// scroll-behavior:smooth moved to the base html rule to keep anchor
+// links gliding, since Lenis used to own that on desktop.
 var targets=document.querySelectorAll(".observe");
 if("IntersectionObserver" in window){
   var observer=new IntersectionObserver(function(entries){

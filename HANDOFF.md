@@ -28,9 +28,8 @@ and strips `Last-Modified`. Without that, browsers hold a stale copy and edits
 look like they did nothing. This wasted real time twice. When a change seems not
 to apply, verify with `curl` before debugging the code.
 
-All four need the server. v4 inlines its map rather than fetching it, but it is
-v2 underneath and so still pulls Lenis from a CDN, which `file://` will not do.
-The scrapped v4 ran from `file://`; this one does not.
+v4 is the exception: it inlines its map instead of fetching, and since Lenis was
+removed it has no external request at all, so it opens straight from `file://`.
 
 ## Files
 
@@ -40,7 +39,7 @@ v3/index.html   a copy of index.html. See the sync trap.
 v2/index.html   editorial build, self-contained
 v1/index.html   copy of v1.html
 v1.html         dark build, source of truth for v1
-v4/index.html   v2 with a still hero. Map inlined; Lenis still from CDN.
+v4/index.html   v2 with a still hero. Map inlined, no external requests.
 assets/counties.json   3,142 records: [x, y, sqrt(land_area), "County, ST"]
                        Albers USA space, 975 x 610. v2 and v3 each keep their
                        own copy because the fetch path is relative.
@@ -80,9 +79,9 @@ it stays easy to re-derive.
 ### What stays, because it is v2
 
 The parallax, the staggered mission-title reveal, the scroll progress bar, the
-stacked scenes, Lenis, the vision constellation with its travelling dashes and
-its four nodes, every hover state, and all the copy. **Do not strip any of it.**
-`grep -c` against v2 is the check: constellation 18, lenis 13, scroll-progress 3,
+stacked scenes, the vision constellation with its travelling dashes and its four
+nodes, every hover state, and all the copy. **Do not strip any of it.**
+`grep -c` against v2 is the check: constellation 18, scroll-progress 3,
 sectionShift 11, stack-scene 10, node 28. v4 should match v2 on all of them.
 
 The hero is the only thing that should differ:
@@ -170,11 +169,11 @@ interaction. Nothing is ever cloned.
 - Idle drift: after 8s without a click the canvas wanders between formations at
   random. Any click hands control back and restarts the countdown.
 
-v2's version came from a Codex handoff package. Its layout, typography, sections,
-Lenis scrolling and stacked section covers are Codex's and were left alone. Only
-the county engine was replaced, which also closed that brief's own open item: the
-old `buildTown()` cloned each county up to seven times into a synthetic
-rectangular grid.
+v2's version came from a Codex handoff package. Its layout, typography, sections
+and stacked section covers are Codex's and were left alone. Only the county
+engine was replaced, which also closed that brief's own open item: the old
+`buildTown()` cloned each county up to seven times into a synthetic rectangular
+grid. Its Lenis scroll smoothing was Codex's too and has since been removed.
 
 v4 does not use this engine at all. Its map is baked SVG. See above.
 
@@ -198,11 +197,20 @@ v4 does not use this engine at all. Its map is baked SVG. See above.
 
 These all cost a debugging cycle at least once.
 
+- **Do not swap nested markup with a non-greedy regex.** Rebuilding v4, I replaced
+  `<div id="map-stage">.*?</div>` — which stops at the *inner* `</div>` of
+  `<div id="tip">`, leaving the outer one orphaned. That stray `</div>` then
+  closed `.stack-hero` early, so `.hero-foot` fell out of the hero entirely and
+  rendered 3,255px down the page, off-screen. It looked like missing text, not
+  broken markup. Match the closing tag explicitly or edit by line, and see the
+  next entry for the check that catches it.
 - **Markup edits can silently drop panels.** A stray `</div>` matches the nearest
   open element of that type. With `.shell` already closed it matched `.stack`,
   closing the stack early, so two sections fell out and rendered on top of each
   other. After any markup edit, re-count
-  `document.querySelectorAll('.stack > .panel')`. It is 4 in v1 and v3.
+  `document.querySelectorAll('.stack > .panel')`. It is 4 in v1 and v3. In v2 and
+  v4 the equivalent check is four `.stack-scene`s with one child each, and
+  `document.querySelector('.hero-foot').parentElement.className === 'hero'`.
 - **The sections use `id="mission"` and `id="vision"`, with no matching class.**
   CSS written as `.mission ...` does nothing at all in v1/v2/v3. Note the nav
   tone script keys off `.light` / `.cta` / `footer`, which *are* real classes.
@@ -225,9 +233,10 @@ These all cost a debugging cycle at least once.
   extent of the shell's children, not `scrollHeight` minus padding: `scrollHeight`
   counts padding inconsistently and made the same content measure 709px unpinned
   and 820px pinned, which can flip-flop.
-- **Scroll is smoothed everywhere, so scripted scrolling lags.** `scrollTo` then
-  sampling a frame later reads the old layout. Poll until the rects settle. See
-  the nav fix section. v1 and v3 use the `SMOOTH` constant; v2 and v4 use Lenis.
+- **v1 and v3 smooth their scroll, so scripted scrolling lags there.** `scrollTo`
+  then sampling a frame later reads the old layout. Poll until the rects settle.
+  See the nav fix section. They use the `SMOOTH` constant. v2 and v4 used to use
+  Lenis and no longer smooth at all, so their scroll is immediate.
 - **Never gate visible copy behind `requestAnimationFrame`.** Learned on a
   scrapped build of v4 whose headline reveal fired from a double rAF: rAF is
   *suspended*, not merely throttled, in a hidden or backgrounded tab, so the
@@ -259,6 +268,11 @@ eye on a scaled image.
   hard (lerp .095, .92 per wheel tick); now .26 and 1.15.
 - Smoothing was then added to v1 and v3 in the animation only. The wheel stays
   native. Strength is the `SMOOTH` constant, currently 0.2.
+- **Lenis was then removed from v2 and v4 outright**, at Nian's call. The wheel is
+  native on both now. `scroll-behavior:smooth` moved from the `max-width:760px`
+  block to the base `html` rule, because Lenis had been the thing making anchor
+  links glide on desktop and without it they teleport. Side effect: with the CDN
+  script gone, v2 and v4 have no external requests and both run from `file://`.
 - "This is nice" on the overall direction.
 - **Rebecca:** picks **v2** as the direction, and wants "a simple website without
   animation and only one front page to look intelligent and intrigue our audience

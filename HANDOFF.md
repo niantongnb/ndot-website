@@ -185,8 +185,22 @@ v4 does not use this engine at all. Its map is baked SVG. See above.
   that rule.
 - "Signal field" is the chaotic scatter in v2/v3. An even dot lattice was tried
   and explicitly rejected. Do not reintroduce a regular grid.
-- The em dash in the vision line is verbatim from the source copy. Keep it. All
-  body copy is word for word from the mission and vision document.
+- The em dash in the vision line is verbatim from the source copy. Keep it.
+- **The mission headline is no longer the source document's.** It is now "Make it
+  easier to navigate, decide and act in everyday life.", Nian's wording, replacing
+  "Make local life easier to navigate, decide, and get things done." Everything
+  else, including all body copy, is still word for word from the mission and
+  vision document. The three verbs are echoed in three other places, so they move
+  together: v2/v4's kicker (now "Navigate → Decide → Act"), v3's verb marquee
+  (now "navigate / decide / act"), and v2/v4's route steps, which already read
+  Information / Decision / Action.
+- **v2 and v4 hard-split that headline across `<span><i>` line wrappers**, one per
+  line, because the stagger animates per wrapper. New copy has to be re-split by
+  hand, and each line must fit the container or it wraps *inside* a wrapper and
+  the cascade reads wrong. Measure it: compare each line's natural width against
+  `.mission-title`'s box. The first attempt at this copy put "to navigate, decide
+  and act" on one line, 1123px against an 856px container, and it silently became
+  two. It is four wrappers now, so the stagger runs to `:nth-child(4)`.
 - "Platform" is capitalised in v3's headline on purpose.
 - v1 has no marquee and no travelling routes. That was a removal, not an oversight.
 - v4 is v2 with a still hero, and that is the entire difference. Do not restore

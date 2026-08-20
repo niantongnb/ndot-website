@@ -10,9 +10,9 @@
    routines as the deck, so anything produced here composites with the plates. */
 (function(){
   var PAL = {
-    ink:'#111110', d1:'#2A2A26', d2:'#43433C', d3:'#6B6B63',
-    m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
-    paper:'#FAFAF8', accent:'#A6231A', accentInk:'#E86A52'
+    navy:'#274464', blue:'#3D638C', blueLt:'#68809A', blueDk:'#1C3049',
+    d3:'#6B6B63', m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
+    ink:'#111110', paper:'#FAFAF8', accent:'#D6493D', accentInk:'#FF5A5A'
   };
   var TILES = {};
   function mkRng(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
@@ -69,10 +69,10 @@
     ctx.restore();
   }
   var RECIPES = {
-    'box-light':  { top:PAL.d1, left:PAL.d2, right:PAL.m2, dot:PAL.accent },
-    'box-mid':    { top:PAL.d3, left:PAL.m2, right:PAL.l2, dot:PAL.accent },
-    'box-pale':   { top:PAL.m1, left:PAL.d2, right:PAL.m2, dot:PAL.accentInk },
-    'box-dark':   { top:PAL.m1, left:PAL.d1, right:PAL.d3, dot:PAL.accentInk }
+    'box-navy':   { top:PAL.navy, left:PAL.blue,  right:PAL.m2,     dot:PAL.accent },
+    'box-mid':    { top:PAL.blue, left:PAL.m2,    right:PAL.l2,     dot:PAL.accent },
+    'box-onband': { top:PAL.m1,   left:PAL.navy,  right:PAL.blueLt, dot:PAL.accentInk },
+    'box-pale':   { top:PAL.m2,   left:PAL.navy,  right:PAL.blue,   dot:PAL.accentInk }
   };
   window.forge = function(name){
     var cv = document.getElementById('c'), ctx = cv.getContext('2d');
@@ -81,6 +81,6 @@
     return true;
   };
   var m = /name=([a-z-]+)/.exec(location.hash);
-  window.forge(m ? m[1] : 'box-light');
+  window.forge(m ? m[1] : 'box-navy');
 })();
 </script>

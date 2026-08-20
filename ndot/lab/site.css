@@ -60,6 +60,7 @@
   --maxw:1500px;
   --hh:100px;              /* sticky header height, used for scroll-margin */
   --ease:cubic-bezier(0,0,.2,1);
+  --sine:cubic-bezier(.39,.575,.565,1);   /* Penner easeOutSine, GSAP "sine" */
 }
 @media (min-width:640px){ :root{ --pad:32px; } }
 @media (min-width:900px){ :root{ --hh:68px; } }
@@ -480,8 +481,44 @@ a{ color:inherit; text-decoration:none; }
 }
 .js .rev.in{ opacity:1; --rev-y:0px; }
 
+/* ---------- text reveal: word skew blur ----------
+   Adapted from Flowbase's GSAP Text Reveal booster, effect 4, Slanted Blur
+   Reveal: words from blur(8px) opacity 0 skewX(-20deg) into place, sine out,
+   stagger .04s. Word level only, so screen readers still read whole words and
+   no aria-label is needed.
+
+   Composition, REPLACE not compose: the script only splits an element that
+   carries .rev itself, and the .rev.tr-split rule below switches that element
+   level reveal off. Exactly one rule writes transform on any one node: .rev on
+   unsplit elements, .w inside split ones.
+
+   The split state hangs off .tr-split, which only the script adds, so with JS
+   off nothing here applies and the text renders plain. Under reduced motion
+   the script bails before touching the DOM, so no .w ever exists. */
+/* the transition sits on .tr-in, not on the base rule: applying the split
+   state must be instantaneous, or the words animate OUT to blurred first and
+   the reveal reads as a dip. One way only. */
+.js .tr-split .w{
+  display:inline-block;
+  opacity:0;
+  filter:blur(8px);
+  transform:skewX(-20deg);
+}
+.js .tr-split.tr-in .w{
+  opacity:1; filter:blur(0px); transform:skewX(0deg);
+  transition:opacity .62s var(--sine),filter .62s var(--sine),transform .62s var(--sine);
+  transition-delay:var(--w-d,0ms);
+}
+/* settled: filter and transform dropped entirely so the resting render is the
+   plain one, not a rasterised layer at blur(0). */
+.js .tr-split.tr-done .w{ filter:none; transform:none; transition:none; }
+.js .rev.tr-split,.js .rev.tr-split.in{ opacity:1; transform:none; transition:none; }
+
 @media (prefers-reduced-motion:reduce){
   .js .rev,.js .rev.in{ opacity:1; transform:none; transition:none; }
+  .js .tr-split .w,.js .tr-split.tr-in .w{
+    opacity:1; filter:none; transform:none; transition:none;
+  }
   .btn:hover .arw,.btn-ghost:hover .arw{ transform:none; }
 }
 

@@ -204,9 +204,106 @@ ground.
   appears because COPY.md states there are exactly seven capabilities.
 - The hero particulars table is not a second nav. It carries no links on
   purpose, so the hero's only tab stops are its two buttons.
-- No parallax and no scroll-linked transforms. The only motion is a fade and a
-  16px rise.
+- No parallax and no scroll-linked transforms. Element motion is a fade and a
+  16px rise; headings additionally carry the char scale reveal below. Nothing
+  on either page is scrubbed to scroll position.
 - No blue outside the primary CTA.
+
+## Text reveal: char scale
+
+Referenced from Flowbase's GSAP Text Reveal booster, effect 3 "Line Divider
+Reveal". Rebuilt in vanilla CSS and one IntersectionObserver. No GSAP, no
+SplitType, no ScrollTrigger, no CDN of any kind.
+
+**Mechanism.** Each targeted heading is split into words, then into chars. Every
+char starts as a squashed horizontal bar and resolves into its letterform:
+
+| | Flowbase effect 3 | This build | Why |
+|---|---|---|---|
+| split | words, chars | words, chars | same |
+| scaleX | 1.8 | 1.8 | same |
+| scaleY | .1 | .08 | flatter, so the collapsed state reads as a rule and not as a squashed letter |
+| blur | 10px fixed | .14em | the display scale is clamped across a 4.5x range, so a fixed 10px erases a 19px heading and barely touches a 44px one |
+| dimming | brightness(50%) | opacity .12 | see below |
+| stagger | .05 | .022 (.024 on the two heroes) | .05 is a scrub budget, not a play-once one; at .05 the hero would run 2.4s |
+| duration | scrubbed to scroll | .62s per char | requirement: play once, never scrub |
+| ease | none | cubic-bezier(.22,1,.36,1) | linear is right for a scrub, wrong for a one-shot |
+| trigger | ScrollTrigger, scrub .5 | IntersectionObserver, once | a scrub can come to rest half revealed |
+
+**Why this effect for this direction.** The whole page is drawn on a ruled 12
+column grid with hairline dividers. Effect 3 is the one effect in the booster
+that is about this page: the display type literally resolves out of a set of
+horizontal rules.
+
+**Why opacity and not a colour override.** The collapsed bar has to read in the
+page's own rule ink. Setting `color:var(--bd)` does that, and it was the first
+build, but it also drops the char's computed colour to 1.34:1 for as long as
+the run lasts, which the structural auditor correctly reports as a contrast
+failure (35 of them on index). Carrying the same dimness with `opacity:.12`
+instead lands on the same ink by composition and never changes the computed
+colour. Measured collapsed values against each ground:
+
+| band | ground | collapsed bar | that band's `--bd` |
+|---|---|---|---|
+| theme-black | rgb(0,0,0) | rgb(29,29,28) | #272220 |
+| default | rgb(14,11,11) | rgb(42,39,38) | #272220 |
+| theme-sand | rgb(238,236,221) | rgb(212,209,196) | #CFCBB8 |
+
+Opacity is also the property the `.rv` element reveal already uses on every
+other block of text on this page, and it fades from 0, so a char starting at
+.12 is strictly more visible than what the page already ships.
+
+**How it composes with the existing `.rv` element reveal.** They never touch the
+same element, so no property is ever written twice. Every element that gained
+`.tr` had `.rv` removed, and `.rv` moved onto its siblings:
+
+- `h1#h-hero` lost `.rv`; the char reveal runs on `.d-hero__lead`, and
+  `.d-hero__rest` picked up `.rv` at `--rvd:.24s`.
+- The seven `.two__a` / `.article__side` / `.cta__a` wrappers lost `.rv`; their
+  `.label` child gained it, and the h2 gained `.tr`.
+- The two `.pair__col` sections (mission, vision) lost `.rv`; their label, lead
+  and prose children each gained it with staggered `--rvd`.
+
+One observer drives both. `.rv` writes `opacity` and `transform` on block
+elements; `.tr` writes `transform`, `filter` and `opacity` on char spans that
+have no `.rv` ancestor inside the reveal.
+
+**Scope: headings only.** 8 elements on index, 5 on careers. Char splitting a
+paragraph is out, both for the screen reader cost and for the span count. The
+three `.d-fig` ledger figures are the one place this was tempting and were left
+alone: they are `<p>`, not headings, and promoting them to `h3` to qualify would
+have changed the document outline for the sake of an animation.
+
+**Piece cap: 480 spans per page**, enforced in the script, which skips any
+element that would cross it rather than splitting it half way. Actual: 222 on
+index (177 chars, 45 words), 148 on careers (122 chars, 26 words).
+
+**Accessibility.** Each split heading gets `aria-label` carrying its exact
+original text, set before the DOM is touched. Measured: `aria-label ===
+textContent` on all 13 headings, and 0 of the 299 char spans are reachable
+without passing through an `aria-hidden="true"` ancestor.
+
+**No-JS and reduced motion.** The pre-animation state lives behind `.is-split`,
+which only the script adds after it has actually split the text, so text is
+never gated on script. Under `prefers-reduced-motion: reduce` the script bails
+before touching the DOM: measured 0 generated spans, 0 `.is-split`, and a DOM
+identical to the no-JS case.
+
+**Settling: the split is undone.** The original markup is captured with
+`el.innerHTML` before a single node is touched, and put back once the run
+finishes, along with removing the `aria-label` the split added. A settled
+element is therefore the exact element that shipped before any of this existed:
+same nodes, same kerning pairs, same line breaking, same accessible name, and
+zero generated spans left in the DOM.
+
+This is not cosmetic. The first build left the pieces in place permanently, and
+`display: inline-block` word boxes are atomic, so they changed where lines broke
+at widths nobody had measured. Verified after the fix, with JavaScript on and
+settled against JavaScript off, at 320, 340, 360, 375, 390, 414, 480, 600, 700,
+768, 834, 900, 930, 1000, 1024, 1100, 1200, 1280, 1320, 1440, 1600 and 1920:
+every element box and the document scroll height match exactly, and the leftover
+span count is 0 on both pages. Rendered `innerText` is also byte identical with
+JavaScript on and off at 320, 390, 768 and 1440.
 
 ## Audit
 
@@ -215,6 +312,13 @@ failures, zero horizontal overflow (scrollWidth equals clientWidth at every
 width), zero targets under 44px, no heading jumps, no missing alt, no broken
 images, all four landmarks with exactly one h1, `noindex,nofollow` present,
 Archivo and Bodoni Moda both reporting loaded.
+
+Re-run after the char scale reveal landed: still zero on every count, both
+pages, at 320, 390, 768 and 1440. The auditor samples about 300ms after its
+scroll sweep, so it is sampling headings mid-run, and it finds nothing. That is
+the check that forced the move from a colour override to opacity: the first
+build put 35 contrast failures on index, all of them single chars caught mid
+transition.
 
 `canvascontrast.mjs` reports "no text found over a canvas" on both pages at all
 four widths. That is correct rather than a pass: these pages contain no

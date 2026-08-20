@@ -702,8 +702,69 @@ html.js .rv.is-in{
   opacity:1;transform:translate3d(0,0,0);
   transition:opacity .85s var(--ease) var(--rvd,0s),transform .85s var(--ease) var(--rvd,0s);
 }
+/* ---------- text reveal: char scale ----------------------------------------
+   Adapted from Flowbase's GSAP Text Reveal booster, effect 3 "Line Divider
+   Reveal" (chars from scaleX 1.8 / scaleY .1 + blur(10px) brightness(50%)).
+   Rebuilt in vanilla CSS with no GSAP, no SplitType, no ScrollTrigger, and
+   played once on enter instead of scrubbed to scroll position.
+
+   Direction-specific change: the collapsed bar reads in this page's own rule
+   colour, but it gets there through opacity rather than through a colour
+   override. .12 of the section's own ink over the section's own ground lands
+   within a step or two of --rule on the dark grounds and of --rule-light on
+   sand, which is the ink the 12 column grid and every hairline divider on this
+   page is already drawn in. Doing it with opacity instead of `color` means the
+   char's computed colour is never anything other than its final colour, so the
+   reveal cannot lower a measured contrast ratio at any point in its run. It is
+   also the same property, and a shallower fade, than the .rv element reveal
+   directly above already uses on every other block of text on the page.
+
+   Blur is set in em, not px, because the display scale is clamped across a
+   4.5x range: a fixed 10px would erase a 19px heading and barely touch a 44px
+   one.
+
+   Composition with the element reveal above: the two never touch the same
+   element. Any element carrying .tr has had .rv removed and .rv moved onto its
+   siblings, so nothing writes transform, filter or opacity twice.
+
+   The pre-animation state is gated on .is-split, which only the script adds
+   after it has actually split the text. No JS and reduced motion therefore
+   render the original, unstyled text. Once the run has finished the script
+   drops both classes, so a settled heading carries no transform, no filter and
+   no opacity override at all: it is the rendering it had before, to the pixel.
+   -------------------------------------------------------------------------- */
+.tr__w{display:inline-block}                 /* keeps words from breaking mid-word */
+.tr__c{display:inline-block}
+
+html.js .tr.is-split{
+  /* transformed chars must not widen the document at a line end */
+  overflow:clip;overflow-clip-margin:0.5em;
+}
+html.js .tr.is-split .tr__c{
+  --trd:calc(var(--tr-lead,0ms) + var(--i,0) * var(--tr-step,22ms));
+  transform:scale(1.8,.08);      /* Flowbase effect 3: scaleX 1.8, scaleY .1 */
+  filter:blur(.14em);
+  opacity:.12;                   /* stands in for brightness(50%), see above */
+  will-change:transform,filter,opacity;
+}
+html.js .tr.is-split.is-in .tr__c{
+  transform:scale(1,1);
+  filter:blur(0em);
+  opacity:1;
+  transition:
+    transform var(--tr-dur,.62s) var(--ease) var(--trd,0s),
+    filter    var(--tr-dur,.62s) var(--ease) var(--trd,0s),
+    opacity   var(--tr-dur,.62s) linear      var(--trd,0s);
+}
+
 @media (prefers-reduced-motion:reduce){
   html.js .rv,html.js .rv.is-in{opacity:1;transform:none;transition:none}
+  /* belt and braces: the script bails before splitting, so .is-split never
+     exists here. If it somehow did, it would still be inert. */
+  html.js .tr.is-split{overflow:visible}
+  html.js .tr.is-split .tr__c,html.js .tr.is-split.is-in .tr__c{
+    transform:none;filter:none;opacity:1;transition:none;will-change:auto;
+  }
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
 

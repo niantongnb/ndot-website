@@ -64,7 +64,7 @@
         <div class="hero__grid">
           <div class="hero__head">
             <p class="eyebrow hero__eyebrow rv">Open roles</p>
-            <h1 id="h-careers" class="display d-hero d-hero--solo rv" style="--rvd:.06s">Join Us to Build the Future of Media Growth!</h1>
+            <h1 id="h-careers" class="display d-hero d-hero--solo tr" style="--tr-step:24ms;--tr-lead:60ms">Join Us to Build the Future of Media Growth!</h1>
             <p class="display d-lead hero__standfirst rv" style="--rvd:.12s">The future of media belongs to companies that own the relationship with their audience.</p>
           </div>
           <div class="hero__foot rv" style="--rvd:.18s">
@@ -94,9 +94,9 @@
       <div class="rules" aria-hidden="true"></div>
       <div class="band__inner pad">
         <div class="article">
-          <div class="article__side rv">
-            <p class="label"><span>Why now</span></p>
-            <h2 id="h-why" class="display d-sec">The model is breaking</h2>
+          <div class="article__side">
+            <p class="label rv"><span>Why now</span></p>
+            <h2 id="h-why" class="display d-sec tr">The model is breaking</h2>
           </div>
           <div class="article__body rv" style="--rvd:.08s">
             <p class="prose prose--fg">For years, publishers have depended heavily on search, social platforms, and other third-party channels for distribution and growth. As referral traffic continues to decline in the AI era, that model is becoming increasingly unpredictable. Building direct audience relationships — and the capabilities to grow, engage, retain, and monetize them — is becoming mission-critical.</p>
@@ -120,9 +120,9 @@
       <div class="rules" aria-hidden="true"></div>
       <div class="band__inner pad">
         <div class="article">
-          <div class="article__side rv">
-            <p class="label"><span>What we bring</span></p>
-            <h2 id="h-bring" class="display d-sec d-sec--lg">Capabilities, validated in operation</h2>
+          <div class="article__side">
+            <p class="label rv"><span>What we bring</span></p>
+            <h2 id="h-bring" class="display d-sec d-sec--lg tr">Capabilities, validated in operation</h2>
           </div>
           <div class="article__body rv" style="--rvd:.08s">
             <p class="prose prose--fg">NDot AI brings together more than a decade of proven capabilities across app and newsletter development, audience and subscriber growth, recommendation and personalization, engagement and retention, advertising technology, content moderation, and publisher-advertiser networks — all developed and repeatedly validated through operating media products at scale.</p>
@@ -138,9 +138,9 @@
       <div class="rules" aria-hidden="true"></div>
       <div class="band__inner pad">
         <div class="article">
-          <div class="article__side rv">
-            <p class="label"><span>The work</span></p>
-            <h2 id="h-work" class="display d-sec">End to end, across an industry</h2>
+          <div class="article__side">
+            <p class="label rv"><span>The work</span></p>
+            <h2 id="h-work" class="display d-sec tr">End to end, across an industry</h2>
           </div>
           <div class="article__body rv" style="--rvd:.08s">
             <p class="prose prose--fg">This is a rare opportunity to work across product, growth, data, recommendation systems, advertising technology, and media — solving complex problems end to end and building technology that can reshape how an entire industry grows.</p>
@@ -156,9 +156,9 @@
     <div class="shell">
       <div class="rules" aria-hidden="true"></div>
       <div class="band__inner pad">
-        <div class="rv">
-          <p class="label"><span>Apply</span></p>
-          <h2 id="h-contact" class="display d-sec">Get in touch</h2>
+        <div>
+          <p class="label rv"><span>Apply</span></p>
+          <h2 id="h-contact" class="display d-sec tr">Get in touch</h2>
         </div>
         <div class="contact-card rv" style="--rvd:.08s">
           <p class="prose">Tell us what you have built, and where you want to work next.</p>
@@ -210,15 +210,85 @@
 
 <script>
 (function(){
-  var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
-  if(!els.length) return;
-  var show = function(el){ el.classList.add('is-in'); };
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- text reveal: char scale (Flowbase effect 3, rebuilt in vanilla) ----
+     Split first, and only then add the class that carries the pre-animation
+     state, so the hidden state can never outlive the split. Under reduced
+     motion we bail before touching the DOM at all, which lands on exactly the
+     no-JS result. Cap is total generated spans per page. */
+  var CAP = 480, used = 0, DUR = 620, TAIL = 400;
+  if(!reduce){
+    Array.prototype.forEach.call(document.querySelectorAll('.tr'), function(el){
+      var parts = el.textContent.split(/(\s+)/), chars = 0, words = 0, i, p;
+      for(i=0;i<parts.length;i++){
+        p = parts[i];
+        if(!p || /^\s+$/.test(p)) continue;
+        words++; chars += Array.from(p).length;
+      }
+      if(!chars || used + chars + words > CAP) return;   /* over cap: leave it plain */
+      used += chars + words;
+
+      el.__trHTML = el.innerHTML;            /* exact pre-split markup */
+      var host = el.closest('h1,h2,h3') || el;
+      el.__trHost = host;
+      el.__trHadLabel = host.hasAttribute('aria-label');
+      var label = host.textContent;                       /* exact original copy */
+      var frag = document.createDocumentFragment(), n = 0;
+      for(i=0;i<parts.length;i++){
+        p = parts[i];
+        if(!p) continue;
+        if(/^\s+$/.test(p)){ frag.appendChild(document.createTextNode(p)); continue; }
+        var w = document.createElement('span');
+        w.className = 'tr__w';
+        Array.from(p).forEach(function(ch){
+          var c = document.createElement('span');
+          c.className = 'tr__c';
+          c.style.setProperty('--i', n++);
+          c.appendChild(document.createTextNode(ch));
+          w.appendChild(c);
+        });
+        frag.appendChild(w);
+      }
+      el.textContent = '';
+      el.appendChild(frag);
+      el.classList.add('is-split');
+      el.setAttribute('data-tr-n', n);
+      host.setAttribute('aria-label', label);
+      Array.prototype.forEach.call(host.children, function(k){ k.setAttribute('aria-hidden','true'); });
+    });
+  }
+
+  /* ---- one observer drives both reveals; neither ever touches the same
+     element as the other, so no property is written twice ---- */
+  var els = Array.prototype.slice.call(document.querySelectorAll('.rv,.tr.is-split'));
+  if(!els.length) return;
+  var show = function(el){
+    if(el.classList.contains('is-in')) return;
+    el.classList.add('is-in');
+    if(!el.classList.contains('is-split')) return;
+    /* settle permanently: once the run is done, drop both classes so the
+       heading carries no transform, no filter and no colour override */
+    var cs = getComputedStyle(el);
+    var step = parseFloat(cs.getPropertyValue('--tr-step')) || 22;
+    var lead = parseFloat(cs.getPropertyValue('--tr-lead')) || 0;
+    var n = parseInt(el.getAttribute('data-tr-n'), 10) || 0;
+    setTimeout(function(){
+      /* put the original markup back, so the settled DOM is the DOM that
+         shipped before the split: same kerning, same line breaking. */
+      if(el.__trHTML != null){
+        el.innerHTML = el.__trHTML; el.__trHTML = null;
+        if(el.__trHost && !el.__trHadLabel) el.__trHost.removeAttribute('aria-label');
+      }
+      el.classList.remove('is-split','is-in');
+    }, lead + n * step + DUR + TAIL);
+  };
   if(reduce || !('IntersectionObserver' in window)){ els.forEach(show); return; }
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } });
   },{rootMargin:'0px 0px -8% 0px',threshold:0.01});
   els.forEach(function(el){ io.observe(el); });
+  // backstop: never let copy stay hidden, whatever the tab state
   setTimeout(function(){ els.forEach(show); }, 1600);
 })();
 </script>

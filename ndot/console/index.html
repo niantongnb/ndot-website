@@ -65,12 +65,6 @@
         <a href="#mandate">Mission and vision</a>
         <a href="#team">Team</a>
       </nav>
-
-      <nav class="jump rv" style="--rv-d:220ms" aria-label="Sections">
-        <a href="#shift">The shift</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#team">Team</a>
-      </nav>
     </div>
   </section>
 
@@ -84,7 +78,7 @@
           <span class="rule" aria-hidden="true"></span>
         </div>
         <div class="grid__body">
-          <p class="head rv">Rented distribution is losing its reliability.</p>
+          <h3 class="head rv">Rented distribution is losing its reliability.</h3>
           <p class="lead lead--sub rv" style="--rv-d:60ms">As referral traffic declines, NDot AI gives publishers the infrastructure to own their audience and take control of their growth — backed by more than a decade of scaling media products to tens of millions of users and hundreds of millions in revenue.</p>
           <dl class="compare rv" style="--rv-d:120ms">
             <div class="row">
@@ -110,7 +104,7 @@
           <h2 class="mono mono--md mono--ink">Proof</h2>
           <span class="rule" aria-hidden="true"></span>
         </div>
-        <p class="head band__lead rv">The platform is built on work already done.</p>
+        <h3 class="head band__lead rv">The platform is built on work already done.</h3>
         <div class="proof">
           <div class="cell rv">
             <span class="mono fig-key">Experience</span>
@@ -141,7 +135,7 @@
           <h2 class="mono mono--md mono--ink">Capabilities</h2>
           <span class="rule" aria-hidden="true"></span>
         </div>
-        <p class="head band__lead rv">Seven capabilities, one platform.</p>
+        <h3 class="head band__lead rv">Seven capabilities, one platform.</h3>
         <p class="lead lead--sub band__sub rv" style="--rv-d:60ms">Our platform spans app and newsletter development, audience growth, personalization, engagement, monetization, and publisher-advertiser networks — all proven at scale.</p>
 
         <!-- ---- the console ---- -->
@@ -237,7 +231,7 @@
           <span class="rule" aria-hidden="true"></span>
         </div>
         <div class="grid__body">
-          <p class="head rv">This section is a placeholder.</p>
+          <h3 class="head rv">This section is a placeholder.</h3>
           <p class="lead lead--sub rv" style="--rv-d:60ms">Names, bios and photographs are pending. Nothing in the plates below describes a real person, and the roles are stand-ins for the shape of the group, not appointments.</p>
           <ul class="team">
             <li class="card rv">
@@ -276,7 +270,7 @@
           <span class="rule" aria-hidden="true"></span>
         </div>
         <div class="grid__body">
-          <p class="head rv">Join Us to Build the Future of Media Growth!</p>
+          <h3 class="head rv">Join Us to Build the Future of Media Growth!</h3>
           <p class="lead lead--sub rv" style="--rv-d:60ms">If you want to help media companies take control of their audience, growth, and future, come build NDot AI with us.</p>
           <div class="cta__act rv" style="--rv-d:120ms">
             <a class="btn" href="careers.html">Read the full careers page <svg class="tick" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2.4 7.6 7.6 2.4M3.5 2.4h4.1v4.1" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"/></svg></a>
@@ -323,14 +317,89 @@
 
 <script>
 (function () {
+  /* ---- text reveal: char colour readout ----
+     Adapted from Flowbase's GSAP Text Reveal effect 5 (Color Text Reveal:
+     chars, stagger .05, duration .5). No GSAP, no SplitType, no scrub.
+
+     Rules this obeys:
+     - prefers-reduced-motion bails BEFORE the DOM is touched, so the result
+       is byte identical to the no-JS case.
+     - the pre-animation colour lives behind `.tr`, a class this script adds
+       after the split, so JS off renders the original text untouched.
+     - spaces stay real text nodes and the pieces stay `display: inline`,
+       so textContent and innerText are unchanged character for character.
+     - char level only on real headings, each carrying aria-label with the
+       exact original string while the pieces sit under one aria-hidden span.
+     - PIECE_CAP is the hard ceiling on spans generated per page. ---- */
+  var PIECE_CAP = 900;
+  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!(rm && rm.matches)) {
+    var budget = PIECE_CAP;
+    [].slice.call(document.querySelectorAll('main h1.display, main h2.mono, main h3.head'))
+      .forEach(function (el) {
+        if (budget <= 0 || el.querySelector('.tr__i')) return;
+        var text = el.textContent;
+        if (!text || !text.trim()) return;
+        var n = text.replace(/\s+/g, '').length;
+        if (!n || n > budget) return;
+        budget -= n;
+
+        /* stagger: .05s is the booster's value and is kept for short
+           headings. Long ones divide a 900ms sweep budget instead, with an
+           8ms floor, so a 180 character display line still resolves in
+           about two seconds rather than nine. */
+        var step = Math.min(50, Math.max(8, 900 / n));
+        var inner = document.createElement('span');
+        inner.className = 'tr__i';
+        inner.setAttribute('aria-hidden', 'true');
+        for (var j = 0, i = 0; j < text.length; j++) {
+          var c = text.charAt(j);
+          if (/\s/.test(c)) { inner.appendChild(document.createTextNode(c)); continue; }
+          var s = document.createElement('span');
+          s.className = 'trc';
+          s.style.setProperty('--tr-i', String(i++));
+          s.appendChild(document.createTextNode(c));
+          inner.appendChild(s);
+        }
+        el.__trHTML = el.innerHTML;      /* exact pre-split markup */
+        el.__trHadLabel = el.hasAttribute('aria-label');
+        el.setAttribute('aria-label', text);
+        el.textContent = '';
+        el.appendChild(inner);
+        el.style.setProperty('--tr-step', step.toFixed(2) + 'ms');
+        el.style.setProperty('--tr-scan-d', Math.max(90, step * 3).toFixed(0) + 'ms');
+        /* replace, do not compose: the element drift is removed from every
+           split element so no two rules write the same property. */
+        el.classList.remove('rv');
+        el.classList.add('tr');
+      });
+  }
+
   /* ---- reveal: IntersectionObserver + setTimeout backstop, never rAF ---- */
-  var items = [].slice.call(document.querySelectorAll('.rv'));
-  function showAll() { items.forEach(function (el) { el.classList.add('is-in'); }); }
+  var items = [].slice.call(document.querySelectorAll('.rv, .tr'));
+  /* once the readout has walked the line, put the original markup back so
+     the settled DOM, its kerning and its accessible name are the ones that
+     shipped before the split. */
+  function trSettle(el) {
+    if (el.__trHTML == null) return;
+    var cs = getComputedStyle(el);
+    var step = parseFloat(cs.getPropertyValue('--tr-step')) || 50;
+    var rvd  = parseFloat(cs.getPropertyValue('--rv-d')) || 0;
+    var n = el.querySelectorAll('.trc').length;
+    setTimeout(function () {
+      if (el.__trHTML == null) return;
+      el.innerHTML = el.__trHTML; el.__trHTML = null;
+      if (!el.__trHadLabel) el.removeAttribute('aria-label');
+      el.classList.remove('tr', 'is-in');
+    }, rvd + n * step + 500 + 400);
+  }
+  function reveal(el) { el.classList.add('is-in'); trSettle(el); }
+  function showAll() { items.forEach(reveal); }
   if (!('IntersectionObserver' in window)) { showAll(); }
   else {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); }
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
     items.forEach(function (el) { io.observe(el); });

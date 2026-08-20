@@ -123,6 +123,94 @@ Geist Mono (keys and labels).
 - `prefers-reduced-motion` kills the reveals, the arrow nudges and the canvas
   loop. The canvas still paints one static frame.
 - All script is inline in each page. The folder holds exactly four files.
+- Display type and section headings additionally carry a word level text
+  reveal. See "Text reveal: word skew blur" below.
+
+## Text reveal: word skew blur
+Adapted from Flowbase's GSAP Text Reveal booster, effect 4 (Slanted Blur
+Reveal). Word level, never char level. A specimen resolving under focus, which
+is the one reveal that suits large tightly set Newsreader; char level would fall
+apart at these sizes and would also make some screen readers spell the heading.
+
+Parameters, from the booster's own source:
+- from `opacity:0`, `filter:blur(8px)`, `transform:skewX(-20deg)`
+- to `opacity:1`, `filter:blur(0px)`, `transform:skewX(0deg)`
+- ease sine out, written as `--sine:cubic-bezier(.39,.575,.565,1)` (Penner
+  easeOutSine, which is what GSAP's `"sine"` resolves to)
+- stagger .04s per word, duration .62s per word
+- enter offset 20, the booster's default, expressed as an IntersectionObserver
+  `rootMargin` of `0px 0px -20% 0px`
+
+Two deviations from the booster, both deliberate:
+- Not scrubbed. The booster ties progress to scroll position, which can leave a
+  word resting at `opacity:0`. Here it plays once on enter and settles for good.
+  An element that has revealed is unobserved and never re-animates.
+- The .04s stagger is compressed on long blocks so the tail never exceeds .7s.
+  Step is `min(40ms, 700ms / (words - 1))`. Headings keep the literal .04s
+  (a 7 word title staggers at 40ms); the 43 word shift statement runs at 16ms.
+  At a flat .04s that block would have taken 1.7s to finish arriving.
+
+Implementation, vanilla:
+- No GSAP, no SplitType, no ScrollTrigger, no CDN. IntersectionObserver plus CSS
+  transitions, inline in each page.
+- The splitter walks text nodes and wraps each run of non-space characters in a
+  `span.w`. Every space is put back as a real text node, so `textContent` and
+  `innerText` come out unchanged to the character. Element structure inside a
+  target (the two block spans in the hero h1) survives the split.
+- Word level, so no `aria-label` swap and no `aria-hidden` pieces are needed.
+  Nothing on either page is char split.
+
+How it composes with the existing `.rev` element reveal: REPLACE, not compose.
+The script only splits elements that carry `.rev` themselves, and the rule
+`.js .rev.tr-split{opacity:1;transform:none;transition:none}` switches that
+element level reveal off wherever words reveal instead. So exactly one rule
+writes `transform` on any one node: `.rev` on unsplit elements, `.w` inside
+split ones. Nothing can be left stuck part way between two rules.
+
+The transition is declared on `.tr-in`, not on the base `.tr-split .w` rule.
+This is the opposite of the `.rev` convention above and it is deliberate: with
+the transition on the base rule, applying the split state animates the words OUT
+to blurred first, and above-the-fold text visibly dips before it arrives.
+Measured mid-flight to confirm the fix, the pre-reveal state is now instant and
+exact: `opacity 0, blur(8px), matrix(1,0,-0.36397,1,0,0)`, and -0.36397 is
+tan(-20deg).
+
+When a block finishes, a `tr-done` class drops `filter` and `transform` back to
+`none` rather than leaving the words sitting at `blur(0)`, so the resting render
+is the plain one and not a rasterised layer.
+
+Where it runs, and the cap:
+- Home: hero h1, the shift statement, the three section standfirsts, both
+  mission and vision leads, the careers statement. Eight targets, 142 pieces.
+- Careers: hero h1, the pull line, the apply line. Three targets, 37 pieces.
+- Body prose, capability names, proof figures, team records, nav, keys and the
+  footer are untouched. It is a reveal, not a screensaver.
+- Hard caps in the script: 240 word pieces per page, and 60 words in any one
+  element. An element over 60 words is left unsplit and simply keeps its `.rev`.
+  The longest split block is the 43 word shift statement.
+
+No-JS and reduced motion:
+- The split state hangs off `.tr-split`, which only the script can add, so with
+  JS off nothing here applies. Measured: text loss 0% on both pages.
+- `prefers-reduced-motion` bails before the first DOM touch. Measured under
+  emulated reduce: 8 and 3 elements still carry `data-tr`, 0 are split, 0 pieces
+  exist. The DOM is identical to the no-JS case.
+
+**Settling: the split is undone.** The original markup is captured with
+`el.innerHTML` before a single node is touched, and put back once the run
+finishes, along with removing the `aria-label` the split added. A settled
+element is therefore the exact element that shipped before any of this existed:
+same nodes, same kerning pairs, same line breaking, same accessible name, and
+zero generated spans left in the DOM.
+
+This is not cosmetic. The first build left the pieces in place permanently, and
+`display: inline-block` word boxes are atomic, so they changed where lines broke
+at widths nobody had measured. Verified after the fix, with JavaScript on and
+settled against JavaScript off, at 320, 340, 360, 375, 390, 414, 480, 600, 700,
+768, 834, 900, 930, 1000, 1024, 1100, 1200, 1280, 1320, 1440, 1600 and 1920:
+every element box and the document scroll height match exactly, and the leftover
+span count is 0 on both pages. Rendered `innerText` is also byte identical with
+JavaScript on and off at 320, 390, 768 and 1440.
 
 ## Deliberately not done
 - No map, no county data, no geography, no "local", no "my town".
@@ -141,6 +229,14 @@ footer present, one h1 per page, robots noindex,nofollow.
 
 `tools/canvascontrast.mjs` at the same four widths, both pages: no text element
 over a canvas (see item 1).
+
+After the text reveal was added, the same four widths on both pages still report
+zero contrast failures, zero horizontal overflow, zero targets under 44px, no
+heading jumps and one h1. `tools/copyverify.mjs` reads rendered `innerText` and
+finds every home block on the home page and every careers block on the careers
+page, capabilities present and in source order, so the split changed no copy.
+`tools/nojscheck.mjs`: 0% text loss on both pages. `tools/rmcheck.mjs`: zero
+running animations, zero faded text, zero shifted text on both pages.
 
 Also measured directly:
 - See the rendered font size census above.

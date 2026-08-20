@@ -666,7 +666,63 @@ html.js .rv {
 }
 html.js .rv.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
 
+/* ---------- text reveal: char colour readout ----------
+   Adapted from Flowbase's GSAP Text Reveal, effect 5 "Color Text Reveal"
+   (chars, stagger .05, duration .5). Scrub replaced by a play-once
+   IntersectionObserver, GSAP replaced by a CSS transition.
+
+   This direction is a console, so the reveal is a record resolving: chars
+   step from the muted token to the settled ink, left to right, with an
+   underscore cursor riding the leading edge and stopping at the end of the
+   line. Nothing moves, nothing blurs, nothing fades. The pieces write only
+   `color` and `text-decoration-color`; the element reveal above writes only
+   `opacity` and `transform`, and the script strips `.rv` off every element
+   it splits, so the two never meet on one element.
+
+   The cursor is a decoration, not a background. A background block was tried
+   first and the audit caught it: mid-sweep it lifted the dark ground to
+   rgb(61,61,58) under text still sitting at `--muted`, which measured 4.37:1.
+   A decoration cannot change the ground a character is measured against, so
+   the transient state is now unmeasurable rather than nearly passing.
+
+   The pre state is `--muted`, not transparent and not zero opacity, so a
+   heading that never receives `is-in` is still readable at 7:1 or better.
+
+   `.trc` stays `display: inline` on purpose: inline-block would let
+   innerText insert breaks between characters and change the copy. Spaces
+   are left as real text nodes, never wrapped. ---------- */
+html.js .tr {
+  --tr-from: var(--muted);   /* start of the walk, re-points on dark ground */
+  --tr-hit:  var(--blue);    /* the cursor, re-points on dark ground        */
+}
+html.js .tr .trc {
+  color: var(--tr-from);
+  /* declared at rest but painted in nothing, so the settled character is
+     byte for byte the character that shipped before this file changed */
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: max(1px, .07em);
+  text-underline-offset: .14em;
+}
+html.js .tr.is-in .trc {
+  color: inherit;            /* exactly the settled colour, by construction */
+  transition: color .5s cubic-bezier(.25, .46, .45, .94);
+  transition-delay: calc(var(--rv-d, 0ms) + var(--tr-i, 0) * var(--tr-step, 50ms));
+  animation: tr-cursor var(--tr-scan-d, 150ms) steps(1, end) forwards;
+  animation-delay: calc(var(--rv-d, 0ms) + var(--tr-i, 0) * var(--tr-step, 50ms));
+}
+@keyframes tr-cursor {
+  from { text-decoration-color: var(--tr-hit); }
+  to   { text-decoration-color: transparent; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.js .rv, html.js .rv.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  /* the script bails before splitting, so this only covers the case where the
+     setting is turned on after the page has already been split */
+  html.js .tr .trc, html.js .tr.is-in .trc {
+    color: inherit !important; text-decoration-color: transparent !important;
+    transition: none !important; animation: none !important;
+  }
   * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
 }

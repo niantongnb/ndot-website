@@ -52,7 +52,7 @@
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <p class="rkey rev">Come build the platform</p>
-      <h1 class="display rev" style="--rev-d:80ms"><span class="hero-h1-lead careers-h1">Join Us to Build the Future of Media Growth!</span></h1>
+      <h1 class="display rev" data-tr style="--rev-d:80ms"><span class="hero-h1-lead careers-h1">Join Us to Build the Future of Media Growth!</span></h1>
       <p class="lede hero-sub rev" style="--rev-d:160ms">The future of media belongs to companies that own the relationship with their audience.</p>
       <div class="hero-cta rev" style="--rev-d:160ms">
         <a class="btn" href="#apply">Apply by email
@@ -100,9 +100,9 @@
   <section class="band band--dark band-pad">
     <div class="wrap doc">
       <h2 class="rkey rev">What we are building</h2>
-      <div class="rev" style="--rev-d:80ms">
-        <p class="pull">That's what we're building at NDot AI.</p>
-        <p class="doc-p doc-spec" style="padding-top:var(--s4)">NDot AI brings together more than a decade of proven capabilities across app and newsletter development, audience and subscriber growth, recommendation and personalization, engagement and retention, advertising technology, content moderation, and publisher-advertiser networks — all developed and repeatedly validated through operating media products at scale.</p>
+      <div>
+        <p class="pull rev" data-tr style="--rev-d:80ms">That's what we're building at NDot AI.</p>
+        <p class="doc-p doc-spec rev" style="--rev-d:80ms;padding-top:var(--s4)">NDot AI brings together more than a decade of proven capabilities across app and newsletter development, audience and subscriber growth, recommendation and personalization, engagement and retention, advertising technology, content moderation, and publisher-advertiser networks — all developed and repeatedly validated through operating media products at scale.</p>
       </div>
       <div class="doc-rail rev" style="--rev-d:160ms">
         <dl class="spec">
@@ -152,7 +152,7 @@
     <div class="wrap apply">
       <h2 class="rkey rev">Apply</h2>
       <div>
-        <p class="apply-line rev" style="--rev-d:80ms">If you want to help media companies take control of their audience, growth, and future, come build NDot AI with us.</p>
+        <p class="apply-line rev" data-tr style="--rev-d:80ms">If you want to help media companies take control of their audience, growth, and future, come build NDot AI with us.</p>
         <div class="rev" style="--rev-d:160ms">
           <a class="mailto" href="mailto:career@ndot.ai">career@ndot.ai</a>
         </div>
@@ -171,7 +171,7 @@
       </a>
       <p class="foot-stat">Build the owned-audience growth infrastructure for the future of media.</p>
     </div>
-    <nav class="foot-col" aria-label="Sections">
+    <nav class="foot-col" aria-label="Platform">
       <h2>Platform</h2>
       <ul class="foot-list">
         <li><a href="index.html#shift">The shift</a></li>
@@ -212,6 +212,98 @@
     nodes.forEach(function(n){ io.observe(n); });
     setTimeout(showAll, 1600);          /* backstop: nothing stays hidden */
     window.addEventListener('load', function(){ setTimeout(showAll, 900); });
+  }
+
+  /* ---- text reveal: WORD SKEW BLUR, adapted from Flowbase's GSAP Text
+     Reveal booster, effect 4 (Slanted Blur Reveal).
+     Words go from blur(8px) opacity 0 skewX(-20deg) into place, sine out over
+     .62s, stagger .04s. Vanilla: IntersectionObserver plus CSS transitions,
+     no GSAP, no SplitType, nothing from a CDN.
+     Plays once on enter and then settles for good. It is never scrubbed, so
+     it cannot come to rest part way at opacity 0.
+     Reduced motion bails here, before a single node is touched, so the result
+     is byte identical to the no-JS render. ---- */
+  var TR_PAGE_CAP = 240;   /* hard cap on word pieces generated per page */
+  var TR_EL_CAP   = 60;    /* an element longer than this is left unsplit */
+  var TR_DUR = 620, TR_STEP = 40, TR_TAIL = 700;
+
+  function trDelay(el){
+    var v = (getComputedStyle(el).getPropertyValue('--rev-d') || '').trim();
+    var f = parseFloat(v);
+    if (!f) return 0;
+    return /ms$/.test(v) ? f : f * 1000;
+  }
+
+  /* split on whitespace, keeping every space as a real text node, so
+     textContent and innerText come out unchanged to the character */
+  function trSplit(el, budget){
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    var texts = [], total = 0, n, m, i;
+    while ((n = walker.nextNode())){
+      m = n.nodeValue.match(/\S+/g);
+      if (m){ texts.push(n); total += m.length; }
+    }
+    if (!total || total > TR_EL_CAP || total > budget) return 0;
+    el.__trHTML = el.innerHTML;          /* exact pre-split markup */
+    var made = [];
+    for (i = 0; i < texts.length; i++){
+      var tn = texts[i], parts = tn.nodeValue.split(/(\s+)/);
+      var frag = document.createDocumentFragment();
+      for (var p = 0; p < parts.length; p++){
+        var s = parts[p];
+        if (!s) continue;
+        if (/^\s+$/.test(s)){ frag.appendChild(document.createTextNode(s)); continue; }
+        var w = document.createElement('span');
+        w.className = 'w';
+        w.appendChild(document.createTextNode(s));
+        frag.appendChild(w);
+        made.push(w);
+      }
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    /* .04s per word, compressed on long blocks so no tail runs past .7s */
+    var step = made.length > 1 ? Math.min(TR_STEP, TR_TAIL / (made.length - 1)) : TR_STEP;
+    var base = trDelay(el);
+    for (i = 0; i < made.length; i++){
+      made[i].style.setProperty('--w-d', Math.round(base + i * step) + 'ms');
+    }
+    el.__trMs = Math.round(base + (made.length - 1) * step) + TR_DUR + 60;
+    el.classList.add('tr-split');
+    return made.length;
+  }
+
+  if (!rm.matches){
+    var budget = TR_PAGE_CAP, split = [];
+    [].slice.call(document.querySelectorAll('[data-tr]')).forEach(function(el){
+      var made = trSplit(el, budget);
+      if (made){ budget -= made; split.push(el); }
+    });
+    var trShow = function(el){
+      if (el.classList.contains('tr-in')) return;
+      void el.offsetWidth;                /* flush the split state first */
+      el.classList.add('tr-in');
+      /* settled: drop filter and transform so the resting render is plain */
+      /* restore the original markup at rest: the inline-block word boxes
+         change line breaking at some widths, so they must not survive. */
+      setTimeout(function(){
+        el.classList.add('tr-done');
+        if (el.__trHTML != null){ el.innerHTML = el.__trHTML; el.__trHTML = null; }
+        el.classList.remove('tr-split','tr-in');
+      }, el.__trMs || 1400);
+    };
+    var trAll = function(){ split.forEach(trShow); };
+    if (!('IntersectionObserver' in window)){
+      trAll();
+    } else {
+      var io2 = new IntersectionObserver(function(es){
+        es.forEach(function(e){
+          if (e.isIntersecting){ trShow(e.target); io2.unobserve(e.target); }
+        });
+      }, { rootMargin:'0px 0px -20% 0px', threshold:0.01 });  /* booster offset 20 */
+      split.forEach(function(el){ io2.observe(el); });
+      setTimeout(trAll, 1600);            /* backstop: no word stays hidden */
+      window.addEventListener('load', function(){ setTimeout(trAll, 900); });
+    }
   }
 
   /* ---- the field: an abstract node and link specimen, no geography.

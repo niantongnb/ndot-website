@@ -188,6 +188,110 @@ property on either page; the CTA arrow is an inline SVG.
   01 and the rail does not switch. The other six framings are present in the DOM
   as attributes but are not rendered. All seven capability names are visible.
 
+## Text reveal: char colour readout
+Referenced from Flowbase's GSAP Text Reveal booster, effect 5 "Color Text
+Reveal". Read out of the booster's own source: chars, stagger `.05`, duration
+`.5`, scrubbed to scroll with a `bottom bottom` end. Rebuilt here in vanilla
+CSS plus IntersectionObserver. No GSAP, no SplitType, no ScrollTrigger, no CDN.
+
+**Mechanism.** Characters step from `--muted` to the element's settled colour,
+left to right, with a blue underscore cursor running the leading edge and
+stopping at the end of the line. Nothing translates, nothing blurs, nothing
+fades. This is the console, so a heading resolves the way a record resolves,
+field by field, and it does not wobble on the way in. The other two directions
+own char scale and word skew blur; neither of those is used anywhere here.
+
+**Parameters.**
+
+| Thing | Value | Where it came from |
+|---|---|---|
+| split level | characters | booster effect 5 |
+| stagger | `.05s`, floored to `8ms` on long lines | booster value, then a 900ms sweep budget divided by the character count |
+| colour duration | `.5s` | booster value, kept as is |
+| easing | `cubic-bezier(.25, .46, .45, .94)` | quad out, the closest CSS curve to GSAP's default `power1.out` |
+| start colour | `--muted` | the direction's own muted token, so it re-points on dark grounds without a second rule |
+| end colour | `inherit` | not a literal, so the settled character is the parent's computed colour by construction |
+| cursor | underscore, `max(1px, .07em)` thick, `--blue`, `steps(1, end)` | authored, allowed by the brief as a block cursor that runs the line and stops |
+| cursor dwell | `max(90ms, 3 x stagger)` | three cells wide on short headings, and long enough to survive a frame on the hero |
+
+The stagger floor is the one number that is not the booster's. The booster
+scrubs, so `.05` costs nothing on a long line. Playing once, `.05` x 148
+characters would take the home page h1 nine seconds. Dividing a 900ms sweep
+budget by the character count instead puts the h1 at `8ms` per character and
+about two seconds end to end, while every heading of eighteen characters or
+fewer still runs at the booster's `.05`.
+
+**What is split, and what is not.** Char splitting is confined to real headings:
+`h1.display`, the mono `h2` section labels, and the authored `h3` display lines.
+The five home and three careers authored headlines were `<p class="head">` and
+are now `<h3 class="head">`. That was needed, not cosmetic: `aria-label` is
+prohibited on `role="paragraph"`, and char splitting requires the original
+string to survive as a label. The reset already flattens `h1, h2, h3` to
+`font-size: 1em; font-weight: inherit; margin: 0`, and every rule that touches
+these lines is class based, so the rendered result is unchanged. Heading order
+stays h1, h2, h3 and the auditor reports no jumps.
+
+Body prose, the three proof figures, the source leads under Mission and Vision,
+and everything inside the console keep the plain element reveal. A reveal, not
+a screensaver.
+
+**Piece cap: 900 spans per page.** Home generates 366 across 13 elements,
+careers 190 across 9. The cap is enforced as a running budget in the split
+loop, so an element that would cross it is skipped rather than half split.
+
+**How it composes with the existing `.rv` reveal.** It replaces it. The script
+calls `classList.remove('rv')` on every element it splits and adds `.tr`, so no
+element ever carries both. `.rv` writes `opacity` and `transform` on the
+element; `.trc` writes `color` and `text-decoration-color` on the pieces. There
+is no property written twice and no element with two rules competing for one
+transform. The inline `--rv-d` stays on the element and is reused as the base
+delay for the character walk, so each section keeps the internal choreography
+it had before. Split elements are added to the same observer list and the same
+2500ms backstop.
+
+**The cursor is a decoration because a background block failed the audit.**
+First build painted `background-color: var(--hair)` on the leading cells. On
+the dark grounds that lifts `#181815` to a measured `rgb(61,61,58)` under text
+still sitting at `--muted`, and audit.mjs caught it at 4.37:1 against a 4.5:1
+requirement. It is a transient state, but it is a real one, and it was only
+almost passing. A text decoration cannot change the ground a character is
+measured against, so the failure mode is gone rather than narrowed.
+
+**Failure modes, each closed.**
+
+- **JS off.** No `.js` class and no `.tr` class, so no rule in the reveal block
+  matches and the original text renders exactly as authored. Measured with
+  nojscheck: 0% text loss on both pages, 3069 and 3126 characters either way.
+- **Reduced motion.** The script tests the media query and returns before it
+  touches the DOM, so nothing is split at all and the result is identical to
+  the no JS case. Measured under emulation: zero `.tr` and zero `.trc` on both
+  pages, and rmcheck reports zero running animations, zero faded text, zero
+  shifted elements. The CSS also carries a reduced motion override for the case
+  where the setting is turned on after a page has already been split.
+- **Never revealed.** The pre state is `--muted`, not `opacity: 0` and not
+  `brightness(0%)`. A heading whose observer never fires is still readable at
+  6.70:1 on the dark grounds and 7.15:1 on cream. There is no state of this
+  page in which a heading is invisible.
+- **Copy changed by the split.** Spaces are left as bare text nodes and never
+  wrapped, and `.trc` stays `display: inline`, because `inline-block` lets
+  `innerText` insert breaks between characters. Verified on the rendered DOM:
+  all 22 split elements match their `aria-label` on `textContent` byte for
+  byte, and `innerText` length is unchanged with the script on or off.
+- **Announced letter by letter.** The pieces sit under one `aria-hidden="true"`
+  wrapper and the heading carries `aria-label` with the exact original string.
+  No paragraph is char split anywhere.
+- **Resting half way.** No scrub. IntersectionObserver adds `is-in` once and
+  unobserves, and the 2500ms `setTimeout` backstop covers a tab that never
+  scrolls or that was backgrounded. Nothing is gated on requestAnimationFrame.
+
+**Settled state, measured.** After 3.5 seconds all 366 home pieces and all 190
+careers pieces report `color` exactly equal to their parent's computed colour
+and `text-decoration-color: rgba(0, 0, 0, 0)`, with zero animations running.
+Geometry against the pre change baseline at 1440: the h1 is 1022 x 196.9 before
+and after, the five `.head` lines are identical to the tenth of a pixel, and
+two mono `h2` labels move by 0.1px and 0.2px from kerning lost across span
+boundaries. No line count changes anywhere.
+
 ## Accessibility
 - **Focus rings.** Pixel-verified on a genuinely keyboard-focused rail button
   (tabbed to, `:focus-visible` matching): the 2px blue ring paints on all four
@@ -207,7 +311,8 @@ property on either page; the CTA arrow is an inline SVG.
 
 ## Deliberately not done
 - No map, no geography, no county anything, no "local".
-- No hero animation, no gradient, no glow, no background texture. Exa has none.
+- No gradient, no glow, no background texture. Exa has none. The only motion
+  on the page is the element reveal and the character colour readout above.
 - No canvas, no image art, no pseudo-element art behind any text.
 - No inline links inside body copy. Every link is at least a 46px block.
 - No fabricated names, titles or headshots.
@@ -250,10 +355,31 @@ footer's top padding came down one step on the scale.
 ## Dead code check, re-run after the cleanup
 Unused custom properties: none. All 36 declared properties are read by `var()` in
 `site.css`, except `--rv-d`, which is declared inline in the HTML and read with a
-fallback.
+fallback. The text reveal adds five more: `--tr-from` and `--tr-hit` are declared
+on `.tr` in `site.css`; `--tr-step`, `--tr-scan-d` and `--tr-i` are written by the
+split script and read with fallbacks, so the rules still resolve if the script is
+absent.
 
 Unused selectors: every selector in `site.css` was probed with
 `querySelectorAll` against both rendered pages. 182 selectors, zero that match
 nothing. The six the probe still lists are artifacts of the probe itself: bare
 `::before`, `::after`, `::selection`, `:focus-visible`, and the two halves of
 `:where(main, section, [id])` after a comma split.
+
+## Settling
+
+**Settling: the split is undone.** The original markup is captured with
+`el.innerHTML` before a single node is touched, and put back once the run
+finishes, along with removing the `aria-label` the split added. A settled
+element is therefore the exact element that shipped before any of this existed:
+same nodes, same kerning pairs, same line breaking, same accessible name, and
+zero generated spans left in the DOM.
+
+This is not cosmetic. The first build left the pieces in place permanently, and
+`display: inline-block` word boxes are atomic, so they changed where lines broke
+at widths nobody had measured. Verified after the fix, with JavaScript on and
+settled against JavaScript off, at 320, 340, 360, 375, 390, 414, 480, 600, 700,
+768, 834, 900, 930, 1000, 1024, 1100, 1200, 1280, 1320, 1440, 1600 and 1920:
+every element box and the document scroll height match exactly, and the leftover
+span count is 0 on both pages. Rendered `innerText` is also byte identical with
+JavaScript on and off at 320, 390, 768 and 1440.

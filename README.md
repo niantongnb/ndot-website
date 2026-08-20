@@ -1,3 +1,25 @@
+# This repo holds two separate sites
+
+| Path | Project | What |
+|---|---|---|
+| `/` | **NDot AI** | The chooser. Two design directions, three layouts each. See `README-NDOT.md`. |
+| `/editorial/1..3/` | NDot AI | The page, the broadsheet, the broadside. |
+| `/systems/1..3/` | NDot AI | The system, facing pages, panels. |
+| `/nearby/` | Nearby AI | The former homepage, moved here when NDot took the root. |
+| `/v1/` `/v2/` `/v3/` `/v4/` | Nearby AI | The four Nearby directions, unchanged. |
+
+**NDot AI and Nearby AI are separate companies and their material must not
+mix.** NDot is a B2B growth platform for media companies: no map, no county
+data, no local-life vocabulary, ever. Nearby is the consumer local-life product
+and owns everything with a county map in it. `HANDOFF.md` covers Nearby;
+`README-NDOT.md` covers NDot.
+
+GitHub Pages serves this repo root directly, with no build step, so anything
+committed here is live. Every page carries `noindex, nofollow` and `robots.txt`
+says `Disallow: /`. Unlisted, not secret.
+
+---
+
 # NDot AI — mission / vision one-pager
 
 Static prototype. No build step: each page is a single self-contained HTML file

@@ -1,10 +1,19 @@
 # Nearby AI one-pager: handoff
 
-> **This repo is now Nearby, not NDot.** NDot AI repositioned to a B2B growth
-> platform for media companies and is being built separately from scratch. All
-> five pages here are Nearby AI: consumer, local-life, county-map. The repo name
-> and URL still say "ndot" and are the next thing to fix. The NDot brief lives in
-> `Vibe_Code/ndot-v2-brief/START-HERE.md`.
+> **This repo now holds BOTH projects, and they must not mix.**
+>
+> - **NDot AI** is at the root: `/`, `/editorial/1..3/`, `/systems/1..3/`.
+>   B2B growth platform for media companies. See `README-NDOT.md`.
+> - **Nearby AI** is everything below: `/v1/`, `/v2/`, `/v3/`, `/v4/`,
+>   `/nearby/` and `assets/`. Consumer, local-life, county map. This document.
+>
+> The former Nearby homepage moved from `/` to `/nearby/` when NDot took the
+> root. Every Nearby deep link is unchanged.
+>
+> They are separate companies. **NDot has no map and must never have one**, and
+> nothing in NDot may derive from the pages below. Splitting Nearby into its own
+> repo is still the right end state; the repo name says "ndot" and should follow
+> whichever project keeps it.
 >
 > Careful when editing: several county names contain the string "ndot"
 > (`Wyandotte, KS`, `Wyandot, OH`), so a blind find-and-replace on "ndot"

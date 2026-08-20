@@ -1,6 +1,16 @@
-# NDot AI one-pager: handoff
+# Nearby AI one-pager: handoff
 
-Prototype site for NDot AI's mission and vision. Four design directions. No build
+> **This repo is now Nearby, not NDot.** NDot AI repositioned to a B2B growth
+> platform for media companies and is being built separately from scratch. All
+> five pages here are Nearby AI: consumer, local-life, county-map. The repo name
+> and URL still say "ndot" and are the next thing to fix. The NDot brief lives in
+> `Vibe_Code/ndot-v2-brief/START-HERE.md`.
+>
+> Careful when editing: several county names contain the string "ndot"
+> (`Wyandotte, KS`, `Wyandot, OH`), so a blind find-and-replace on "ndot"
+> corrupts the dataset. Replace fully-qualified strings only.
+
+Prototype site for Nearby AI's mission and vision. Four design directions. No build
 step: every page is one self-contained HTML file plus the county dataset.
 
 ## Live

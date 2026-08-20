@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>NDot AI: three directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFBF9; --paper-2:#F1F1EC; --ink:#12120F; --ink-2:#6A6A61;
+    --rule:#DADAD0; --accent:#B3261E;
+    --sans:Archivo,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin-inline:auto;padding:clamp(26px,5vw,60px) clamp(20px,4vw,48px)}
+
+  header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+    padding-bottom:14px;border-bottom:1px solid var(--ink)}
+  .brand{font-weight:600;font-size:19px;letter-spacing:-.02em}
+  .label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-2);margin:0}
+
+  h1{margin:clamp(30px,4.5vw,48px) 0 0;font-weight:500;letter-spacing:-.03em;line-height:1.12;
+    font-size:clamp(27px,1rem + 2.1vw,41px);max-width:20ch;text-wrap:balance}
+  .note{margin-top:16px;color:var(--ink-2);max-width:64ch}
+  .note b{color:var(--ink);font-weight:500}
+
+  h2.sec{margin:clamp(36px,5vw,56px) 0 0;font-family:var(--mono);font-size:11px;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+    padding-bottom:12px;border-bottom:1px solid var(--ink)}
+
+  .grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0}
+  @media (min-width:760px){ .grid{grid-template-columns:repeat(3,1fr)} }
+
+  .card{background:var(--paper);padding:clamp(20px,2.4vw,28px);
+    display:flex;flex-direction:column;min-height:210px}
+  .card .idx{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--accent)}
+  .card h3{margin:16px 0 0;font-weight:600;font-size:21px;letter-spacing:-.02em;line-height:1.2}
+  .card .ref{margin:8px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-2)}
+  .card p{margin:12px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.55}
+  .card .links{margin-top:auto;padding-top:20px;display:flex;gap:8px 18px;flex-wrap:wrap}
+  .card a{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);
+    padding-block:14px;transition:color .12s ease,border-color .12s ease}
+  .card a:hover,.card a:focus-visible{color:var(--accent);border-color:var(--accent)}
+
+  footer{margin-top:clamp(40px,5vw,64px);padding-top:18px;border-top:1px solid var(--rule)}
+  footer p{margin:0 0 6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ink-2)}
+  footer a{color:var(--ink-2);display:inline-block;padding-block:14px}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  @media (prefers-color-scheme:dark){
+    :root{--paper:#111110;--paper-2:#1A1A18;--ink:#F2F1EC;--ink-2:#9E9E94;
+          --rule:#333330;--accent:#E4655C}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="brand">NDot AI</span>
+    <p class="label">Three directions</p>
+  </header>
+
+  <h1>Three directions for the NDot AI site.</h1>
+  <p class="note">
+    Identical copy, identical structure, identical brand rules across all three.
+    Each takes its design language from a different reference site, named under
+    the title. Every version is a working HTML mockup, not a picture.
+    <b>NDot AI here is the B2B growth platform for media companies, not the
+    consumer local-life product.</b> That one is Nearby, and it lives at the
+    root of this site.
+  </p>
+
+  <h2 class="sec">The directions</h2>
+  <div class="grid">
+
+    <article class="card">
+      <span class="idx">01</span>
+      <h3>Institutional</h3>
+      <p class="ref">after hebbia.com</p>
+      <p>Cinematic dark. High contrast serif set in caps, warm near black ground,
+         one blue accent, dense prospectus type. Sells gravitas before it sells a
+         feature.</p>
+      <div class="links">
+        <a href="institutional/">Home</a>
+        <a href="institutional/careers.html">Careers</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <span class="idx">02</span>
+      <h3>Console</h3>
+      <p class="ref">after exa.ai</p>
+      <p>Light and engineered. Warm flare serif over a grotesk, monospace micro
+         labels, hairline rules, small radii, and a working surface in the hero
+         rather than a picture of one.</p>
+      <div class="links">
+        <a href="console/">Home</a>
+        <a href="console/careers.html">Careers</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <span class="idx">03</span>
+      <h3>Lab</h3>
+      <p class="ref">after a1base.com</p>
+      <p>A research lab. Amber on near black against cream, square corners
+         throughout, tiny wide tracked mono labels over large tightly set serif,
+         and a key value specimen strip.</p>
+      <div class="links">
+        <a href="lab/">Home</a>
+        <a href="lab/careers.html">Careers</a>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    <p>Prototype. Not indexed.</p>
+    <p>Copy is verbatim from the approved source document.</p>
+    <p><a href="../">Nearby, the other site in this repo</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

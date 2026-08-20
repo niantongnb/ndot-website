@@ -1,0 +1,86 @@
+<meta charset="utf-8">
+<title>ndot elements</title>
+<style>
+  body{margin:0;background:transparent}
+  canvas{display:block}
+</style>
+<canvas id="c" width="1600" height="1600"></canvas>
+<script>
+/* Standalone forge for the reusable collage elements. Same texture and box
+   routines as the deck, so anything produced here composites with the plates. */
+(function(){
+  var PAL = {
+    ink:'#111110', d1:'#2A2A26', d2:'#43433C', d3:'#6B6B63',
+    m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
+    paper:'#FAFAF8', accent:'#A6231A', accentInk:'#E86A52'
+  };
+  var TILES = {};
+  function mkRng(seed){ var s=(seed>>>0)||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+  function tile(key, w, h, draw){
+    if(TILES[key]) return TILES[key];
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h); TILES[key] = c; return c;
+  }
+  function texture(ctx, kind, colour, scale){
+    var key = kind + '|' + colour + '|' + scale, t, m;
+    if(kind === 'dots'){
+      t = tile(key, scale, scale, function(c,w,h){ c.fillStyle = colour; c.beginPath(); c.arc(w/2,h/2,w*0.23,0,Math.PI*2); c.fill(); });
+      m = new DOMMatrix().rotateSelf(45);
+    } else if(kind === 'hatch'){
+      t = tile(key, scale, scale, function(c,w,h){ c.strokeStyle = colour; c.lineWidth = 1; c.beginPath(); c.moveTo(0,h+0.5); c.lineTo(w,h+0.5); c.stroke(); });
+      m = new DOMMatrix().rotateSelf(-38);
+    } else if(kind === 'cross'){
+      t = tile(key, scale, scale, function(c,w,h){ c.strokeStyle = colour; c.lineWidth = 0.9; c.beginPath(); c.moveTo(0,h+0.5); c.lineTo(w,h+0.5); c.moveTo(w+0.5,0); c.lineTo(w+0.5,h); c.stroke(); });
+      m = new DOMMatrix().rotateSelf(24);
+    } else {
+      t = tile(key, 90, 90, function(c,w,h){
+        var img = c.createImageData(w,h), d = img.data;
+        var rr = parseInt(colour.slice(1,3),16), gg = parseInt(colour.slice(3,5),16), bb = parseInt(colour.slice(5,7),16);
+        var q = mkRng(9173);
+        for(var i=0;i<d.length;i+=4){ var v=q(); d[i]=rr; d[i+1]=gg; d[i+2]=bb; d[i+3]= v>0.76 ? Math.floor(v*165) : 0; }
+        c.putImageData(img,0,0);
+      });
+      m = new DOMMatrix();
+    }
+    var p = ctx.createPattern(t,'repeat');
+    if(m && p.setTransform) p.setTransform(m);
+    return p;
+  }
+  function isoBox(ctx, cx, cy, s, opt){
+    var kx = s*0.866, ky = s*0.5;
+    [ { pts:[[0,-s],[kx,-ky],[0,0],[-kx,-ky]], col:opt.top,   tex:'grit',  sc:7 },
+      { pts:[[-kx,-ky],[0,0],[0,s],[-kx,ky]],  col:opt.left,  tex:'hatch', sc:5 },
+      { pts:[[kx,-ky],[0,0],[0,s],[kx,ky]],    col:opt.right, tex:'dots',  sc:6 }
+    ].forEach(function(f){
+      ctx.save(); ctx.beginPath();
+      f.pts.forEach(function(p,i){ i ? ctx.lineTo(cx+p[0],cy+p[1]) : ctx.moveTo(cx+p[0],cy+p[1]); });
+      ctx.closePath(); ctx.clip();
+      ctx.fillStyle = f.col; ctx.fillRect(cx-kx-2, cy-s-2, kx*2+4, s*2+4);
+      ctx.globalAlpha = 0.24;
+      ctx.fillStyle = texture(ctx, f.tex, '#FFFFFF', f.sc);
+      ctx.fillRect(cx-kx-2, cy-s-2, kx*2+4, s*2+4);
+      ctx.restore();
+    });
+    var dr = s*0.15;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, dr, 0, Math.PI*2);
+    ctx.fillStyle = opt.dot; ctx.fill();
+    ctx.globalAlpha = 0.5; ctx.fillStyle = texture(ctx,'grit','#FFFFFF',7); ctx.fill();
+    ctx.restore();
+  }
+  var RECIPES = {
+    'box-light':  { top:PAL.d1, left:PAL.d2, right:PAL.m2, dot:PAL.accent },
+    'box-mid':    { top:PAL.d3, left:PAL.m2, right:PAL.l2, dot:PAL.accent },
+    'box-pale':   { top:PAL.m1, left:PAL.d2, right:PAL.m2, dot:PAL.accentInk },
+    'box-dark':   { top:PAL.m1, left:PAL.d1, right:PAL.d3, dot:PAL.accentInk }
+  };
+  window.forge = function(name){
+    var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+    ctx.clearRect(0,0,1600,1600);
+    isoBox(ctx, 800, 800, 560, RECIPES[name]);
+    return true;
+  };
+  var m = /name=([a-z-]+)/.exec(location.hash);
+  window.forge(m ? m[1] : 'box-light');
+})();
+</script>

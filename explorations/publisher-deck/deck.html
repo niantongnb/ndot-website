@@ -26,8 +26,11 @@
   --line:#D8D8CE;         /* hairline on paper                          */
   --line-2:#C9C9C0;       /* plate numerals, decoration                 */
 
-  --accent:#A6231A;       /* folios, ordinals        6.98:1 on paper    */
-  --accent-ink:#E86A52;   /* the same hue lifted for the band 5.80:1    */
+  /* NewsBreak palette. Dark Red carries the accent on paper; Primary Red is
+     too light there (2.93:1) and is reserved for the inverted band, where it
+     reads at 4.38:1. */
+  --accent:#D6493D;       /* NewsBreak secondary dark red   4.12:1 on paper */
+  --accent-ink:#FF5A5A;   /* NewsBreak primary red          4.38:1 on band  */
   --accent-live:var(--accent);
 
   --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
@@ -73,12 +76,13 @@ body{
 }
 .js .page{position:absolute; inset:0; margin:0; opacity:0; visibility:hidden}
 .js .page.is-on{opacity:1; visibility:visible}
-/* the inverted band. --accent is a banned pair on this ground (2.55:1),
-   so the accent token flips to --accent-ink, and hairlines use a solid
-   #6A6A63 rather than a low-alpha rgba that measures 1.37:1. */
+/* The inverted band is NewsBreak primary blue taken down to #1C3049 so type
+   clears on it. Dark Red is a banned pair here (2.33:1), so the accent flips
+   to Primary Red, and the hairline is lifted to #68809A: the warm grey rule
+   measures 2.46:1 on this ground and would vanish. */
 .page[data-ground="dark"]{
-  --paper:#131310; --panel:#1D1D19; --ink:#F4F4EE; --ink-2:#DCDCD4;
-  --mute:#9A9A90; --line:#6A6A63; --line-2:#7C7C74;
+  --paper:#1C3049; --panel:#26405F; --ink:#EEF2F6; --ink-2:#CBD6E0;
+  --mute:#93A4B5; --line:#68809A; --line-2:#7A93AC;
   --accent-live:var(--accent-ink);
 }
 
@@ -808,17 +812,18 @@ h2{font-size:41px; line-height:1.08}
      over a drafting grid. Deterministic: same seed, same composition.
      ====================================================================== */
 
-  /* Achromatic, because the brand's source of truth is black and white.
-     The printer's red appears exactly once per composition: the dot. */
+  /* NewsBreak: the blues carry the mass, the red appears exactly once per
+     composition, as the dot inside the box. Greys hold the pale end so the
+     blue never turns the page corporate-navy. */
   var PAL = {
-    ink:'#111110', d1:'#2A2A26', d2:'#43433C', d3:'#6B6B63',
-    m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
-    paper:'#FAFAF8', accent:'#A6231A', accentInk:'#E86A52'
+    navy:'#274464', blue:'#3D638C', blueLt:'#68809A', blueDk:'#1C3049',
+    d3:'#6B6B63', m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
+    ink:'#111110', paper:'#FAFAF8', accent:'#D6493D', accentInk:'#FF5A5A'
   };
   var LIGHT_SET = [PAL.l3, PAL.l3, PAL.l2, PAL.l2, PAL.l1, PAL.l1, PAL.m2, PAL.m2,
-                   PAL.m1, PAL.m1, PAL.d3, PAL.d2];
-  var DARK_SET  = [PAL.d1, PAL.d1, PAL.d2, PAL.d2, '#33332E', '#33332E',
-                   PAL.d3, PAL.m1, PAL.m2];
+                   PAL.m1, PAL.m1, PAL.blue, PAL.navy];
+  var DARK_SET  = [PAL.blueDk, PAL.blueDk, '#26405F', '#26405F', '#2E4A6B', '#2E4A6B',
+                   PAL.blue, PAL.blueLt, PAL.m2];
 
   function mkRng(seed){
     var s = (seed >>> 0) || 1;
@@ -922,7 +927,7 @@ h2{font-size:41px; line-height:1.08}
   /* --- big washed plates, the ground layer of the collage --- */
   function plates(ctx, Z, R, opt){
     var pale = opt.dark
-      ? ['#1E1E1A','#262622','#2E2E29','#33332E','#3A3A34']
+      ? ['#223751','#26405F','#2B4869','#305073','#35587D']
       : [PAL.l3, PAL.l2, PAL.l1, PAL.m2, '#EDEDE6', '#E0E0D8'];
     for(var i = 0; i < (opt.count || 3); i++){
       var w = Z[2] * lerp(0.34, 0.82, R());
@@ -1094,8 +1099,8 @@ h2{font-size:41px; line-height:1.08}
     if(art === 'photo'){                       /* the printed picture in the app */
       R = mkRng(5501);
       ctx.fillStyle = PAL.l2; ctx.fillRect(0, 0, W, H);
-      cut(ctx, function(c){ c.rect(0, 0, W, H*0.62); }, [0,0,W,H], PAL.d2, 'grit', 7, 1);
-      cut(ctx, function(c){ c.arc(W*0.72, H*0.62, H*0.42, 0, Math.PI*2); }, [0,0,W,H], PAL.m1, 'dots', 5, 0.95);
+      cut(ctx, function(c){ c.rect(0, 0, W, H*0.62); }, [0,0,W,H], PAL.navy, 'grit', 7, 1);
+      cut(ctx, function(c){ c.arc(W*0.72, H*0.62, H*0.42, 0, Math.PI*2); }, [0,0,W,H], PAL.blue, 'dots', 5, 0.95);
       cut(ctx, function(c){ c.moveTo(0,H); c.lineTo(W*0.42,H*0.3); c.lineTo(W*0.68,H); c.closePath(); }, [0,0,W,H], PAL.m2, 'hatch', 5, 0.9);
       tooth(ctx, W, H, false);
       return;
@@ -1109,7 +1114,7 @@ h2{font-size:41px; line-height:1.08}
       guides(ctx, W, H, R, { dark: dark, cols: 4, rows: 3, nodes: 3 });
       scatter(ctx, Z, R, set, { count: 16, min: 30, max: 175, screen: screen });
       isoBox(ctx, zc + Z[2] * 0.05, H * 0.47, zm * 0.235, R,
-             { top: PAL.d1, left: PAL.d2, right: PAL.m2, dot: PAL.accent, screen: screen });
+             { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
       scatter(ctx, Z, R, set, { count: 7, min: 22, max: 78, screen: screen });
       tooth(ctx, W, H, dark);
       return;
@@ -1129,15 +1134,15 @@ h2{font-size:41px; line-height:1.08}
       });
       if(stage === 2){
         isoBox(ctx, zc + Z[2] * 0.07, H * 0.54, zm * 0.17, R,
-               { top: PAL.d3, left: PAL.m2, right: PAL.l2, dot: PAL.accent, screen: screen });
+               { top: PAL.blue, left: PAL.m2, right: PAL.l2, dot: PAL.accent, screen: screen });
       }
       if(stage === 3){
         isoBox(ctx, zc, H * 0.5, zm * 0.27, R,
-               { top: PAL.m1, left: PAL.d2, right: PAL.m2, dot: PAL.accentInk, screen: screen });
+               { top: PAL.m1, left: PAL.navy, right: PAL.blueLt, dot: PAL.accentInk, screen: screen });
       }
       if(stage === 4){
         isoBox(ctx, zc + Z[2] * 0.03, H * 0.5, zm * 0.24, R,
-               { top: PAL.d1, left: PAL.d2, right: PAL.m2, dot: PAL.accent, screen: screen });
+               { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
       }
       tooth(ctx, W, H, dark);
       return;
@@ -1149,7 +1154,7 @@ h2{font-size:41px; line-height:1.08}
       guides(ctx, W, H, R, { dark: dark, cols: 3, rows: 2, nodes: 2 });
       scatter(ctx, Z, R, set, { count: 8, min: 36, max: 170, order: true, screen: screen });
       isoBox(ctx, zc + Z[2] * 0.06, H * 0.52, zm * 0.23, R,
-             { top: PAL.m1, left: PAL.d1, right: PAL.d3, dot: PAL.accentInk, screen: screen });
+             { top: PAL.m2, left: PAL.navy, right: PAL.blue, dot: PAL.accentInk, screen: screen });
       tooth(ctx, W, H, dark);
     }
   }

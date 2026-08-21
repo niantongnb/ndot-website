@@ -496,3 +496,19 @@ body.embed .hero-foot .meta{font-size:8px}
   .readout,.console,.ledger,.contact{background:none}
   .readouts,.ledger,.lrow,.console,.person,.readout{break-inside:avoid}
 }
+
+/* ============================================================
+   SCROLL REVEAL: section drift
+
+   FAIL-OPEN. The hidden state only exists once the inline page
+   script has stamped `jsrv` on <html>, so no-JS renders every
+   word, and only under prefers-reduced-motion:no-preference.
+   Revealed sections settle to transform:none so position:sticky
+   children behave at rest. Print forces everything visible.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  html.jsrv .srv{opacity:0;transform:translateY(16px)}
+  html.jsrv .srv.srv-in{opacity:1;transform:none;
+    transition:opacity .65s ease-out,transform .65s ease-out}
+}
+@media print{.srv{opacity:1!important;transform:none!important}}

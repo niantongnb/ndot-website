@@ -522,6 +522,14 @@ a{ color:inherit; text-decoration:none; }
   .btn:hover .arw,.btn-ghost:hover .arw{ transform:none; }
 }
 
+/* ---------- print: nothing the reveal hides may stay hidden on paper ---------- */
+@media print{
+  .js .rev,.js .rev.in{ opacity:1 !important; transform:none !important; transition:none !important; }
+  .js .tr-split .w,.js .tr-split.tr-in .w{
+    opacity:1 !important; filter:none !important; transform:none !important; transition:none !important;
+  }
+}
+
 /* ---------- small states and details ---------- */
 ::selection{ background:var(--amber); color:#11100E; }
 [id]{ scroll-margin-top:calc(var(--hh) + 8px); }

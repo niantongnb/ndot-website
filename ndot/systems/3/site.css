@@ -228,6 +228,22 @@ body.embed .vswitch{display:none}
 }
 
 /* ============================================================
+   SCROLL REVEAL: section drift
+
+   FAIL-OPEN. The hidden state only exists once the inline page
+   script has stamped `jsrv` on <html>, so no-JS renders every
+   word, and only under prefers-reduced-motion:no-preference.
+   Revealed sections settle to transform:none so position:sticky
+   children behave at rest. Print forces everything visible.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  html.jsrv .srv{opacity:0;transform:translateY(16px)}
+  html.jsrv .srv.srv-in{opacity:1;transform:none;
+    transition:opacity .65s ease-out,transform .65s ease-out}
+}
+@media print{.srv{opacity:1!important;transform:none!important}}
+
+/* ============================================================
    LAYOUT: PANELS  (Systems, round 3)
 
    One screen at a time. Against the other systems rounds the
@@ -288,6 +304,44 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 }
 @media (min-width:1100px){ .panel-full{padding-left:calc(var(--pad) + 76px)} }
 .plate-inner{max-width:1240px;margin-inline:auto;width:100%}
+
+/* ---------- the cover stack ----------
+   Each panel pins at the top of the viewport and the next slides up OVER
+   it. Later siblings paint above earlier positioned ones, so DOM order is
+   the z-order and no z-index ladder is needed; the pinned plate only needs
+   its own opaque ground. A panel pins ONLY when another panel follows to
+   cover it (`:has(+ .panel-full)`), which is also what keeps the careers
+   page's lone panel from pinning over its static article. No script, and
+   fail-open: a browser without :has() simply keeps the plain page.
+
+   The gate is WIDER than the snap gate on purpose. A panel taller than
+   the viewport must never pin — sticky top:0 would hold its overflow
+   below the fold forever — and measured at 900-999px the team plate runs
+   to ~1160px tall. The two panels that can still outgrow short viewports
+   are released from the pin below their measured heights (their own
+   junction falls back to a plain scroll; every other junction covers).
+
+   The incoming plate's leading edge is a 1px rule, not a shadow: the
+   base forbids shadows. The pinned plate's bottom rule is dropped so a
+   junction is one rule, never two. `screen` keeps all of this out of
+   print, where the page box can match the widths. */
+@media screen and (min-width:1000px) and (min-height:680px){
+  .panel-full{background:var(--paper)}
+  .panel-full:has(+ .panel-full){position:sticky;top:0;border-bottom:0}
+  .panel-full + .panel-full{border-top:1px solid var(--rule)}
+  /* a covered panel that receives keyboard focus lifts back above the
+     cover, so tabbing never lands on a control painted underneath */
+  .panel-full:focus-within{z-index:1}
+}
+/* the opening runs to 875px at full type scale (measured 781-875 across
+   1000-1920px wide): under 880px of viewport it scrolls instead of pinning */
+@media screen and (min-width:1000px) and (min-height:680px) and (max-height:879px){
+  .panel-full.opening{position:relative}
+}
+/* the platform plate peaks at ~700px around 1140-1320px wide */
+@media screen and (min-width:1000px) and (min-height:680px) and (max-height:719px){
+  #platform{position:relative}
+}
 
 /* the panel's own folio, set large in the corner: on a page with no
    continuous column, the number is how you know where you are */
@@ -403,7 +457,9 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 body.embed{--bar:34px}
 body.embed html,body.embed{scroll-snap-type:none}
 body.embed .ticks{display:none}
-body.embed .panel-full{min-height:0;padding:calc(var(--bar) + 16px) 16px 18px;scroll-snap-align:none}
+/* relative, never sticky, and never static: the card must not pin, but the
+   panel is still the anchor for its absolutely-positioned .stamp */
+body.embed .panel-full{min-height:0;padding:calc(var(--bar) + 16px) 16px 18px;scroll-snap-align:none;position:relative}
 body.embed .topbar{position:static;height:34px;padding-inline:16px}
 body.embed .topbar .brand svg{height:13px}
 body.embed .nav{display:none}

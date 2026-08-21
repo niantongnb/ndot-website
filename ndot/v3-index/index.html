@@ -59,9 +59,9 @@
   </section>
 
   <!-- The shift, in one sentence — moved out of the hero -->
-  <section aria-label="The shift">
+  <section class="shift" aria-label="The shift">
     <div class="wrap">
-      <p class="deck" style="margin-block:clamp(26px,4vw,44px)">As referral traffic declines, NDot AI gives publishers the infrastructure to own their audience and take control of their growth &mdash; backed by more than a decade of scaling media products to tens of millions of users and hundreds of millions in revenue.</p>
+      <p class="deck">As referral traffic declines, NDot AI gives publishers the infrastructure to own their audience and take control of their growth &mdash; backed by more than a decade of scaling media products to tens of millions of users and hundreds of millions in revenue.</p>
     </div>
   </section>
 
@@ -251,6 +251,33 @@
 <script>
   /* Gallery preview only. No content on this page depends on it running. */
   if (window.self !== window.top) document.body.classList.add('embed');
+</script>
+<script>
+  /* Section scroll reveal, fail-open: with JS off, without IntersectionObserver,
+     or under reduced motion the jsrv class is never added and nothing is ever
+     hidden. Sections settle to transform:none so sticky children work at rest. */
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.self !== window.top) return; /* gallery cards stay pinned to the finished state */
+    document.documentElement.classList.add('jsrv');
+    var els = [].slice.call(document.querySelectorAll('main > section, body > section'));
+    if (!els.length) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('srv-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    els.forEach(function (el) {
+      el.classList.add('srv');
+      if (el.getBoundingClientRect().top < vh * 0.85) {
+        el.classList.add('srv-in');   /* already on screen: no flash, no re-run */
+      } else {
+        io.observe(el);
+      }
+    });
+  })();
 </script>
 </body>
 </html>

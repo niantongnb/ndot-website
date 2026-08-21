@@ -228,6 +228,22 @@ body.embed .vswitch{display:none}
 }
 
 /* ============================================================
+   SCROLL REVEAL: section drift
+
+   FAIL-OPEN. The hidden state only exists once the inline page
+   script has stamped `jsrv` on <html>, so no-JS renders every
+   word, and only under prefers-reduced-motion:no-preference.
+   Revealed sections settle to transform:none so position:sticky
+   children behave at rest. Print forces everything visible.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  html.jsrv .srv{opacity:0;transform:translateY(16px)}
+  html.jsrv .srv.srv-in{opacity:1;transform:none;
+    transition:opacity .65s ease-out,transform .65s ease-out}
+}
+@media print{.srv{opacity:1!important;transform:none!important}}
+
+/* ============================================================
    LAYOUT: BROADSIDE  (Editorial, round 3)
 
    One centred measure, printed dark. Against the other two
@@ -400,8 +416,7 @@ body.embed .quiet-nav{display:none}
 body.embed .opening{padding-block:16px 18px}
 body.embed .opening h1{font-size:19px;line-height:1.16}
 body.embed .shiftline{padding-block:clamp(4px,1.2vw,14px) clamp(34px,5vw,56px)}
-.shiftline .deck{margin:0}
-.opening .rule-c{margin-block:14px}
+body.embed .opening .rule-c{margin-block:14px}
 body.embed .opening .deck{font-size:10.5px;line-height:1.5}
 body.embed .opening .actions{margin-top:14px}
 body.embed .btn{font-size:9px;padding:7px 11px}

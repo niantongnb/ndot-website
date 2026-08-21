@@ -343,10 +343,14 @@ body::after{
   .hero__foot{grid-column:1 / 13}
 }
 .hero__eyebrow{margin-block-end:var(--sp-6)}
-.hero h1{margin-block-end:var(--sp-8);max-width:24ch}
+/* The standfirst hangs off the claim: a small step down from the h1, then a
+   full break before whatever follows it (the button row on the home page, the
+   particulars foot on careers). Both steps are deliberate, neither inherited. */
+.hero h1{margin-block-end:clamp(18px,.95rem + .35vw,22px);max-width:24ch}
 @media (min-width:57.5em){ .hero h1{max-width:none} }
+.hero__head .prose{margin-block-end:clamp(30px,1.55rem + .7vw,36px)}
 .hero__rule{height:1px;background:var(--rule);margin-block:var(--sp-6) 0}
-.hero__standfirst{color:var(--warm-soft);max-width:26ch;margin-block-end:var(--sp-4)}
+.hero__standfirst{color:var(--warm-soft);max-width:26ch}
 @media (min-width:57.5em){ .hero__standfirst{max-width:30ch} }
 
 /* Hero lower third on both pages: a particulars table. The prospectus front
@@ -376,10 +380,14 @@ body::after{
   .particulars__row{
     grid-template-columns:repeat(12,minmax(0,1fr));
     column-gap:var(--gap);row-gap:0;
-    align-items:baseline;
+    align-items:start;
     padding-block:var(--sp-6);
   }
-  .particulars dt{grid-column:1 / 4}
+  /* Key and value share a first line: the key's line box is sized to the
+     value's (17px x 1.55), so with the row top-aligned their first lines sit
+     on the same band. Baseline alignment left the value's taller line box
+     poking ~4px above the key, and the dd's column rule with it. */
+  .particulars dt{grid-column:1 / 4;line-height:calc(var(--fz-body) * 1.55)}
   /* the column rule between key and value is the same hairline the page draws
      behind it, landed on a real content column edge */
   .particulars dd{
@@ -766,6 +774,15 @@ html.js .tr.is-split.is-in .tr__c{
     transform:none;filter:none;opacity:1;transition:none;will-change:auto;
   }
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ---------- print: nothing the reveal hides may stay hidden on paper ---------- */
+@media print{
+  html.js .rv,html.js .rv.is-in{opacity:1 !important;transform:none !important;transition:none !important}
+  html.js .tr.is-split{overflow:visible}
+  html.js .tr.is-split .tr__c,html.js .tr.is-split.is-in .tr__c{
+    opacity:1 !important;transform:none !important;filter:none !important;transition:none !important;
+  }
 }
 
 /* ---------- 320px: the header bar has to fit, so it is re-cut, not shrunk ---------- */

@@ -1,34 +1,38 @@
 /* ==========================================================================
    NDot AI: Direction A "Institutional"
-   Reference language: hebbia.com (warm near-black, high-contrast serif,
+   Reference language: hebbia.com for the structure (high-contrast serif,
    4/8/12 column rules drawn on the page, hairline dividers, one blue accent)
+   and exa.ai for the palette (light gray ground, near-white paper, blue as a
+   fill rather than as ink)
    ========================================================================== */
 
 /* ---------- tokens ---------- */
+/* One light gray system, read off exa.ai: a near-white paper, a gray ground
+   that carries most of the page, hairlines light enough to read as drawn lines
+   rather than as borders, and a single saturated blue doing a single job.
+   Every band is light, so the themed block below only ever moves --bg. Ink and
+   rules hold still from the masthead to the footer rule. */
 :root{
   /* ground + ink */
-  --black:#000;
-  --ground:#0E0B0B;          /* warm near-black */
-  --ground-2:#151110;
-  --sand:#EEECDD;            /* the one light ground */
-  --sand-2:#E5E2D1;
-  --ink:#130F0F;
-  --warm:#F4F1EB;            /* primary type on dark */
-  --warm-soft:#B4AFA6;       /* secondary type on dark  9.2:1 */
-  --ink-soft:#54504A;        /* secondary type on sand  6.6:1 */
-  --blue:#465BFF;            /* the only accent, only on the primary CTA */
-  --blue-hover:#3043E0;
+  --paper:#FFFFFF;           /* brightest surface: hero, mission, one card */
+  --ground:#F1F2F5;          /* light gray, the page's default band */
+  --ground-2:#E9ECF1;        /* one step down: footer, plates, panels */
+  --blue-wash:#E9EDFD;       /* the blue-tinted band, closing CTA only */
+  --ink:#0D1117;             /* primary type, 16.9:1 on --ground */
+  --ink-soft:#59616E;        /* secondary type, 5.6:1 on --ground */
+  --blue:#2C4BFF;            /* the one accent: CTA fills, 5.9:1 under white */
+  --blue-hover:#1B33D9;
+  --blue-bd:#C6D0F5;         /* the blue band's own hairline */
+  --blue-bd-grid:#DBE2FA;
 
   /* rules */
-  --rule:#272220;            /* hairline on dark */
-  --rule-soft:#1C1917;       /* column rules on dark */
-  --rule-light:#CFCBB8;      /* hairline on sand */
-  --rule-light-soft:#DCD9C7;
+  --rule:#D5DAE2;            /* hairline dividers */
+  --rule-soft:#E3E7ED;       /* the drawn column grid, one step lighter */
 
-  /* section theming (flipped by .theme-sand) */
+  /* section theming (moved by .theme-paper and .theme-blue) */
   --bg:var(--ground);
-  --fg:var(--warm);
-  --fg-soft:var(--warm-soft);
+  --fg:var(--ink);
+  --fg-soft:var(--ink-soft);
   --bd:var(--rule);
   --bd-grid:var(--rule-soft);
 
@@ -72,14 +76,14 @@
 @media (min-width:57.5em){ :root{ --cols:12; --outer:44px; --gap:24px; --card-pad:24px; --card-h:340px; } }
 @media (min-width:76.25em){ :root{ --outer:60px; } }
 
-.theme-sand{
-  --bg:var(--sand);
-  --fg:var(--ink);
-  --fg-soft:var(--ink-soft);
-  --bd:var(--rule-light);
-  --bd-grid:var(--rule-light-soft);
+/* The two bands that step off the gray. Paper opens the page and carries the
+   mission; the blue wash closes it. Nothing else changes hands. */
+.theme-paper{ --bg:var(--paper) }
+.theme-blue{
+  --bg:var(--blue-wash);
+  --bd:var(--blue-bd);
+  --bd-grid:var(--blue-bd-grid);
 }
-.theme-black{ --bg:var(--black); }
 
 /* ---------- reset ---------- */
 *,*::before,*::after{box-sizing:border-box}
@@ -87,7 +91,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   margin:0;
   background:var(--ground);
-  color:var(--warm);
+  color:var(--ink);
   font-family:var(--ff-sans);
   font-size:var(--fz-body);
   line-height:1.5;
@@ -104,11 +108,14 @@ a{color:inherit}
 /* anchors must clear the sticky header, or the section label lands under it */
 [id]{scroll-margin-block-start:calc(var(--hdr) + 16px)}
 
-/* film grain, lifted from the reference's feTurbulence overlay */
+/* Film grain, lifted from the reference's feTurbulence overlay. On a dark
+   ground `overlay` was what made it read; over a near-white one it composites
+   to nothing, so the grain multiplies instead and the alpha is raised a step.
+   The result is paper tooth, not noise: about 2% darkening at its strongest. */
 body::after{
-  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.5;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  mix-blend-mode:overlay;
+  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.34;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.075 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode:multiply;
 }
 
 /* ---------- focus ---------- */
@@ -119,7 +126,7 @@ body::after{
 }
 .skip{
   position:absolute;left:var(--outer);top:-100px;z-index:80;
-  background:var(--warm);color:var(--black);
+  background:var(--ink);color:var(--paper);
   padding:14px 20px;border-radius:var(--radius-sm);
   font-size:var(--fz-ui);min-height:44px;display:inline-flex;align-items:center;
   transition:top .2s var(--ease);
@@ -169,7 +176,7 @@ body::after{
 }
 .d-hero{font-size:clamp(1.75rem,1.16rem + 2.95vw,3.5rem);line-height:1.12}
 .d-lead{font-size:clamp(1.5rem,1.1rem + 2vw,2.75rem);line-height:1.16}
-.d-lead--sand{font-size:clamp(1.375rem,1.06rem + 1.58vw,2.375rem);line-height:1.2}
+.d-lead--stmt{font-size:clamp(1.375rem,1.06rem + 1.58vw,2.375rem);line-height:1.2}
 .d-sec {font-size:clamp(1.375rem,1.1rem + 1.4vw,2.1875rem);line-height:1.18}
 .d-sec--lg{font-size:clamp(1.625rem,1.16rem + 2.35vw,3rem);line-height:1.1}
 .d-sec--sm{font-size:clamp(1.1875rem,1.06rem + .65vw,1.625rem);line-height:1.24}
@@ -194,7 +201,7 @@ body::after{
 .d-hero__rest{
   display:block;
   font-size:.6em;line-height:1.3;letter-spacing:.005em;
-  color:var(--warm-soft);
+  color:var(--fg-soft);
   max-width:46ch;
 }
 .d-hero--solo{font-weight:500}
@@ -231,6 +238,7 @@ body::after{
   line-height:1.62;
   color:var(--fg-soft);
   max-width:62ch;
+  text-wrap:pretty;          /* no single-word last line, at any measure */
 }
 .prose + .prose{margin-block-start:1.15em}
 .prose--fg{color:var(--fg)}
@@ -250,31 +258,33 @@ body::after{
 .btn--primary:hover{background:var(--blue-hover);border-color:var(--blue-hover)}
 .btn--ghost{background:transparent;color:var(--fg);border-color:var(--bd)}
 .btn--ghost:hover{border-color:var(--fg)}
-.btn--solid{background:var(--warm);color:var(--black);border-color:var(--warm)}
-.btn--solid:hover{background:#fff;border-color:#fff}
+.btn--solid{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn--solid:hover{background:#232934;border-color:#232934}
 .btn__arrow{transition:transform .28s var(--ease-firm)}
 .btn:hover .btn__arrow{transform:translateX(4px)}
 .btn-row{display:flex;flex-wrap:wrap;gap:var(--sp-3)}
+/* Once the row has to stack there is no reason for the two pills to be
+   different widths, so below the wrap point they share one track. */
+@media (max-width:29.99em){ .btn-row{display:grid;grid-template-columns:1fr} }
 
 /* ---------- header ---------- */
 .site-header{
   position:sticky;top:0;z-index:50;
-  background:var(--black);
-  border-block-end:1px solid var(--rule);
+  background:var(--paper);
+  border-block-end:1px solid var(--bd);
 }
-.site-header .shell{border-inline-color:var(--rule-soft)}
+.site-header .shell{border-inline-color:var(--bd-grid)}
 .hbar{
   display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);
   min-height:72px;
 }
 .brand{display:inline-flex;align-items:center;text-decoration:none;min-height:44px;padding-block:7px}
 /* ndot-wordmark.svg is transparent, tight-cropped, drawn in currentColor which
-   resolves to black inside an <img>. Both places it appears (header, footer)
-   sit on the pure black ground, so it is inverted to warm white. Height is set
-   and width follows the intrinsic 2.903:1 ratio. No crop box, no offsets. */
+   resolves to black inside an <img>. On the light grounds it appears on that
+   black is the mark, so it ships uninverted. Height is set and width follows
+   the intrinsic 2.903:1 ratio. No crop box, no offsets. */
 .wordmark{
   height:26px;width:auto;max-width:none;flex:0 0 auto;
-  filter:invert(1);
 }
 @media (min-width:40em){ .wordmark{height:30px} }
 
@@ -284,12 +294,12 @@ body::after{
 }
 .dnav a{
   display:inline-flex;align-items:center;min-height:44px;padding:0 14px;
-  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
+  font-size:var(--fz-ui);color:var(--fg-soft);text-decoration:none;
   border-radius:var(--radius-sm);
   transition:color var(--trs),background-color var(--trs);
 }
-.dnav a:hover{color:var(--warm);background:rgba(255,255,255,.06)}
-.dnav a[aria-current="page"]{color:var(--warm)}
+.dnav a:hover{color:var(--fg);background:rgba(13,17,23,.05)}
+.dnav a[aria-current="page"]{color:var(--fg)}
 .hbar__right{position:relative;display:flex;align-items:center;gap:var(--sp-2)}
 .hbar__right .btn{min-height:44px;padding:10px 20px}
 
@@ -299,11 +309,11 @@ body::after{
   list-style:none;cursor:pointer;
   display:inline-flex;align-items:center;gap:10px;
   min-height:44px;padding:0 16px;
-  font-size:var(--fz-ui);color:var(--warm);
-  border:1px solid var(--rule);border-radius:var(--pill);
+  font-size:var(--fz-ui);color:var(--fg);
+  border:1px solid var(--bd);border-radius:var(--pill);
   transition:background-color var(--trs),border-color var(--trs);
 }
-.mnav>summary:hover{background:rgba(255,255,255,.06);border-color:var(--warm-soft)}
+.mnav>summary:hover{background:rgba(13,17,23,.05);border-color:var(--ink-soft)}
 .mnav>summary::-webkit-details-marker{display:none}
 .mnav>summary::after{
   content:"";width:9px;height:9px;flex:0 0 auto;
@@ -320,17 +330,18 @@ body::after{
 .mnav__panel{
   position:absolute;right:0;top:calc(100% + 12px);z-index:60;
   min-width:min(74vw,260px);
-  background:var(--black);
-  border:1px solid var(--rule);border-radius:var(--radius);
+  background:var(--paper);
+  border:1px solid var(--bd);border-radius:var(--radius);
+  box-shadow:0 18px 44px -22px rgba(13,17,23,.30);
   padding:var(--sp-2);
 }
 .mnav__panel a{
   display:flex;align-items:center;min-height:48px;padding:0 14px;
-  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
+  font-size:var(--fz-ui);color:var(--fg-soft);text-decoration:none;
   border-radius:var(--radius-sm);
 }
-.mnav__panel a:hover{color:var(--warm);background:rgba(255,255,255,.06)}
-.mnav__panel li + li{border-block-start:1px solid var(--rule-soft)}
+.mnav__panel a:hover{color:var(--fg);background:rgba(13,17,23,.05)}
+.mnav__panel li + li{border-block-start:1px solid var(--bd-grid)}
 
 /* ---------- hero ---------- */
 .hero .band__inner{
@@ -349,8 +360,8 @@ body::after{
 .hero h1{margin-block-end:clamp(18px,.95rem + .35vw,22px);max-width:24ch}
 @media (min-width:57.5em){ .hero h1{max-width:none} }
 .hero__head .prose{margin-block-end:clamp(30px,1.55rem + .7vw,36px)}
-.hero__rule{height:1px;background:var(--rule);margin-block:var(--sp-6) 0}
-.hero__standfirst{color:var(--warm-soft);max-width:26ch}
+.hero__rule{height:1px;background:var(--bd);margin-block:var(--sp-6) 0}
+.hero__standfirst{color:var(--fg-soft);max-width:26ch}
 @media (min-width:57.5em){ .hero__standfirst{max-width:30ch} }
 
 /* Hero lower third on both pages: a particulars table. The prospectus front
@@ -363,18 +374,18 @@ body::after{
 .particulars__row{
   display:grid;gap:var(--sp-2);
   padding-block:var(--sp-5);
-  border-block-end:1px solid var(--rule-soft);
+  border-block-end:1px solid var(--bd-grid);
 }
 .particulars__row:last-child{border-block-end:0;padding-block-end:0}
 .particulars dt{
   font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
   text-transform:uppercase;letter-spacing:var(--lts-label);
-  color:var(--warm-soft);
+  color:var(--fg-soft);
 }
 .particulars dd{
   margin:0;
-  font-size:var(--fz-body);line-height:1.55;color:var(--warm);
-  max-width:62ch;
+  font-size:var(--fz-body);line-height:1.55;color:var(--fg);
+  max-width:62ch;text-wrap:pretty;
 }
 @media (min-width:57.5em){
   .particulars__row{
@@ -392,7 +403,7 @@ body::after{
      behind it, landed on a real content column edge */
   .particulars dd{
     grid-column:4 / 11;
-    border-inline-start:1px solid var(--rule);
+    border-inline-start:1px solid var(--bd);
     padding-inline-start:var(--gap);
   }
 }
@@ -414,6 +425,47 @@ body::after{
 }
 .colmeta__v{font-size:var(--fz-ui);color:var(--fg-soft);margin-block-start:var(--sp-2)}
 
+/* ---------- the shift: one drawing, read twice ----------------------------
+   The section had a claim and a paragraph and then five empty columns. The
+   claim is a before and after, so it gets drawn as one: the same audience in
+   both panels, and only the routes to it change. Panel one keeps them on the
+   far side of three channel blocks, the dashes thinning and the third route
+   already broken. Panel two puts them inside the publisher's own perimeter,
+   with two owned surfaces and a solid line running the whole way.
+
+   Same construction as the capability cards it sits above: outline only, ink
+   at low alpha, one radius, no fill and nothing plotted. The one thing drawn
+   in the accent is the direct line, which is the only thing the section is
+   claiming. -------------------------------------------------------------- */
+.shiftfig{
+  margin:var(--sp-12) 0 0;
+  display:grid;gap:var(--bento-gap);
+}
+@media (min-width:57.5em){
+  .shiftfig{grid-template-columns:1fr 1fr}
+}
+.shiftfig__panel{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  border:1px solid var(--bd);border-radius:var(--radius);
+  background:var(--paper);
+  padding:var(--card-pad);
+}
+.shiftfig__panel--after{background:var(--blue-wash);border-color:var(--blue-bd)}
+.shiftfig__k{
+  font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
+  text-transform:uppercase;letter-spacing:var(--lts-label);color:var(--fg);
+}
+.shiftfig__art{
+  width:100%;height:auto;
+  margin-block:var(--sp-6) var(--sp-5);
+}
+.shiftfig__live{stroke:var(--blue)}
+.shiftfig__cap{
+  font-size:var(--fz-ui);line-height:1.55;color:var(--fg-soft);
+  margin-block-start:auto;max-width:46ch;text-wrap:pretty;
+}
+
 /* ---------- proof: a ruled ledger, not a card trio ---------- */
 .ledger{
   margin-block-start:var(--sp-10);
@@ -425,7 +477,7 @@ body::after{
   border-block-end:1px solid var(--bd);
   transition:background-color var(--trs);
 }
-.ledger__row:hover{background:rgba(255,255,255,.028)}
+.ledger__row:hover{background:rgba(13,17,23,.032)}
 @media (min-width:57.5em){
   .ledger__row{
     grid-template-columns:repeat(12,minmax(0,1fr));
@@ -434,21 +486,31 @@ body::after{
     padding-block:var(--sp-8);
   }
   .ledger__key{grid-column:1 / 3}
-  .ledger__fig{grid-column:3 / 9}
-  .ledger__note{grid-column:9 / 13}
+  .ledger__fig{grid-column:3 / 10}
+  .ledger__src{grid-column:10 / 13}
 }
 .ledger__key{
   font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
-  text-transform:uppercase;letter-spacing:var(--lts-label);color:var(--warm-soft);
+  text-transform:uppercase;letter-spacing:var(--lts-label);color:var(--fg-soft);
 }
-.ledger__fig{color:var(--warm)}
-.ledger__cap{font-size:var(--fz-ui);color:var(--warm)}
+/* Each entry is a whole sentence, not a figure with its unit filed in the next
+   column over. The unit finishes the line it belongs to, three sizes down and
+   in the secondary ink, so the entry still reads as one figure at a glance and
+   as one clause when actually read. `pretty` rather than the display default
+   `balance`, because balancing a line built out of two type sizes puts the
+   break in the wrong place. */
+.ledger__fig{color:var(--fg);text-wrap:pretty}
+/* Relative to the figure so it stays a fixed step below it, floored at the UI
+   size so the phone, where the figure is at its smallest, never sets it at
+   ten pixels. */
+.ledger__tail{
+  font-size:max(.42em,var(--fz-ui));letter-spacing:.005em;line-height:1.2;
+  color:var(--fg-soft);
+}
+/* The provenance sits beside the sentence, hanging from its baseline. */
 .ledger__src{
-  font-size:var(--fz-ui);line-height:1.55;color:var(--warm-soft);
-  margin-block-start:var(--sp-3);
-  padding-block-start:var(--sp-3);
-  border-block-start:1px solid var(--rule-soft);
-  max-width:44ch;
+  font-size:var(--fz-ui);line-height:1.55;color:var(--fg-soft);
+  max-width:44ch;text-wrap:pretty;
 }
 
 /* ---------- capabilities bento ---------- */
@@ -466,10 +528,10 @@ body::after{
   padding:var(--card-pad);
   display:flex;flex-direction:column;
   background:var(--ground-2);
-  border:1px solid var(--cap-bd,rgba(255,255,255,.07));
+  border:1px solid var(--cap-bd,rgba(13,17,23,.09));
   transition:border-color var(--trs);
 }
-.cap:hover{border-color:var(--cap-bd-h,rgba(255,255,255,.20))}
+.cap:hover{border-color:var(--cap-bd-h,rgba(13,17,23,.24))}
 /* flex-basis:0 only ever acts on the inline axis. Below 40em .bento__row is
    display:contents, which would make these the block axis of a column flex
    container and crush every card to nothing, so the row ratios are scoped to
@@ -491,7 +553,7 @@ body::after{
   margin-block-start:10px;
   font-size:var(--fz-ui);line-height:1.5;
   color:currentColor;opacity:.72;
-  max-width:34ch;
+  max-width:34ch;text-wrap:pretty;
 }
 .cap__hr{
   position:relative;z-index:2;
@@ -506,63 +568,66 @@ body::after{
 /* Seven grounds, all derived from this direction's own token set. No
    photography and no video: NDot has no footage, so the cards carry rule
    fields at seven densities, and the two wide cards carry a drawn structural
-   motif. Nothing here plots a number. */
-.cap--a{color:var(--warm);background:#171A38}
+   motif. Nothing here plots a number. Light rebuild: the seven separations
+   that used to be carried by hue at near-black luminance are now carried by
+   two cool grays, two warm grays, two blue washes and the paper itself, and
+   every rule field is ink at low alpha instead of white. */
+.cap--a{color:var(--ink);background:#E6ECFC;--cap-bd:rgba(44,75,255,.16);--cap-bd-h:rgba(44,75,255,.38)}
 .cap--a .cap__art::after{
-  background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.10) 0 1px,transparent 1px 18px);
+  background-image:repeating-linear-gradient(to bottom,rgba(13,17,23,.075) 0 1px,transparent 1px 18px);
   -webkit-mask-image:linear-gradient(to bottom,transparent 42%,#000 100%);
   mask-image:linear-gradient(to bottom,transparent 42%,#000 100%);}
 /* app frame plus newsletter sheet, outlines only */
 .cap--a .cap__art::before{
   content:"";position:absolute;right:-6%;bottom:-14%;width:62%;height:88%;
   background-repeat:no-repeat;background-position:right bottom;background-size:contain;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 150' fill='none' stroke='%23F4F1EB' stroke-opacity='0.22'><rect x='118' y='14' width='86' height='134' rx='12'/><line x1='118' y1='38' x2='204' y2='38'/><line x1='132' y1='60' x2='190' y2='60'/><line x1='132' y1='76' x2='176' y2='76'/><rect x='14' y='40' width='88' height='108' rx='4'/><line x1='30' y1='64' x2='86' y2='64'/><line x1='30' y1='82' x2='86' y2='82'/><line x1='30' y1='100' x2='70' y2='100'/><line x1='30' y1='118' x2='78' y2='118'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 150' fill='none' stroke='%230D1117' stroke-opacity='0.20'><rect x='118' y='14' width='86' height='134' rx='12'/><line x1='118' y1='38' x2='204' y2='38'/><line x1='132' y1='60' x2='190' y2='60'/><line x1='132' y1='76' x2='176' y2='76'/><rect x='14' y='40' width='88' height='108' rx='4'/><line x1='30' y1='64' x2='86' y2='64'/><line x1='30' y1='82' x2='86' y2='82'/><line x1='30' y1='100' x2='70' y2='100'/><line x1='30' y1='118' x2='78' y2='118'/></svg>");
   -webkit-mask-image:linear-gradient(to bottom,transparent 6%,#000 46%);
   mask-image:linear-gradient(to bottom,transparent 6%,#000 46%);}
 
-.cap--b{color:var(--warm);background:#231D1B}
+.cap--b{color:var(--ink);background:#EEEEEA}
 .cap--b .cap__art::after{
-  background-image:repeating-linear-gradient(to right,rgba(255,255,255,.12) 0 1px,transparent 1px 13px);
+  background-image:repeating-linear-gradient(to right,rgba(13,17,23,.085) 0 1px,transparent 1px 13px);
   -webkit-mask-image:linear-gradient(to right,transparent 8%,#000 100%);
   mask-image:linear-gradient(to right,transparent 8%,#000 100%);}
 
-.cap--c{color:var(--ink);background:var(--sand-2);--cap-bd:rgba(0,0,0,.13);--cap-bd-h:rgba(0,0,0,.30)}
+.cap--c{color:var(--ink);background:var(--paper);--cap-bd:rgba(13,17,23,.12);--cap-bd-h:rgba(13,17,23,.30)}
 .cap--c .cap__art::after{
-  background-image:repeating-radial-gradient(circle at 84% 122%,rgba(0,0,0,.13) 0 1px,transparent 1px 26px);
+  background-image:repeating-radial-gradient(circle at 84% 122%,rgba(13,17,23,.11) 0 1px,transparent 1px 26px);
   -webkit-mask-image:linear-gradient(to bottom,transparent 30%,#000 90%);
   mask-image:linear-gradient(to bottom,transparent 30%,#000 90%);}
 
-.cap--d{color:var(--warm);background:#2A2320}
+.cap--d{color:var(--ink);background:#E4E8EE}
 .cap--d .cap__art::after{
-  background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.10) 0 1px,transparent 1px 15px),
-                   repeating-linear-gradient(to right,rgba(255,255,255,.06) 0 1px,transparent 1px 60px);
+  background-image:repeating-linear-gradient(to bottom,rgba(13,17,23,.075) 0 1px,transparent 1px 15px),
+                   repeating-linear-gradient(to right,rgba(13,17,23,.05) 0 1px,transparent 1px 60px);
   -webkit-mask-image:radial-gradient(140% 120% at 100% 118%,#000 0%,transparent 76%);
   mask-image:radial-gradient(140% 120% at 100% 118%,#000 0%,transparent 76%);}
 /* nested shells: a returning reader, outlines only */
 .cap--d .cap__art::before{
   content:"";position:absolute;right:-8%;bottom:-24%;width:56%;height:96%;
   background-repeat:no-repeat;background-position:right bottom;background-size:contain;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160' fill='none' stroke='%23F4F1EB' stroke-opacity='0.20'><rect x='8' y='8' width='184' height='144' rx='24'/><rect x='34' y='30' width='132' height='122' rx='20'/><rect x='60' y='52' width='80' height='100' rx='16'/><circle cx='100' cy='96' r='6'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160' fill='none' stroke='%230D1117' stroke-opacity='0.18'><rect x='8' y='8' width='184' height='144' rx='24'/><rect x='34' y='30' width='132' height='122' rx='20'/><rect x='60' y='52' width='80' height='100' rx='16'/><circle cx='100' cy='96' r='6'/></svg>");
   -webkit-mask-image:linear-gradient(to bottom,transparent 8%,#000 44%);
   mask-image:linear-gradient(to bottom,transparent 8%,#000 44%);}
 
-.cap--e{color:var(--warm);background:#1A1615}
+.cap--e{color:var(--ink);background:#F1F0EC}
 .cap--e .cap__art::after{
-  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 1px,transparent 1px 11px);
+  background-image:repeating-linear-gradient(45deg,rgba(13,17,23,.075) 0 1px,transparent 1px 11px);
   -webkit-mask-image:linear-gradient(120deg,transparent 22%,#000 100%);
   mask-image:linear-gradient(120deg,transparent 22%,#000 100%);}
 
-.cap--f{color:var(--warm);background:#2E3350}
+.cap--f{color:var(--ink);background:#DCE3F9;--cap-bd:rgba(44,75,255,.16);--cap-bd-h:rgba(44,75,255,.38)}
 .cap--f .cap__art::after{
-  background-image:radial-gradient(rgba(255,255,255,.18) .9px,transparent 1px);
+  background-image:radial-gradient(rgba(13,17,23,.13) .9px,transparent 1px);
   background-size:14px 14px;
   -webkit-mask-image:linear-gradient(to bottom,transparent 34%,#000 100%);
   mask-image:linear-gradient(to bottom,transparent 34%,#000 100%);}
 
-.cap--g{color:var(--warm);background:#2B2219}
+.cap--g{color:var(--ink);background:#E9EBE6}
 .cap--g .cap__art::after{
-  background-image:repeating-linear-gradient(to right,rgba(255,255,255,.09) 0 1px,transparent 1px 34px),
-                   repeating-linear-gradient(to bottom,rgba(255,255,255,.09) 0 1px,transparent 1px 34px);
+  background-image:repeating-linear-gradient(to right,rgba(13,17,23,.07) 0 1px,transparent 1px 34px),
+                   repeating-linear-gradient(to bottom,rgba(13,17,23,.07) 0 1px,transparent 1px 34px);
   -webkit-mask-image:radial-gradient(120% 100% at 88% 112%,#000 0%,transparent 72%);
   mask-image:radial-gradient(120% 100% at 88% 112%,#000 0%,transparent 72%);}
 
@@ -573,7 +638,16 @@ body::after{
 /* mission and vision stack in reading order */
 .pair h2{margin-block-end:var(--sp-5)}
 .pair .prose{margin-block-start:var(--sp-6)}
-.pair .d-lead--sand{max-width:44ch}
+/* The statement is the section. It gets two thirds of the band and wraps on
+   its own terms; a ch cap sized it off the serif's zero width, which at this
+   display size left a third of the row empty on every line. */
+.pair .d-lead--stmt{max-width:100%}
+/* `pretty` rather than the display default `balance`: balance holds the line
+   count and then evens the lines, so a statement capped at two thirds of the
+   band still only ever drew half of it. `pretty` fills the measure and leaves
+   the last line to look after itself, which is the job it exists for. */
+@media (min-width:57.5em){ .pair .d-lead--stmt{max-width:66%;text-wrap:pretty} }
+@media (min-width:57.5em){ .pair .prose{max-width:min(52%,66ch)} }
 
 /* ---------- team: one ruled roster, not four repeated plates ---------- */
 .roster{
@@ -589,31 +663,31 @@ body::after{
   border-block-end:1px solid var(--bd);
   transition:background-color var(--trs);
 }
-.roster__row:hover{background:rgba(255,255,255,.028)}
+.roster__row:hover{background:rgba(13,17,23,.032)}
 .roster__plate{
   position:relative;width:72px;aspect-ratio:4/5;overflow:hidden;
   border:1px solid var(--bd);border-radius:var(--radius-sm);
-  background:linear-gradient(180deg,#17130F 0%,#0E0B0B 100%);
+  background:linear-gradient(180deg,var(--paper) 0%,var(--ground-2) 100%);
   display:grid;place-items:center;
 }
 /* mesh density steps per row, so no two plates are the same plate */
 .roster__plate::before{
   content:"";position:absolute;inset:0;
   background-image:
-    repeating-linear-gradient(to right,rgba(255,255,255,.05) 0 1px,transparent 1px var(--mesh,14px)),
-    repeating-linear-gradient(to bottom,rgba(255,255,255,.05) 0 1px,transparent 1px var(--mesh,14px));
+    repeating-linear-gradient(to right,rgba(13,17,23,.06) 0 1px,transparent 1px var(--mesh,14px)),
+    repeating-linear-gradient(to bottom,rgba(13,17,23,.06) 0 1px,transparent 1px var(--mesh,14px));
 }
 .roster__mono{
   position:relative;
   font-family:var(--ff-display);font-size:1.25rem;font-weight:500;
-  color:var(--warm-soft);letter-spacing:.04em;
+  color:var(--ink-soft);letter-spacing:.04em;
 }
-.roster__name{font-size:1.0625rem;color:var(--warm)}
-.roster__role{font-size:var(--fz-ui);color:var(--warm-soft);margin-block-start:2px}
+.roster__name{font-size:1.0625rem;color:var(--fg)}
+.roster__role{font-size:var(--fz-ui);color:var(--fg-soft);margin-block-start:2px}
 .roster__note{
   grid-column:1 / -1;
   font-size:var(--fz-meta);letter-spacing:.12em;text-transform:uppercase;
-  color:var(--warm-soft);
+  color:var(--fg-soft);
 }
 /* declared after the base rules so the twelve column placement wins */
 @media (min-width:57.5em){
@@ -631,12 +705,16 @@ body::after{
   .cta__mid{grid-column:6 / 10}
   .cta__b{grid-column:10 / 13;justify-self:end}
 }
+/* Stacked in a column this narrow, two pills sized to their own text read as
+   two different components. One track makes them one component: the column is
+   as wide as the longer label, and both fill it. */
+.cta__b .btn-row{display:grid;grid-template-columns:1fr;gap:var(--sp-3)}
 .cta__mid ul{border-block-start:1px solid var(--bd)}
 .cta__mid li{
-  border-block-end:1px solid var(--rule-soft);
+  border-block-end:1px solid var(--bd-grid);
   padding-block:14px;
   font-size:var(--fz-ui);letter-spacing:.01em;
-  color:var(--warm-soft);
+  color:var(--fg-soft);
 }
 
 /* ---------- careers page ---------- */
@@ -664,7 +742,7 @@ body::after{
 
 .contact-card{
   border:1px solid var(--bd);border-radius:var(--radius);
-  background:var(--ground-2);
+  background:var(--paper);
   padding:var(--sp-8);
   display:grid;gap:var(--sp-6);
   margin-block-start:var(--sp-10);
@@ -674,8 +752,8 @@ body::after{
 }
 
 /* ---------- footer ---------- */
-.site-footer{background:var(--black);border-block-start:1px solid var(--rule)}
-.site-footer .shell{border-inline-color:var(--rule-soft)}
+.site-footer{background:var(--ground-2);border-block-start:1px solid var(--bd)}
+.site-footer .shell{border-inline-color:var(--bd-grid)}
 .foot{display:grid;gap:var(--sp-10);padding-block:var(--sp-16) var(--sp-8)}
 @media (min-width:57.5em){
   .foot{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
@@ -684,21 +762,21 @@ body::after{
   .foot__contact{grid-column:9 / 13}
 }
 .foot h2{font-size:var(--fz-meta);text-transform:uppercase;letter-spacing:var(--lts-label);
-  color:var(--warm-soft);font-family:var(--ff-sans);font-weight:600;
-  padding-block-end:var(--sp-4);border-block-end:1px solid var(--rule);margin-block-end:var(--sp-2)}
+  color:var(--fg-soft);font-family:var(--ff-sans);font-weight:600;
+  padding-block-end:var(--sp-4);border-block-end:1px solid var(--bd);margin-block-end:var(--sp-2)}
 .foot__nav a,.foot__contact a{
   display:flex;align-items:center;min-height:48px;
-  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
-  border-block-end:1px solid var(--rule-soft);
+  font-size:var(--fz-ui);color:var(--fg-soft);text-decoration:none;
+  border-block-end:1px solid var(--bd-grid);
   transition:color var(--trs);
 }
-.foot__nav a:hover,.foot__contact a:hover{color:var(--warm)}
-.foot__note{font-size:var(--fz-ui);color:var(--warm-soft);margin-block-start:var(--sp-5);max-width:34ch}
+.foot__nav a:hover,.foot__contact a:hover{color:var(--fg)}
+.foot__note{font-size:var(--fz-ui);color:var(--fg-soft);margin-block-start:var(--sp-5);max-width:34ch;text-wrap:pretty}
 .foot__bottom{
   display:flex;flex-wrap:wrap;gap:var(--sp-4);justify-content:space-between;
-  border-block-start:1px solid var(--rule);
+  border-block-start:1px solid var(--bd);
   padding-block:var(--sp-6) var(--sp-8);
-  font-size:var(--fz-ui);letter-spacing:.04em;color:var(--warm-soft);
+  font-size:var(--fz-ui);letter-spacing:.04em;color:var(--fg-soft);
 }
 
 /* ---------- reveal (IO + timeout backstop; one transform property) ---------- */
@@ -716,9 +794,9 @@ html.js .rv.is-in{
    Direction-specific change: the collapsed bar reads in this page's own rule
    colour, but it gets there through opacity rather than through a colour
    override. .12 of the section's own ink over the section's own ground lands
-   within a step or two of --rule on the dark grounds and of --rule-light on
-   sand, which is the ink the 12 column grid and every hairline divider on this
-   page is already drawn in. Doing it with opacity instead of `color` means the
+   within a step or two of --rule on all three grounds, which is the ink the 12
+   column grid and every hairline divider on this page is already drawn in.
+   Doing it with opacity instead of `color` means the
    char's computed colour is never anything other than its final colour, so the
    reveal cannot lower a measured contrast ratio at any point in its run. It is
    also the same property, and a shallower fade, than the .rv element reveal

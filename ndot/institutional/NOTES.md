@@ -1,7 +1,9 @@
 # Direction A: Institutional
 
-Reference: hebbia.com. Warm near-black ground, high-contrast serif, a visible
-column grid, hairline dividers, one blue accent doing one job.
+Two references, doing two jobs. hebbia.com for the structure: a visible column
+grid, hairline dividers, ruled key-and-value tables, and one blue accent doing
+one job. exa.ai for the palette: a light gray ground, near-white paper, and the
+blue used as a fill rather than as ink.
 
 Files: `index.html`, `careers.html`, `site.css`. No JS beyond two inline blocks
 (the `html.js` flag and the reveal observer). No CDN, no build step.
@@ -21,13 +23,8 @@ Everything else (the shift standfirst, the seven-card capabilities bento, the
 single sand band for mission and vision) exists to give those three tables air.
 
 ## Taken from hebbia.com
-- Ground `#0E0B0B` warm near-black, hero and footer on pure `#000`, sand
-  `#EEECDD` as the one light ground. Type is warm off-white `#F4F1EB`, never
-  pure white.
-- One accent, `#465BFF`, only ever a primary CTA fill. It is never a link
-  colour, because at 3.9:1 on the dark ground it would fail as body text.
-- Hairline system: 1px rules at `#272220`, column rules at `#1C1917`, and the
-  light-band equivalents. Sections carry a top hairline, nothing else.
+- Hairline system: 1px rules between sections, one step lighter for the drawn
+  column rules. Sections carry a top hairline, nothing else.
 - The 4 / 8 / 12 column grid at their breakpoints (40em, 57.5em), drawn on the
   page rather than implied.
 - Their bento geometry: 10px gaps, 8px radius, rows of flex `2.45 : 1`, card
@@ -37,11 +34,99 @@ single sand band for mission and vision) exists to give those three tables air.
   overlay.
 - 100px pill CTAs.
 
-Not taken: their uppercase display serif (see the casing decision below), and
-their card colours. Every card ground is derived from this direction's own
-tokens.
+Not taken: their ground, which is now light (see below); their uppercase
+display serif (see the casing decision); and their card colours. Every card
+ground is derived from this direction's own tokens.
+
+## Taken from exa.ai
+- Three surfaces and no more: paper `#FFFFFF`, a light gray `#F1F2F5` that
+  carries most of the page, and `#E9ECF1` one step down for the footer and the
+  roster plates. A fourth, `#E9EDFD`, is the blue wash and appears twice.
+- Hairlines light enough to read as drawn lines rather than as borders:
+  `#D5DAE2` for dividers, `#E3E7ED` for the column grid.
+- The blue as a fill, not as ink: white type on `#2C4BFF` is 5.9:1, and the
+  same blue on the gray ground is 5.3:1, so it can also carry the one drawn
+  line in the shift figure without dropping under AA.
 
 ## Decisions
+
+### The palette is a light gray system now
+The whole direction ran on a warm near-black. It is now light, and the flip was
+done in the token set rather than per rule, so the page still has exactly one
+place where a colour is decided.
+
+- `--warm` / `--warm-soft` / `--rule` / `--rule-soft` named a ground, so on a
+  light page they would have been lies. Every use in the stylesheet now reads
+  the themed `--fg` / `--fg-soft` / `--bd` / `--bd-grid`, and the raw palette
+  values sit in `:root` under names that describe the value.
+- Because every band is light, the themed block only ever moves `--bg`. Ink and
+  rules hold still from the masthead to the footer rule; `.theme-blue` is the
+  one exception and moves the hairlines too, so they stay visible on the wash.
+- Ink `#0D1117` is 16.9:1 on the gray, secondary `#59616E` is 5.6:1, and the
+  blue is 5.3:1. Every one of those is a text pairing that already existed; the
+  numbers moved, the pairings did not.
+- Band order, top to bottom: paper, gray, gray, gray, paper, gray, blue wash,
+  and the footer one step under the gray. The rhythm is the one the dark build
+  had, with black reading as paper and sand reading as gray.
+- The seven card grounds used to separate by hue at near-black luminance. They
+  now separate as two cool grays, two warm grays, two blue washes and the paper
+  itself, and every rule field is ink at low alpha instead of white.
+- The grain survives, but `overlay` composites to nothing over a near-white
+  ground, so it multiplies instead, at a slightly higher alpha and a lower
+  opacity. About 2% darkening at its strongest: paper tooth, not noise.
+
+## Decisions
+
+### The shift section is a drawing, read twice
+"Why owned audience, and why now" was a claim, a paragraph, and five empty
+columns. The claim is a before and an after, so it is drawn as one: the same
+audience in both panels, and only the routes to it change. Panel one keeps them
+on the far side of three channel blocks, dashes thinning, the third route
+already broken. Panel two puts them inside the publisher's own perimeter, with
+two owned surfaces and a solid line running the whole way.
+
+Same construction as the capability cards it sits above: outline only, ink at
+low alpha, one radius, no fill, nothing plotted. The one thing drawn in the
+accent is the direct line, which is the one thing the section claims. Both SVGs
+are `aria-hidden` and both panels carry a real sentence, so nothing is said
+only in the drawing.
+
+### The proof entries are sentences, not figures with captions filed elsewhere
+The ledger printed "More than a decade" at columns 3 to 8 and its unit, "of
+scaling media products", four columns away at 9. Read left to right you got a
+figure, a gap the width of three columns, and then the noun it belonged to.
+
+The unit now finishes the line it belongs to, at `max(.42em, 15px)` and in the
+secondary ink, so the entry still reads as a figure at a glance and as a whole
+clause when actually read. The provenance takes the right column on its own.
+`text-wrap:pretty` rather than the display default `balance`, because balancing
+a line built out of two type sizes puts the break in the wrong place.
+
+### Mission and vision take the width they were given
+Both statements were capped at `44ch`, a measure sized off Playfair's zero
+width, which at that display size drew about a third of the band and left the
+rest empty. They are now capped at 66% of the band and set `text-wrap:pretty`,
+because `balance` holds the line count and then evens the lines, so a wider cap
+alone changed nothing.
+
+### One track for the two pills in the careers CTA
+Stacked in a three-column box, two pills sized to their own text read as two
+different components: 216px over 158px. The row is now a single-column grid, so
+the column is as wide as the longer label and both fill it. Below the wrap
+point every `.btn-row` does the same.
+
+### No last line is one word
+Every run of copy on both pages has its final word pair bound with a
+non-breaking space, and every prose class carries `text-wrap:pretty`. Measured
+by walking each block's text nodes with a Range and grouping the word rects
+into lines, at 360, 430, 560, 700, 820, 960, 1100, 1280, 1440 and 1600: 26
+blocks came back with a one-word or under-22% last line before, and none do
+after. The four still flagged are a three-word last line, which is not an
+orphan, and two ledger entries whose unit sits on the same line at a smaller
+size, which the line grouping reads as a second line.
+
+The glue is skipped where the bound pair would exceed 32 characters, so it can
+never push a pair wider than the narrowest container it has to fit.
 
 ### Casing: source copy keeps the source's casing
 The h1's opening clause used to be `text-transform:uppercase`, which rendered
@@ -136,9 +221,11 @@ baked-in backdrop and ground rects is gone, and so is every hack that existed
 to rescue it: the `.brand__crop` overflow box, the four hard-coded negative
 pixel offsets, and the two oversize `width`/`height` pairs.
 
-Both instances sit on the pure black ground, so the only treatment is
-`filter:invert(1)`. Height is set (26px, 30px above 40em, 22px below 26em) and
-width follows the intrinsic ratio.
+The file is drawn in `currentColor`, which resolves to black inside an `<img>`.
+On the light grounds it now sits on, black is the mark, so it ships with no
+filter at all; the `filter:invert(1)` that rescued it on black is gone. Height
+is set (26px, 30px above 40em, 22px below 26em) and width follows the intrinsic
+ratio.
 
 Measured on all four instances: `naturalWidth` 929, `naturalHeight` 320,
 rendered box 63.88 x 22 and 87.09 x 30, ratio 2.903 at every width.
@@ -148,13 +235,12 @@ the wordmark itself is under 44px tall.
 
 ### Favicon and theme colour
 Both pages carry `<link rel="icon" href="../assets/ndot-mark.svg">` and
-`<meta name="theme-color" content="#000000">`, matching the header and footer
-ground.
+`<meta name="theme-color" content="#F1F2F5">`, matching the page ground.
 
 ### Kept as they were
-- **Proof ledger.** A ruled ledger on the 12 column grid: label at columns 1
-  to 2, the verbatim entry at 3 to 8, the verbatim caption plus one line of
-  provenance at 9 to 12. No numerals, no ranges, no chart.
+- **Proof ledger.** Still a ruled ledger on the 12 column grid, still no
+  numerals, no ranges, no chart. The columns moved: label at 1 to 2, the whole
+  entry at 3 to 9, provenance at 10 to 12.
 - **Team roster.** One ruled roster, not four repeated plates. Four rows: a
   72px portrait slot with a per-row mesh density and a per-role monogram
   (L, P, E, G), the placeholder name and the real function, and the "Portrait
@@ -169,8 +255,8 @@ ground.
 - **Capabilities** is the largest section at every width. Each card carries the
   verbatim capability name plus one 15px clause, and the ground is a rule field
   at a different density per card. Nothing on a card plots a number.
-- **Mission and vision** are the one light band. The whole token set flips,
-  including the column rule colour.
+- **Mission and vision** are a band that steps off the gray onto paper, the
+  same job the sand band did against the dark ground.
 - **Right hand columns have jobs.** Section headers are a three part grid
   (label and head 1 to 4, prose 5 to 9, a ruled count 10 to 12).
 - **Motion.** IntersectionObserver plus a 1600ms setTimeout backstop, hidden
@@ -188,7 +274,7 @@ ground.
   measured the "Careers" row's phantom rect against the hero's blue CTA and
   reported 2.29:1 for text that was never painted. Those boxes were also
   phantom hit geometry. Fixed with `.mnav:not([open]) .mnav__panel{display:none}`.
-  The open panel measures 48px rows at `#B4AFA6` on `#000`, 9.2:1.
+  The open panel measures 48px rows at `#59616E` on `#FFFFFF`, 6.3:1.
 - **Logo target under 44px.** Dropping the crop box took the header and footer
   brand links to 64 x 34 and 87 x 42. `.brand{min-height:44px}` restores them.
 - Everything the previous pass fixed is still fixed: the bento collapse below

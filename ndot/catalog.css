@@ -97,6 +97,19 @@ a.cell:hover{background:var(--ink);color:var(--ground)}
 /* ============ THE LIST ============ */
 .list{list-style:none;margin:0;padding:0}
 
+/* ============ THE VIEWS ============
+   The masthead's two middle cells are a switch. The active cell is set
+   solid, the same reversal the mark cell uses. Scriptless, both groups
+   render under small label rows; with script one group shows at a time. */
+.cell.tab.is-on{background:var(--ink);color:var(--ground)}
+.grouplabel{margin:0;padding:10px var(--pad);border-bottom:1px solid var(--ink);
+  font-size:clamp(11px,1.1vw,13px);font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-2)}
+html.views .grouplabel{display:none}
+html.views .group-archived{display:none}
+html.views.show-archived .group-archived{display:block}
+html.views.show-archived .group-selected{display:none}
+
 .row{
   position:relative;
   display:flex;align-items:center;justify-content:space-between;gap:16px;

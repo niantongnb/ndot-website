@@ -366,7 +366,20 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 @media (min-width:820px){ .stats{grid-template-columns:repeat(3,1fr)} }
 .stat{background:var(--paper);display:flex;flex-direction:column;
       padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,30px);min-height:clamp(170px,22vh,240px)}
-.stat .fig{font-size:clamp(27px,1rem + 2vw,42px);font-weight:500;letter-spacing:-.028em}
+/* Sized to the box rather than to taste. The longest figure, "Hundreds of
+   millions", is 8.67x its font size wide; a card's content box is roughly
+   0.245vw. At the old 42px cap that figure was 364px inside a 350px box, so
+   it broke to two lines while "More than a decade" sat flush against both
+   walls: the three cards read as three different sizes. 2.7vw capped at
+   37px keeps every figure on one line from 820px up with 18-29px of air on
+   the longest one, measured at 820, 900, 1100, 1440 and 1920. */
+.stat .fig{font-size:clamp(23px,2.7vw,37px);font-weight:500;letter-spacing:-.028em}
+/* below 820 the cards stack full width, so the three-up constraint is gone
+   and the figure goes back to the size it wants */
+@media (max-width:819px){ .stat .fig{font-size:clamp(27px,1rem + 2vw,36px)} }
+/* the figure is the biggest type on the page and its caption was the
+   smallest; 11px at .14em tracking is where mono stops being readable */
+.stat .label{font-size:12.5px;letter-spacing:.1em}
 
 /* ---------- the shift ---------- */
 .figure-pair{display:grid;gap:clamp(18px,2.4vw,30px);margin-top:clamp(24px,3vw,36px)}

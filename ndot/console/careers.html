@@ -53,11 +53,6 @@
         <a class="btn btn--ghost" href="index.html#capabilities">See the capabilities</a>
       </div>
 
-      <div class="hero__note rv" style="--rv-d:220ms">
-        <span class="mono">Document</span>
-        <span class="rule" aria-hidden="true"></span>
-        <span class="mono mono--md">Context, platform, track record, the work, apply</span>
-      </div>
       <nav class="jump" aria-label="Sections">
         <a href="#context">Context</a>
         <a href="#building">Building</a>
@@ -305,7 +300,6 @@
         el.textContent = '';
         el.appendChild(inner);
         el.style.setProperty('--tr-step', step.toFixed(2) + 'ms');
-        el.style.setProperty('--tr-scan-d', Math.max(90, step * 3).toFixed(0) + 'ms');
         el.classList.remove('rv');
         el.classList.add('tr');
       });

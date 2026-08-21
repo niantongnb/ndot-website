@@ -53,6 +53,10 @@ Inside any version, the bar in the bottom-right corner switches direction and
 round. **It is a review tool, not part of the design.** Strip it before launch:
 search for `vswitch` and remove the CSS block and the one `<nav>` per page.
 
+`systems/3/` has already been stripped: it is the direction being shown, so
+the bar is gone from both of its pages and there is no `vswitch` left in its
+stylesheet. Every other version still carries it.
+
 ## Stylesheets are generated
 
 ```bash

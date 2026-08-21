@@ -13,6 +13,8 @@ language shrunk into a record margin on the careers page. No ruled ledger tables
 - `index.html` home, seven numbered sections
 - `careers.html` careers as a five-part document with a record margin
 - `site.css` both pages
+- `IMAGE-BRIEF.md` art direction and per-slot prompts, for generating artwork
+  that will sit on this direction. Nothing in it is wired into the pages yet.
 - Logo: `../assets/ndot-wordmark.svg`, favicon `../assets/ndot-mark.svg`
 
 ## Logo
@@ -31,7 +33,51 @@ Both pages point at the normalized wordmark. It is transparent, tight viewBox
 `<meta name="theme-color" content="#ffffff">` are on both pages. White is the
 ground this direction opens on, on both the home page and careers.
 
-## What changed in this pass
+## What changed in this pass (edit round)
+1. **The ruled contents line is gone from both heroes.** `Sections / Shift,
+   proof, capabilities, mission, vision, team, careers` on index, and
+   `Document / Context, platform, track record, the work, apply` on careers. It
+   restated the section labels the visitor was about to scroll through, and on
+   index it restated the primary nav as well. The mobile `.jump` index below it
+   stays, because that one is a set of real links standing in for the nav links
+   the header drops under 720px; it takes over the 32px top margin the contents
+   line was holding. `.hero__note` is out of `site.css`.
+2. **The shift carries a schematic.** Each comparison row now draws its own
+   route under the phrase: publisher, third-party channels, readers, with the
+   last leg dashed, against publisher and readers joined directly in both
+   directions. Same two endpoints in both drawings at the same coordinates, so
+   the only thing that differs is what stands in the middle. It is a diagram
+   rather than art: hairlines, `--field` / `--bar` / `--edge` / `--blue` and the
+   10px mono label, no new vocabulary. The row's mono key labels the picture as
+   well as the phrase, so nothing is printed twice. Dropped under 720px, where
+   five nodes will not fit and the phrase carries the row on its own.
+3. **The capabilities standfirst stopped listing the seven.** It read `Our
+   platform spans app and newsletter development, audience growth,
+   personalization, engagement, monetization, and publisher-advertiser networks
+   — all proven at scale`, immediately above a rail printing those same seven
+   names. That is the manifest problem from the previous pass in prose form. It
+   now names the four groups the record panel already has a field for, which is
+   the one thing the rail does not show at a glance. POSITIONING-3 is therefore
+   no longer present verbatim on the page; see Copy fidelity.
+4. **The proof figures came down a tier.** They were set to the exact `h1.display`
+   clamp, which put `Hundreds of millions` on two lines at 45px inside a third of
+   the column and read as a pull quote competing with the h1. Now
+   `clamp(1.44rem, 1.16rem + 1.24vw, 2rem)` with line-height 1.14: all three fit
+   on one line at 1440, and the band reads as three measurements rather than
+   three statements.
+5. **The blue underscore cursor is gone from the text reveal.** It was the one
+   mark on either page that read as an effect rather than as the page settling,
+   and it pulled the eye along the line instead of letting the line arrive. The
+   character colour walk stays. Out with it: `text-decoration-*` on `.trc`,
+   `--tr-hit`, `--tr-scan-d`, the `tr-cursor` keyframes, and the one script line
+   that wrote the scan duration.
+6. **Nothing ends on an orphan word.** A new line-breaking block sets
+   `text-wrap: balance` on short blocks and `pretty` on running copy, and
+   standfirsts balance from 640px up. Layout only: no text node is touched and
+   no non-breaking space is introduced, so every string still matches its source
+   character for character. Measured, see Audit.
+
+## What changed in the previous pass
 1. **The seven capability names were printed twice on the home page**, once in
    the console rail and once in a manifest list below. The manifest is gone. The
    rail is the assigned language and it carried more (a framing line, a support
@@ -40,8 +86,7 @@ ground this direction opens on, on both the home page and careers.
 2. **The console moved out of the hero and into the Capabilities band.** That is
    the section whose job is to name the seven, so the records now live in the
    section that owns them and appear exactly once on the page. The hero is the
-   positioning statement, an authored standfirst, two actions and a ruled
-   contents line. Home page bands at 1440: hero 607, shift 564, proof 721,
+   positioning statement, an authored standfirst and two actions. Home page bands at 1440: hero 607, shift 564, proof 721,
    capabilities 989, mission and vision 567, team 824, careers 538. Tallest to
    shortest is 1.84 to 1.
 3. **careers.html had an empty right third in all five bands.** It now runs three
@@ -137,8 +182,13 @@ headline above them would compete rather than frame.
 ## Copy fidelity
 Checked against COPY.md by string containment on the rendered pages:
 
-- POSITIONING-1, -2, -3, MISSION-LEAD, MISSION-BODY, VISION-LEAD, VISION-BODY all
+- POSITIONING-1, -2, MISSION-LEAD, MISSION-BODY, VISION-LEAD, VISION-BODY all
   present verbatim on index.
+- **POSITIONING-3 is deliberately no longer present.** It was the capabilities
+  standfirst, and it enumerated the seven capability names in prose directly
+  above the rail that prints them. The line under it now is authored and names
+  the four groups instead. This is the same call the previous pass made about
+  the manifest list, applied to the sentence that was doing the same thing.
 - All seven capability strings present on index, and their source order is
   preserved by document position.
 - CAREERS-TITLE through CAREERS-7 all present verbatim on careers. CAREERS-TITLE
@@ -146,10 +196,11 @@ Checked against COPY.md by string containment on the rendered pages:
 - The three proof figures appear once each on index and once each on careers.
 - The superseded address appears nowhere.
 
-Non-ASCII census: em dash only, and every one comes from a COPY.md block. Six on
-index (POSITIONING-1, -2, -3 and the three proof separators), eight on careers
-(CAREERS-2 twice, -4, -5, -6 and the three proof separators). Zero U+2014 and
-zero U+2013 in `site.css` and in this file. No character with the Unicode Emoji
+Non-ASCII census: em dash only, and every one comes from a COPY.md block. Four
+on index (POSITIONING-1, -2 and the three proof separators, minus the one that
+left with POSITIONING-3), eight on careers (CAREERS-2 twice, -4, -5, -6 and the
+three proof separators). Zero U+2014 and zero U+2013 in `site.css`. The orphan
+work introduced no U+00A0: it is CSS only, so the census is unchanged by it. No character with the Unicode Emoji
 property on either page; the CTA arrow is an inline SVG.
 
 ## Other decisions
@@ -173,7 +224,8 @@ property on either page; the CTA arrow is an inline SVG.
   other sections use, with a mono key per cell, the figures at the h1 tier and the
   em dash caption below.
 - **The shift carries a two row ruled comparison** under the source paragraph.
-  Both values are source phrasing from CAREERS-2; the two keys are authored.
+  Both values are source phrasing from CAREERS-2; the two keys are authored, and
+  each row now draws the route it names underneath the phrase.
 - **Team.** The four plates are a flat field with a single centred hairline and a
   numbered monogram sitting on it: deliberately blank rather than the diagonal
   cross that reads as a failed image.
@@ -195,9 +247,10 @@ Reveal". Read out of the booster's own source: chars, stagger `.05`, duration
 CSS plus IntersectionObserver. No GSAP, no SplitType, no ScrollTrigger, no CDN.
 
 **Mechanism.** Characters step from `--muted` to the element's settled colour,
-left to right, with a blue underscore cursor running the leading edge and
-stopping at the end of the line. Nothing translates, nothing blurs, nothing
-fades. This is the console, so a heading resolves the way a record resolves,
+left to right. Nothing translates, nothing blurs, nothing fades, and nothing is
+drawn under the line: a blue underscore cursor used to ride the leading edge and
+has been removed, because it was the only mark on either page that read as an
+effect rather than as the page settling. This is the console, so a heading resolves the way a record resolves,
 field by field, and it does not wobble on the way in. The other two directions
 own char scale and word skew blur; neither of those is used anywhere here.
 
@@ -305,8 +358,8 @@ boundaries. No line count changes anywhere.
 - **`::selection` on dark grounds** is `#101321` on `#a1aff7`, 8.7:1, because
   `--blue` re-points to `--blue-lift` there and white on it was 2.10:1.
 - **Mobile navigation.** The nav drops its three section links below 720px rather
-  than hiding them behind a hamburger, and an in-page mono index sits in the hero
-  at mobile widths. The footer nav carries the same three. The two hero CTAs go
+  than hiding them behind a hamburger, and the in-page `.jump` index sits in the
+  hero at mobile widths to replace them. The footer nav carries the same three. The two hero CTAs go
   full width below 480px.
 
 ## Deliberately not done
@@ -320,7 +373,42 @@ boundaries. No line count changes anywhere.
   positions 01 to 07, the 06 areas list, and the 01 / 07 counter, all of which
   count the lists themselves and assert nothing.
 
-## Audit
+## Audit: orphan words
+Headless Chromium, both pages at 320 / 390 / 640 / 719 / 720 / 768 / 900 / 1024 /
+1280 / 1440 / 1600, fonts confirmed loaded before measuring and
+`prefers-reduced-motion: reduce` set so the split never runs and the DOM measured
+is the settled one. Every text block is walked with a `Range` per word, words are
+grouped into lines by their client rect tops, and the last line of every block is
+reported with its word count and its width as a fraction of the widest line.
+
+Before: 44 flagged blocks across the two pages. After: **index.html is clean at
+every width**, and careers.html has two, both inside long source paragraphs:
+
+- `mission-critical.` alone on the last line of CAREERS-2 at 320 and 390. One
+  word, but a seventeen-character compound occupying 37% of the measure, which
+  is a full-looking line rather than a stub. The browser's own `pretty`
+  heuristic leaves it for the same reason.
+- `at scale.` on the last line of CAREERS-4 at 1280 and up, 13% of the measure.
+  In the three-track layout the prose column is narrower than `.prose--wide`'s
+  68ch, so the measure is set by the track and moving `max-width` does not reach
+  it; 66ch, 65ch and 64ch all render identically and 63ch makes it worse. The
+  block runs six to seven lines, which is past the point where the browser will
+  balance, so `balance` is a no-op on it too. Fixing it means either changing
+  the track widths or trimming the sentence, and the sentence is source copy.
+
+Both are recorded rather than papered over: no non-breaking space was inserted
+anywhere, because that would put a U+00A0 inside a source string and break the
+string-containment check the copy fidelity section depends on.
+
+Layout was re-checked at the same eleven widths after the change: no horizontal
+overflow on either page, no control under 44px tall, the shift schematic present
+exactly twice at 720 and up and absent below it, and all seven capability names
+still in the rail. With the `js` class dropped, which is exactly the CSS a
+scripting-disabled browser gets, all 34 reveal elements on index and 24 on
+careers sit at opacity 1, and no heading carries a text decoration now that the
+cursor is gone.
+
+## Audit: the previous pass
 `tools/audit.mjs`, headless Chrome over CDP, both pages at 320 / 390 / 768 / 1440.
 
 Clean at every width on both pages: zero contrast failures, zero horizontal
@@ -355,10 +443,10 @@ footer's top padding came down one step on the scale.
 ## Dead code check, re-run after the cleanup
 Unused custom properties: none. All 36 declared properties are read by `var()` in
 `site.css`, except `--rv-d`, which is declared inline in the HTML and read with a
-fallback. The text reveal adds five more: `--tr-from` and `--tr-hit` are declared
-on `.tr` in `site.css`; `--tr-step`, `--tr-scan-d` and `--tr-i` are written by the
-split script and read with fallbacks, so the rules still resolve if the script is
-absent.
+fallback. The text reveal adds three more: `--tr-from` is declared on `.tr` in
+`site.css`; `--tr-step` and `--tr-i` are written by the split script and read
+with fallbacks, so the rules still resolve if the script is absent. `--tr-hit`
+and `--tr-scan-d` went out with the cursor.
 
 Unused selectors: every selector in `site.css` was probed with
 `querySelectorAll` against both rendered pages. 182 selectors, zero that match

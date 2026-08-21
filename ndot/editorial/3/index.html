@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0B0B0A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
@@ -34,6 +34,7 @@
 
   <!-- ============ THE OPENING ============ -->
   <section class="opening leaf">
+    <div class="lattice" aria-hidden="true"><canvas id="lattice"></canvas></div>
     <h1 class="h-xl">NDot AI is the growth platform for modern media</h1>
     <div class="rule-c"></div>
     <p class="deck">We help publishers turn great content and trusted brands into direct audiences, deeper engagement, and sustainable revenue.</p>
@@ -43,11 +44,9 @@
     </div>
   </section>
 
-  <!-- The shift, in one sentence — moved out of the hero -->
-  <section aria-label="The shift">
-    <div class="wrap">
-      <p class="deck" style="margin-block:clamp(26px,4vw,44px)">As referral traffic declines, NDot AI gives publishers the infrastructure to own their audience and take control of their growth — backed by more than a decade of scaling media products to tens of millions of users and hundreds of millions in revenue.</p>
-    </div>
+  <!-- The shift, in one sentence -->
+  <section class="leaf shiftline" aria-label="The shift">
+    <p class="deck">As referral traffic declines, NDot AI gives publishers the infrastructure to own their audience and take control of their growth — backed by more than a decade of scaling media products to tens of millions of users and hundreds of millions in revenue.</p>
   </section>
 
 
@@ -183,5 +182,117 @@
       <a href="../../editorial/2/index.html" aria-label="Round 2">2</a>
       <a class="is-on" aria-current="page" href="../../editorial/3/index.html" aria-label="Round 3">3</a>
     </nav>
+
+<script>
+/* ============================================================
+   THE DOT LATTICE — hero decoration, canvas 2D, no libraries.
+   Adapted from v4-signal. On the broadside the field is INVERTED:
+   sparse at the centre so the measure stays clean, denser toward
+   the edges, in paper tone on the ink ground.
+
+   CONTRACT — this script may never gate content:
+     - the canvas is aria-hidden and pointer-events:none
+     - prefers-reduced-motion renders exactly ONE frame, no rAF
+     - the loop stops when the tab is hidden
+     - every early return leaves a transparent canvas over a
+       page that is already fully readable
+   ============================================================ */
+(function () {
+  var c = document.getElementById('lattice');
+  if (!c || !c.getContext) return;
+  var ctx = c.getContext('2d');
+  if (!ctx) return;
+
+  var dots = [], w = 0, h = 0, t = 0, raf = 0, resizeT = 0;
+  var mx = 0, my = 0, pointer = false;
+  var GAP = 26, R = 1.2, REACH = 130;
+  var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)');
+  var still = !!(mq && mq.matches);
+
+  function build() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = c.getBoundingClientRect();
+    w = Math.max(1, Math.round(r.width));
+    h = Math.max(1, Math.round(r.height));
+    c.width = Math.round(w * dpr);
+    c.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#F5F5EF';
+
+    dots.length = 0;
+    var cx = w * 0.5, cy = h * 0.46;
+    var max = Math.sqrt(cx * cx + cy * cy) || 1;
+    for (var y = GAP * 0.5; y < h; y += GAP) {
+      for (var x = GAP * 0.5; x < w; x += GAP) {
+        var d = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) / max;
+        if (Math.random() > 0.08 + d * 0.82) continue;   /* denser toward the edges */
+        dots.push({
+          x: x + (Math.random() - 0.5) * GAP * 0.6,
+          y: y + (Math.random() - 0.5) * GAP * 0.6,
+          p: Math.random() * 6.2832,
+          s: 0.35 + Math.random() * 0.5,
+          a: 0.04 + d * 0.22
+        });
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < dots.length; i++) {
+      var o = dots[i];
+      var x = o.x + Math.sin(t * o.s + o.p) * 3.2;
+      var y = o.y + Math.cos(t * o.s * 0.8 + o.p) * 3.2;
+      var a = o.a, r = R;
+      if (pointer) {
+        var dx = x - mx, dy = y - my;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REACH) {
+          var k = 1 - dist / REACH;
+          k *= k;
+          /* CEILING 0.34 — the text sits over the centre where the ground
+             gradient dims the field further; the halo may still never lift a
+             dot to where it competes with the measure. */
+          a = Math.min(0.34, a + k * 0.5);
+          r = R + k * 1.4;
+        }
+      }
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 6.2832);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function loop() { t += 0.006; draw(); raf = requestAnimationFrame(loop); }
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+  function run() { stop(); if (still || document.hidden) { draw(); } else { loop(); } }
+
+  build(); run();
+
+  function rebuild() {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function () { build(); run(); }, 160);
+  }
+  window.addEventListener('resize', rebuild);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(rebuild);
+  if (window.ResizeObserver) new ResizeObserver(rebuild).observe(c);
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : run(); });
+  if (mq && mq.addEventListener) {
+    mq.addEventListener('change', function (e) { still = e.matches; run(); });
+  }
+
+  var hero = c.closest ? c.closest('.opening') : null;
+  if (hero && window.matchMedia && window.matchMedia('(pointer:fine)').matches) {
+    hero.addEventListener('pointermove', function (e) {
+      var r = c.getBoundingClientRect();
+      mx = e.clientX - r.left; my = e.clientY - r.top; pointer = true;
+      if (still) draw();
+    });
+    hero.addEventListener('pointerleave', function () { pointer = false; if (still) draw(); });
+  }
+})();
+</script>
 </body>
 </html>

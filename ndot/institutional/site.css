@@ -57,7 +57,7 @@
   --card-hr-hover:96px;
 
   /* type */
-  --ff-display:"Bodoni Moda","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --ff-display:"Playfair Display",ui-serif,"New York","Iowan Old Style","Palatino Linotype",Georgia,serif;
   --ff-sans:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
   --fz-meta:.8125rem;        /* 13px: labels and meta only, never prose */
   --fz-ui:.9375rem;          /* 15px: nav, buttons, captions */

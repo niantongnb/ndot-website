@@ -463,12 +463,7 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 .duo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
 .duo .cell { padding: var(--s6) 0; border-top: 1px solid var(--hair); }
 .duo .cell:first-child { border-top: 0; padding-top: 0; }
-@media (min-width: 860px) {
-  .duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .duo .cell { padding: 0 var(--s7); border-top: 0; border-left: 1px solid var(--hair); }
-  .duo .cell:first-child { padding-left: 0; border-left: 0; }
-  .duo .cell:last-child { padding-right: 0; }
-}
+/* mission and vision in sequence, separated by the hairline */
 .duo .kicker { display: block; margin-bottom: var(--s4); }
 .duo .lead { margin-bottom: var(--s4); }
 

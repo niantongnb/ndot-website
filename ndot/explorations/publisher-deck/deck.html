@@ -339,10 +339,9 @@ h2{font-size:41px; line-height:1.08}
 /* the timeline is a rule with a dot at each step; the dot is the mark, so the
    sequence is drawn in the same language as the data pages */
 .timeline{list-style:none; margin:0; padding:30px 0 0; display:grid; grid-template-columns:repeat(4,1fr); position:relative}
+.timeline::before{content:""; position:absolute; left:0; right:0; top:5px; height:1px; background:var(--accent-live)}
 .tl-step{position:relative; padding-right:34px}
-.tl-step::before{content:""; position:absolute; left:0; top:-30px; width:11px; height:11px; border-radius:50%; background:var(--accent-live)}
-.tl-step::after{content:""; position:absolute; left:11px; right:0; top:-25px; height:1px; background:var(--accent-live)}
-.tl-step:last-child::after{display:none}
+.tl-step::before{content:""; position:absolute; left:0; top:-30px; width:11px; height:11px; border-radius:50%; background:var(--accent-live); z-index:1}
 .tl-n{display:block; font-family:var(--mono); font-weight:600; font-size:12px; letter-spacing:.18em; color:var(--accent-live)}
 .tl-t{display:block; font-family:var(--serif); font-weight:600; font-size:19px; letter-spacing:-.015em; color:var(--ink); margin-top:7px}
 .fit-foot{border-top:2px solid var(--accent-live); padding-top:16px; max-width:360px}

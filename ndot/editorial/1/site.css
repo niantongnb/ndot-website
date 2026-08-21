@@ -148,6 +148,12 @@ h1,h2,h3{margin:0;font-family:var(--serif);font-weight:300;text-wrap:balance}
 .hero .deck{margin-top:clamp(26px,3vw,36px);color:var(--ink-2)}
 .hero-rule{height:2px;background:var(--ink);margin-bottom:clamp(30px,4vw,44px)}
 
+/* ---------- the shift, one sentence between hero and proof ----------
+   The strip sits centred in the paper between the hero's foot and the ink
+   band: the hero's own bottom padding supplies most of the room above, so the
+   paragraph adds almost nothing there and carries the full break below. */
+.shift .deck{margin-block:clamp(4px,.5vw,8px) clamp(56px,7vw,100px)}
+
 /* ---------- 01 proof ledger (full-bleed spread) ---------- */
 .proof{padding-block:var(--section)}
 .stats{display:grid;gap:0;border-top:1px solid var(--rule-ink)}

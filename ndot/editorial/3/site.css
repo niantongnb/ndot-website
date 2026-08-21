@@ -416,8 +416,7 @@ body.embed .quiet-nav{display:none}
 body.embed .opening{padding-block:16px 18px}
 body.embed .opening h1{font-size:19px;line-height:1.16}
 body.embed .shiftline{padding-block:clamp(4px,1.2vw,14px) clamp(34px,5vw,56px)}
-.shiftline .deck{margin:0}
-.opening .rule-c{margin-block:14px}
+body.embed .opening .rule-c{margin-block:14px}
 body.embed .opening .deck{font-size:10.5px;line-height:1.5}
 body.embed .opening .actions{margin-top:14px}
 body.embed .btn{font-size:9px;padding:7px 11px}

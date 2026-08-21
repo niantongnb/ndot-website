@@ -208,6 +208,12 @@ h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
 .hero{position:relative;overflow:hidden;padding-block:clamp(56px,9vw,132px) clamp(40px,5vw,72px);text-align:center}
 .hero .deck{margin-top:clamp(20px,2.4vw,30px)}
 
+/* The shift, one sentence between the hero and the product surface. The
+   hero's bottom padding supplies the room above, so the paragraph adds only a
+   sliver there and carries the full break down to the panel, landing the
+   strip centred between the two. */
+.shift .deck{margin-block:clamp(8px,1vw,16px) clamp(48px,6vw,88px)}
+
 /* The field is capped and centred rather than pinned to the viewport: at
    2560px an uncapped field parks the fragments 670px from the headline and
    they stop reading as its margin notes. */

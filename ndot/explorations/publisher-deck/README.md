@@ -1,112 +1,122 @@
-# Artistic direction: the publisher deck
+# Publisher deck: artistic material
 
-A visual direction explored on a 15-page pitch deck, kept here as a resource for
-site iteration. The deck itself is a side artefact; **what is worth reusing is the
-system**: the palette, the type pairing, the collage engine, and the isometric box
-with the dot held inside it.
+A visual direction worked out on a 17-page pitch deck, kept here as **source
+material for the NDot site**. The deck is the artefact; what is meant to be reused
+is the system underneath it.
 
-Read `SPEC.md` for the palette, type scale and grid. Everything below is how it was made.
+If you are an agent picking this up: start at `tokens.json`, then `collage.js`,
+then `SPEC.md`. The rest is output.
 
 ---
 
 ## The direction in one paragraph
 
-Flat cut-paper shapes, each carrying a printed texture (halftone, hatch, cross-hatch,
-rule, grit), laid over a cool off-white ground on a visible 96px construction lattice,
-with an isometric box as the recurring object and a single printer's red appearing
-exactly once per composition, as the dot inside the box. Achromatic otherwise. Hard
+Flat cut shapes, each filled once and then screened with a printed texture, laid
+over a cool off-white ground on a visible 96px construction lattice, with an
+isometric box as the recurring object and a single accent red appearing exactly
+once per composition, as the dot inside that box. Achromatic otherwise. Hard
 corners, no gradients, no shadows.
 
-Reference points were two product films (Harvey, Kimi). The palette, type and rules
-are NDot's own, lifted from `prototypes/ndot-site/site.css` in the
-`n-interactive-prototype` repo, which is the source of truth for the brand.
+---
+
+## What to reach for
+
+| File | What it gives you |
+|---|---|
+| `tokens.json` | The whole system as data: colour with computed contrast ratios, the type scale and which face carries what, the grid, the motif rules. **Read this first.** |
+| `tokens.css` | The same as custom properties, ready to drop into a stylesheet. `.ndot-band` flips the accent and the hairline for inverted sections. |
+| `collage.js` | The generative engine, standalone. Point it at a canvas and it composes. Deterministic per seed. |
+| `SPEC.md` | The prose version: page-by-page structure, what each device is for. |
+| `deck.html` | The whole deck, one self-contained file. Every technique in the system is in here in working form. |
+| `assets/` | Everything already rendered, below. |
+| `fonts/` | Newsreader and IBM Plex Mono, static instances, OFL. |
+| `build/` | How the plates and the PowerPoint export are produced. |
+
+### Using the engine
+
+```html
+<canvas id="art" style="width:1200px;height:700px"></canvas>
+<script src="collage.js"></script>
+<script>
+  NDot.paint(document.getElementById('art'), {
+    recipe: 'cover',              // cover | div1..div4 | terms | quiet | photo
+    zone:   [0.55, 0, 0.48, 1],   // where fragments may live, in page fractions
+    dark:   false,
+    seed:   2026
+  });
+</script>
+```
+
+`zone` is the only thing keeping shapes off your type: fragments are placed inside
+it and bleed outward, so give it the half of the frame the text does not occupy.
+`quiet` is the calm recipe for content-heavy pages: lattice and grain only, with a
+few fragments in the outer margin.
+
+Lower level, if you want one piece:
+
+```js
+NDot.isoBox(ctx, cx, cy, size, { top, left, right, dot, screen });
+ctx.fillStyle = NDot.texture(ctx, 'dots', '#111110', 6);   // dots|hatch|cross|rule|grit
+NDot.guides(ctx, w, h, NDot.rng(41), { dark:false, cols:4, rows:3, nodes:3 });
+```
+
+### Assets already rendered
+
+| Folder | |
+|---|---|
+| `assets/backgrounds/` | 17 plates with **no text**, 2560 × 1440. Set your own type over them. |
+| `assets/backgrounds-transparent/` | The same with the ground knocked out, for any colour. |
+| `assets/reference/` | The finished pages. Layout reference. |
+| `assets/elements/` | The isometric box alone, transparent, four value recipes. |
+| `assets/textures/` | The paper grain alone: flat fields and the seamless 90px tile, opaque and transparent, on light and on ink. |
+| `assets/brand/` | `wordmark.svg`, `mark.svg`, both `fill="currentColor"` so they invert. |
 
 ---
 
-## What is here
+## Rules that are not preferences
 
-```
-deck.html                  the whole artefact, one self-contained file
-SPEC.md                    palette, type scale, grid, structure
-assets/
-  backgrounds/             15 slide plates, no text, 2560x1440
-  backgrounds-transparent/ the same with the paper ground knocked out
-  reference/               the finished slides, for layout reference
-  elements/                the isometric box, transparent, four value recipes
-  brand/                   wordmark.svg, mark.svg (fill="currentColor")
-fonts/                     Newsreader + IBM Plex Mono, static instances
-build/                     the render and export pipeline
-```
+Taken from `prototypes/ndot-site/CLAUDE.md` in `n-interactive-prototype`, which is
+the source of truth for NDot brand. Breaking these is what makes work stop looking
+like NDot.
 
-`deck.html` is deliberately not named `index.html`, so this folder is not served as a
-page by the repo's GitHub Pages build. The repo's root `robots.txt` disallows
-everything, so nothing here is indexed.
+- **The brand is black and white.** The accent is editorial chrome, under 2% of
+  surface. Delete the two accent tokens and everything still works.
+- **`#A6231A` on `#131310` is a banned pair** at 2.55:1. Inside a dark band the
+  accent is `#E86A52`.
+- **Never a low-alpha white hairline on a dark band.** The transparent version
+  measures 1.37:1 and disappears. Solid `#6A6A63`.
+- **Hard corners.** The only round things are dots, because a dot is the mark.
+- **No map, no geography, no pins, no coordinates.** A dot field reads as the
+  sister company's county map, which is what NDot is no longer about.
+- **Every element is TYPE, a RULE, a piece of DATA, or a numbered record.**
 
----
-
-## The collage engine
-
-All of it lives in the `<script>` at the bottom of `deck.html`. Worth lifting:
-
-- **`texture(ctx, kind, colour, scale)`** builds cached repeating tiles and returns a
-  canvas pattern. `dots` is a real 45-degree halftone screen, `hatch` and `cross` use
-  `DOMMatrix` rotation, `grit` is a seeded noise tile. Every shape is filled flat and
-  then screened with one of these at low alpha, which is what makes them read as
-  printed rather than vector.
-- **`plates()` / `scatter()` / `isoBox()`** compose in layers: big washed plates behind,
-  fragments clustered around the core with tails that bleed off frame, the box, then
-  small pieces on top, then a grain pass over the whole plate.
-- **`guides()`** draws the construction lattice. Positions come off the page's own
-  96px columns with a minimum gap of two columns, never off a random float; two lines
-  landing 3px apart reads as a printing fault, not a grid.
-- Everything is driven by a seeded PRNG (`mkRng`), so a given page always composes
-  identically. Change the seed, get a different composition in the same language.
-
-Each page carries one full-bleed `<canvas class="art">` with `data-art` (which recipe)
-and `data-zone="x,y,w,h"` in page fractions (where the fragments may live). The zone is
-the only thing keeping shapes off the type.
+The collage and the isometric box are, strictly, illustration, and the fragment
+scatter is a dot field. Both are deliberate departures made for this deck. Carry
+them onto the site only on purpose.
 
 ---
 
-## Running it
+## The one motif worth stealing
 
-```bash
-python3 -m http.server 8000
-# open http://localhost:8000/explorations/publisher-deck/deck.html
-```
+**One dot, one unit.** Wherever the deck states a quantity it draws that many dots
+and says what one dot is: one percentage point, one turn of revenue, one reader in
+a hundred. It is why the accent only ever appears once per composition, as the dot
+inside the box, and it is the thing that ties the data pages to the brand name.
 
-Arrow keys move, `#p=7` deep-links a page, `P` prints one page per sheet.
-Without JavaScript it degrades to a scrollable document rather than a blank screen.
+State the unit in a caption or do not use the device.
 
-## Rebuilding the exports
+---
 
-`build/` renders the plates and produces a PowerPoint file with live text:
+## Notes for whoever runs this next
 
-1. Append an override to `deck.html` that makes `#stage` static and `#reel`
-   untransformed. For the text-free plates also set
-   `-webkit-text-fill-color: transparent`, which kills glyphs but not SVG fill, so
-   the wordmark survives into the plate.
-2. `chrome-headless-shell --force-device-scale-factor=2 --window-size=1280,720
-   --screenshot`, once per page via the `#p=N` hash. 2560x1440 is 192 DPI on a
-   13.333in slide.
-3. `build/cdp_eval.py` drives the same binary over CDP to run `build/extract.js`,
-   which walks the DOM for every text run with its position, face, size, weight,
-   colour and letter-spacing. Needs `--remote-allow-origins=*` or the websocket
-   handshake 403s.
-4. `build/build_pptx.py` lays each plate full-bleed and adds one text box per block.
-
-Two traps worth remembering:
-
-- A `<canvas>` is a **replaced element**. `position:absolute; top:0; bottom:0` does
-  not stretch it — it keeps its intrinsic height and `bottom` is dropped. Set
-  `height:100%`.
-- Use **Range client rects** for a text block's top, not the element rect. A block
-  holding both a block child and its own text reports the child's top as its own,
-  and the two lines land on top of each other.
-
-## Fonts
-
-Google Fonts only ships Newsreader as a variable font, so PowerPoint fakes the bold.
-`fonts/` holds static Regular / Bold / Italic instances cut with
-`fontTools.varLib.instancer` at `opsz 16` and renamed so bold maps correctly, plus
-IBM Plex Mono statics. Both families are OFL.
+- `deck.html` is deliberately **not** `index.html`, so Pages does not serve this
+  folder as a page.
+- The deck **fails open**: without script it is a scrollable document. An inline
+  script stamps `html.js` and only then does it become one screen at a time.
+- Two traps that cost time and will cost you the same:
+  a `<canvas>` is a replaced element, so `position:absolute; top:0; bottom:0` does
+  **not** stretch it, set `height:100%`; and use **Range client rects** for a text
+  block's top, because an element holding both a block child and its own text
+  reports the child's top as its own.
+- The reference films that informed this direction are third-party marketing
+  videos and are deliberately **not** committed here.

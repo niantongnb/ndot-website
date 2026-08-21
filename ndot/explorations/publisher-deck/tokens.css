@@ -1,0 +1,91 @@
+/* =============================================================================
+   ndot design tokens
+   -----------------------------------------------------------------------------
+   Lifted from prototypes/ndot-site/site.css in Nianthony/n-interactive-prototype,
+   which is the source of truth for NDot brand, and extended with the collage
+   tones used by the publisher-deck exploration.
+
+   Contrast ratios in the comments are computed (WCAG 2.1), not eyeballed.
+   Machine-readable twin: tokens.json
+   ============================================================================= */
+
+:root {
+  /* ---- ground and ink, on paper ---- */
+  --ndot-paper:      #FAFAF8;   /* page ground, cool near-white stock          */
+  --ndot-plate:      #F1F1EC;   /* flat surfaces: panels, tables               */
+  --ndot-ink:        #111110;   /* headlines, body        18.08:1 on paper     */
+  --ndot-ink-2:      #3D3D37;   /* secondary body                              */
+  --ndot-mute:       #6B6B63;   /* decks, captions         5.14:1 on paper     */
+  --ndot-rule:       #D8D8CE;   /* hairlines                                   */
+  --ndot-rule-2:     #C9C9C0;   /* decoration, empty dots                      */
+
+  /* ---- the inverted band ---- */
+  --ndot-band:       #131310;   /* full-bleed dark ground                      */
+  --ndot-band-plate: #1D1D19;
+  --ndot-on-band:    #F4F4EE;   /* text on the band       16.86:1              */
+  --ndot-on-band-2:  #DCDCD4;
+  --ndot-band-mute:  #9A9A90;   /* labels on the band      6.56:1              */
+  --ndot-band-rule:  #6A6A63;   /* hairline on the band    3.38:1, clears 1.4.11 */
+
+  /* ---- the one accent ----
+     The brand is black and white; this is editorial chrome, under 2% of surface.
+     Delete these two and everything still works, achromatic. */
+  --ndot-accent:     #A6231A;   /* folios, ordinals, key numbers  6.98:1 on paper */
+  --ndot-accent-band:#E86A52;   /* the same hue lifted for the band  5.80:1    */
+
+  /* ---- collage tones ---- */
+  --ndot-c-d1: #2A2A26;
+  --ndot-c-d2: #43433C;
+  --ndot-c-d3: #6B6B63;
+  --ndot-c-m1: #9A9A90;
+  --ndot-c-m2: #C9C9C0;
+  --ndot-c-l1: #D8D8CE;
+  --ndot-c-l2: #E6E6DF;
+  --ndot-c-l3: #F1F1EC;
+
+  /* ---- type ---- */
+  --ndot-serif: Newsreader, "Iowan Old Style", "Palatino Linotype", Palatino,
+                Georgia, "Times New Roman", serif;
+  --ndot-mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Serif carries prose. Mono carries the system layer only: labels, folios,
+     ordinals, data captions, table heads, page numbers. */
+
+  --ndot-size-display:  54px;   /* cover headline,   weight 600, tracking -.017em */
+  --ndot-size-section:  78px;   /* section divider,  weight 600                   */
+  --ndot-size-head:     41px;   /* page headline,    weight 600                   */
+  --ndot-size-lede:   16.5px;   /* standfirst,       weight 400                   */
+  --ndot-size-body:     14px;
+  --ndot-size-figure:   52px;   /* a stated figure,  weight 600, tracking -.035em */
+  --ndot-size-label:  10.5px;   /* mono, .2em, uppercase                          */
+  --ndot-size-agate:   9.5px;   /* mono, .15em, uppercase                         */
+
+  /* ---- grid ---- */
+  --ndot-margin:  64px;   /* outer margin on a 1280px measure                  */
+  --ndot-column:  96px;   /* construction lattice; guides sit on it, never between */
+  --ndot-gutter:  40px;
+}
+
+/* Hard corners are a brand rule, not a preference. The only round things are
+   dots, because a dot is the mark. */
+.ndot-scope, .ndot-scope *, .ndot-scope *::before, .ndot-scope *::after {
+  border-radius: 0;
+}
+.ndot-scope .ndot-dot { border-radius: 50%; }
+
+/* The inverted band. --ndot-accent is a BANNED pair here: #A6231A on #131310 is
+   2.55:1. Anything accent-coloured inside a band must use --ndot-accent-band.
+   Never a low-alpha white hairline on the band either; the transparent version
+   measured 1.37:1 and was effectively invisible. */
+.ndot-band {
+  background: var(--ndot-band);
+  color: var(--ndot-on-band);
+  --ndot-accent-live: var(--ndot-accent-band);
+  --ndot-rule: var(--ndot-band-rule);
+  --ndot-mute: var(--ndot-band-mute);
+}
+:root { --ndot-accent-live: var(--ndot-accent); }
+
+/* Paper grain. The deck applies it at 0.20 over paper and 0.16 over the band. */
+.ndot-grain { background-image: url("assets/textures/grain-tile-on-light-90.png"); }
+.ndot-band.ndot-grain { background-image: url("assets/textures/grain-tile-on-dark-90.png"); }

@@ -1,0 +1,31 @@
+<meta charset="utf-8"><title>collage module test</title>
+<style>
+  body{margin:0;background:#FAFAF8;font:12px/1.4 monospace;color:#6B6B63}
+  .row{display:flex;flex-wrap:wrap}
+  figure{margin:0;width:426px}
+  canvas{width:426px;height:240px;display:block;background:#FAFAF8}
+  figure.dark canvas{background:#131310}
+  figcaption{padding:4px 8px 12px}
+</style>
+<div class="row" id="r"></div>
+<script src="../collage.js"></script>
+<script>
+  var cases = [
+    ['cover',  [0.55,0,0.48,1], false],
+    ['div1',   [0.50,0,0.55,1], false],
+    ['div3',   [0.50,0,0.55,1], true ],
+    ['terms',  [0.55,0,0.50,1], true ],
+    ['quiet',  [0.94,0,0.10,1], false],
+    ['photo',  [0,0,1,1],       false]
+  ];
+  var r = document.getElementById('r');
+  cases.forEach(function(c, i){
+    var f = document.createElement('figure');
+    if(c[2]) f.className = 'dark';
+    f.innerHTML = '<canvas></canvas><figcaption>' + c[0] + (c[2] ? '  (dark)' : '') + '</figcaption>';
+    r.appendChild(f);
+    var ok = NDot.paint(f.querySelector('canvas'), {recipe:c[0], zone:c[1], dark:c[2], seed:2026 + i*13});
+    if(!ok) f.querySelector('figcaption').textContent = c[0] + '  FAILED';
+  });
+  window.__api = Object.keys(NDot).join(',');
+</script>

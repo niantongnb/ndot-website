@@ -573,6 +573,7 @@ body::after{
 /* mission and vision stack in reading order */
 .pair h2{margin-block-end:var(--sp-5)}
 .pair .prose{margin-block-start:var(--sp-6)}
+.pair .d-lead--sand{max-width:44ch}
 
 /* ---------- team: one ruled roster, not four repeated plates ---------- */
 .roster{

@@ -170,7 +170,7 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 /* mission above vision, one rule between */
 .mv > div{background:var(--paper);padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,32px)}
 .mv .h-m{margin-top:14px}
-.mv .body{margin-top:14px;color:var(--ink-2);font-size:15px;line-height:1.6}
+.mv .body{margin-top:14px;color:var(--ink-2);font-size:15px;line-height:1.6;max-width:64ch}
 
 /* ---------- team ---------- */
 .grid-people{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr);

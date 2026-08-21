@@ -465,7 +465,7 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 .duo .cell:first-child { border-top: 0; padding-top: 0; }
 /* mission and vision in sequence, separated by the hairline */
 .duo .kicker { display: block; margin-bottom: var(--s4); }
-.duo .lead { margin-bottom: var(--s4); }
+.duo .lead { margin-bottom: var(--s4); max-width: 44ch; }
 
 /* ---------- team: four plates, deliberately blank rather than broken ---------- */
 .team {

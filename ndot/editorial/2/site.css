@@ -419,8 +419,8 @@ body{font-size:17px;line-height:24px}
 .mv{margin-top:24px}
 /* mission and vision stack; .cols supplies the rule between them */
 .mv .label{line-height:18px}
-.mv .h-m{margin-top:12px;font-size:22px;line-height:30px;font-weight:400;letter-spacing:-.01em}
-.mv .body{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:24px}
+.mv .h-m{margin-top:12px;font-size:22px;line-height:30px;font-weight:400;letter-spacing:-.01em;max-width:52ch}
+.mv .body{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:24px;max-width:68ch}
 
 /* ---------- team, a strip along the foot ---------- */
 .grid-people{margin-top:24px;grid-template-columns:repeat(2,1fr)}

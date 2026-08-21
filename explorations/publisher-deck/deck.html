@@ -1,0 +1,1246 @@
+<meta charset="utf-8">
+<script>document.documentElement.className += " js";</script>
+<title>ndot for Publishers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+/* ==========================================================================
+   ndot for publishers
+   Printed-collage system: cool paper ground, muted plate colours, every
+   shape carrying a texture. Sections I and II are fragments; from Section III
+   the fragments assemble into a box with the dot inside it.
+   ========================================================================== */
+
+:root{
+  /* NDot AI tokens, lifted from prototypes/ndot-site/site.css in
+     Nianthony/n-interactive-prototype. Contrast ratios are computed, not
+     eyeballed. The brand's source of truth is black and white; --accent is
+     one printer's red used as editorial chrome, nothing else. */
+  --paper:#FAFAF8;        /* page ground, cool near-white stock          */
+  --panel:#F1F1EC;        /* flat surfaces: plates, tables              */
+  --ink:#111110;          /* headlines, body        18.08:1 on paper    */
+  --ink-2:#3D3D37;        /* secondary body                             */
+  --mute:#6B6B63;         /* decks, captions         5.14:1 on paper    */
+  --line:#D8D8CE;         /* hairline on paper                          */
+  --line-2:#C9C9C0;       /* plate numerals, decoration                 */
+
+  /* NewsBreak palette. Dark Red carries the accent on paper; Primary Red is
+     too light there (2.93:1) and is reserved for the inverted band, where it
+     reads at 4.38:1. */
+  --accent:#D6493D;       /* NewsBreak secondary dark red   4.12:1 on paper */
+  --accent-ink:#FF5A5A;   /* NewsBreak primary red          4.38:1 on band  */
+  --accent-live:var(--accent);
+
+  --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  --W:1280px; --H:720px;
+  --mx:64px; --my:46px;
+}
+
+/* Hard corners are a brand rule, not a preference. The only round things
+   on the page are dots, which are the mark. */
+*,*::before,*::after{border-radius:0}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+.js,.js body{height:100%; overflow:hidden}
+/* Fail open. Without script the deck is a scrollable 15-page document;
+   .js turns it into one screen at a time. No copy is ever gated behind JS. */
+body{
+  background:#1B1D1E;
+  color:var(--ink);
+  font-family:var(--serif);
+  font-variant-numeric:lining-nums tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- stage ---------- */
+#stage{display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px}
+.js #stage{position:fixed; inset:0; flex-direction:row; gap:0; padding:0; justify-content:center}
+#reel{
+  width:var(--W); position:relative;
+  transform-origin:center center;
+  box-shadow:0 34px 90px rgba(0,0,0,.5);   /* viewer chrome, not page design */
+}
+.js #reel{height:var(--H)}
+.page{
+  position:relative; margin-bottom:20px;
+  width:var(--W); height:var(--H);
+  padding:var(--my) var(--mx);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  background:var(--paper); color:var(--ink);
+}
+.js .page{position:absolute; inset:0; margin:0; opacity:0; visibility:hidden}
+.js .page.is-on{opacity:1; visibility:visible}
+/* The inverted band is NewsBreak primary blue taken down to #1C3049 so type
+   clears on it. Dark Red is a banned pair here (2.33:1), so the accent flips
+   to Primary Red, and the hairline is lifted to #68809A: the warm grey rule
+   measures 2.46:1 on this ground and would vanish. */
+.page[data-ground="dark"]{
+  --paper:#1C3049; --panel:#26405F; --ink:#EEF2F6; --ink-2:#CBD6E0;
+  --mute:#93A4B5; --line:#68809A; --line-2:#7A93AC;
+  --accent-live:var(--accent-ink);
+}
+
+/* collage layers sit under the type */
+.art{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:0}
+.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
+
+/* ---------- chrome ---------- */
+.folio{display:flex; align-items:center; justify-content:space-between; gap:20px; flex:none; padding-bottom:12px; border-bottom:1px solid var(--line-2)}
+.flag{display:flex; align-items:center; gap:8px}
+.flag svg{height:15px; width:auto; display:block; color:var(--ink)}
+.flag .fw{font-family:var(--mono); 
+  font-size:10.5px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--mute); padding-left:10px; margin-left:4px; border-left:1px solid var(--line-2);
+}
+.folio-r{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); text-align:right}
+.folio-r b{color:var(--accent-live); font-weight:500; letter-spacing:.1em}
+
+.foot{flex:none; display:flex; align-items:flex-start; justify-content:space-between; gap:26px; padding-top:11px; border-top:1px solid var(--line)}
+.foot .src{font-family:var(--mono); font-size:9.5px; line-height:1.55; color:var(--mute); max-width:880px}
+.foot .pg{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); white-space:nowrap}
+
+/* ---------- type ---------- */
+.kicker{font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--accent-live)}
+.label{font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--mute)}
+h1,h2{font-family:var(--serif); font-weight:600; letter-spacing:-.017em; text-wrap:balance; color:var(--ink)}
+h3{font-family:var(--serif); font-weight:600; font-size:19px; line-height:1.2; letter-spacing:-.01em}
+h1{font-size:70px; line-height:1.0}
+h2{font-size:41px; line-height:1.08}
+.lede{font-size:16.5px; line-height:1.6; color:var(--ink-2); max-width:70ch; text-wrap:pretty}
+.lede.dim{color:var(--mute)}
+.body{font-size:14px; line-height:1.65; color:var(--mute); text-wrap:pretty}
+.serif-it{font-family:var(--serif); font-style:italic; font-weight:300}
+.to{font-family:var(--serif); font-style:italic; font-weight:300; letter-spacing:0}
+
+/* floating panel, the reference's signature surface */
+/* a plate is a fill and a rule. No shadow, no radius, no gradient. */
+.panel{ background:var(--panel); border:1px solid var(--line); }
+
+/* ---------- 1 &middot; cover ---------- */
+.cover{flex:1; min-height:0; display:flex; flex-direction:column; padding-top:30px; max-width:642px}
+.cover h1{font-size:54px; line-height:1.06}
+.cover h1 em{font-style:normal; color:var(--accent-live)}
+.cover .deck{font-family:var(--serif); font-style:italic; font-weight:300; font-size:18px; line-height:1.45; color:var(--mute); max-width:34ch; margin-top:20px; padding-top:18px; border-top:1px solid var(--line-2)}
+.cover .stand{margin-top:auto; font-size:13px; line-height:1.62; color:var(--ink-2); max-width:58ch}
+.cover .stand b{font-weight:600; color:var(--ink)}
+.fig-cap{position:absolute; right:var(--mx); bottom:calc(var(--my) + 46px); z-index:2; width:262px; padding:13px 15px; font-size:9px; font-weight:600; line-height:1.5; letter-spacing:.15em; text-transform:uppercase; color:var(--ink)}
+.fig-cap span{display:block; margin-top:6px; font-weight:400; letter-spacing:.08em; text-transform:none; font-size:10.5px; line-height:1.5; color:var(--mute)}
+
+/* ---------- 2 &middot; contents ---------- */
+.toc{flex:1; min-height:0; display:grid; grid-template-columns:290px 1fr; gap:60px; padding-top:30px}
+.toc-l{display:flex; flex-direction:column}
+.toc-l h2{font-size:46px}
+.toc-note{font-family:var(--serif); font-style:italic; font-weight:300; font-size:15px; line-height:1.6; color:var(--mute); margin-top:18px}
+.colophon{margin-top:auto; padding-top:18px; border-top:1px solid var(--line-2); display:flex; flex-direction:column; gap:12px}
+.colophon div{font-size:12.5px; color:var(--ink)}
+.colophon span{font-family:var(--mono); display:block; font-size:9px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--mute); margin-bottom:3px}
+.toc-list{display:flex; flex-direction:column; justify-content:center}
+.toc-row{display:grid; grid-template-columns:58px 1fr 62px; gap:20px; align-items:baseline; padding:20px 0; border-top:1px solid var(--line)}
+.toc-row:last-child{border-bottom:1px solid var(--line)}
+.toc-rn{font-family:var(--mono); font-weight:500; font-size:12px; letter-spacing:.1em; color:var(--accent-live)}
+.toc-t{font-family:var(--serif); font-weight:600; font-size:25px; letter-spacing:-.015em}
+.toc-t span{display:block; font-family:var(--serif); font-weight:400; font-size:14px; letter-spacing:0; color:var(--mute); margin-top:5px}
+.toc-p{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); text-align:right}
+
+/* ---------- section dividers ---------- */
+.divider{flex:1; min-height:0; display:flex; flex-direction:column; max-width:552px; padding:34px 0 22px}
+.div-rn{font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:var(--accent-live); padding-bottom:14px; border-bottom:1px solid var(--line-2)}
+.divider h2{font-size:78px; line-height:1.0; margin:auto 0 22px}
+.div-line{font-family:var(--serif); font-weight:300; font-size:21px; line-height:1.45; color:var(--mute); max-width:30ch}
+.div-jump{font-family:var(--mono); margin-top:26px; padding-top:13px; border-top:1px solid var(--line); font-size:9.5px; letter-spacing:.17em; text-transform:uppercase; color:var(--mute)}
+
+/* ---------- content shell ---------- */
+.head{flex:none; padding-top:24px}
+.head .kicker{display:block; margin-bottom:11px}
+.head .lede{margin-top:13px}
+.main{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center; padding:14px 0}
+
+/* ---------- unit dots ---------- */
+.rails{display:flex; flex-direction:column}
+.rail-row{display:grid; grid-template-columns:150px 1fr; gap:26px; align-items:center; padding:15px 0; border-top:1px solid var(--line)}
+.rail-row:last-child{border-bottom:1px solid var(--line)}
+.rail-num{font-family:var(--serif); font-weight:600; font-size:40px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums; color:var(--accent-live)}
+.rail-num .pct{font-size:23px}
+.rail-meta{display:flex; align-items:baseline; justify-content:space-between; gap:18px; margin-bottom:9px}
+.rail-lab{font-size:14px; font-weight:600; color:var(--ink)}
+.rail-when{font-family:var(--mono); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); white-space:nowrap}
+.rail{display:flex; align-items:center}
+.rail i{width:9.4px; height:9.4px; display:block; flex:none; position:relative}
+.rail i::after{content:""; position:absolute; left:0; top:2.5px; width:4.4px; height:4.4px; border-radius:50%; background:#CFD1CB}
+.rail i.on::after{background:var(--accent-live)}
+.cap{font-family:var(--mono); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:14px}
+
+/* ---------- 5 &middot; valuation ---------- */
+.two{display:grid; grid-template-columns:1fr 420px; gap:44px; flex:1; min-height:0; align-items:center}
+.notice{padding:20px 22px}
+.notice .nh{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--accent-live); padding-bottom:11px; margin-bottom:13px; border-bottom:1px solid var(--line)}
+.notice p{font-family:var(--serif); font-size:14.5px; line-height:1.62; color:var(--ink)}
+.notice p b{font-weight:600}
+.notice .reg{font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); margin-top:13px}
+.pull{margin-top:24px; padding-left:20px; border-left:2px solid var(--accent-live); font-family:var(--serif); font-style:italic; font-weight:300; font-size:19px; line-height:1.45; color:var(--ink)}
+.mult{display:flex; flex-direction:column; gap:30px}
+.mult-col{display:grid; grid-template-columns:138px 1fr; gap:20px; align-items:center}
+.mult-lab{font-family:var(--mono); grid-column:1 / -1; font-size:9.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--mute); padding-bottom:10px; border-bottom:1px solid var(--line)}
+.mult-val{font-family:var(--serif); font-weight:600; font-size:48px; line-height:.95; letter-spacing:-.03em; font-variant-numeric:tabular-nums}
+.mult-val .to{font-size:22px; padding:0 3px; color:var(--mute)}
+.mult-val.hot{color:var(--accent-live)}
+.stack{display:flex; gap:5px; margin-bottom:8px}
+.stack u{width:12px; height:12px; border-radius:50%; background:var(--ink); display:block; flex:none}
+.stack u.hot{background:var(--accent-live)}
+.stack u.ghost{background:none; border:1.5px solid var(--accent-live); opacity:.5}
+.mult-sub{font-size:12px; line-height:1.45; color:var(--mute); max-width:30ch}
+
+/* ---------- 7 &middot; owned channels ---------- */
+.shift{display:grid; grid-template-columns:244px 1fr; gap:48px; flex:1; min-height:0; align-items:center}
+.phone{padding:11px 10px 14px}
+.phone .notch{width:46px; height:4px; background:var(--line-2); margin:1px auto 11px}
+.phone .pm{display:flex; align-items:center; justify-content:space-between; padding:0 6px 9px; border-bottom:1px solid var(--line)}
+.phone .pm b{font-family:var(--serif); font-weight:600; font-size:14px}
+.phone .pm i{width:7px; height:7px; border-radius:50%; background:var(--accent-live); display:block}
+.phone .lead{margin:11px 6px 0}
+.phone canvas{width:100%; height:78px; display:block}
+.phone .hl{height:6px; background:var(--ink); margin-top:8px; opacity:.82}
+.phone .hl.s{width:70%}
+.phone .tx{height:3px; background:var(--line); margin-top:5px}
+.phone .tx.s{width:54%}
+.phone .tag{height:5px; width:34px; background:var(--accent-live); margin-top:9px}
+.phone .row{display:flex; gap:9px; margin:12px 6px 0; padding-top:11px; border-top:1px solid var(--line)}
+.phone .row .thumb{width:42px; height:32px; background:var(--line-2); flex:none; opacity:.55}
+.phone .row .rc{flex:1}
+.phone-cap{font-family:var(--serif); font-style:italic; font-weight:300; font-size:13px; line-height:1.5; color:var(--mute); margin-top:15px; padding-top:11px; border-top:1px solid var(--line)}
+.gains{display:flex; flex-direction:column}
+.gain{display:grid; grid-template-columns:142px 1fr; gap:22px; align-items:center; padding:16px 0; border-top:1px solid var(--line)}
+.gain-v{font-family:var(--serif); font-weight:600; font-size:36px; line-height:1; letter-spacing:-.03em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.gain-v .to{font-size:18px; padding:0 2px; color:var(--mute)}
+.gain-t{font-size:14px; line-height:1.5; color:var(--ink)}
+.gain-t span{font-family:var(--mono); display:block; font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:6px}
+.gain-d{display:flex; gap:5px; margin-top:9px}
+.gain-d u{width:8px; height:8px; border-radius:50%; background:var(--accent-live); display:block}
+.gain-d u.ghost{background:none; border:1.5px solid var(--accent-live); opacity:.45}
+
+/* ---------- 9 &middot; the engine ---------- */
+.sol{display:grid; grid-template-columns:1fr 420px; gap:52px; flex:1; min-height:0; align-items:center}
+.sol h2{font-size:44px; margin-bottom:20px}
+.chips{display:flex; gap:9px; margin-top:26px}
+.chip{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; border:1px solid var(--line-2); padding:8px 14px; color:var(--ink-2)}
+.chip.hot{border-color:var(--accent-live); color:var(--accent-live)}
+.flow{display:flex; flex-direction:column; gap:9px}
+.flow-node{padding:15px 18px; display:grid; grid-template-columns:11px 1fr; gap:14px; align-items:start}
+.flow-node .bul{width:9px; height:9px; border-radius:50%; background:var(--ink); margin-top:6px}
+.flow-node.mid .bul{background:none; border:1.5px solid var(--accent-live); width:11px; height:11px; margin-top:5px; margin-left:-1px}
+.flow-node .fh{font-family:var(--mono); font-size:9px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--mute)}
+.flow-node .ft{font-family:var(--serif); font-weight:600; font-size:18px; letter-spacing:-.015em; margin-top:5px}
+.flow-node .fs{font-size:12px; line-height:1.5; color:var(--mute); margin-top:5px}
+.flow-link{height:11px; margin-left:28px; border-left:1px solid var(--line-2)}
+
+/* ---------- 10 &middot; what we build ---------- */
+.caps{display:flex; flex-direction:column; flex:1; min-height:0; justify-content:center}
+.cap-item{display:grid; grid-template-columns:22px 320px 1fr; gap:0 26px; align-items:start; padding:23px 0; border-top:1px solid var(--line)}
+.cap-item:last-child{border-bottom:1px solid var(--line)}
+.cap-item .bul{width:9px; height:9px; border-radius:50%; background:var(--accent-live); margin-top:9px}
+.cap-item p{font-size:14px; line-height:1.6; color:var(--mute); max-width:64ch}
+
+/* ---------- 11 &middot; the record ---------- */
+.proof-hero{display:flex; align-items:baseline; gap:24px; padding-bottom:24px; border-bottom:1px solid var(--line)}
+.proof-hero .n{font-family:var(--serif); font-weight:600; font-size:66px; line-height:.9; letter-spacing:-.035em; color:var(--accent-live)}
+.proof-hero .t{font-family:var(--serif); font-weight:600; font-size:25px; line-height:1.2; letter-spacing:-.015em; max-width:17ch}
+.proof-grid{display:grid; grid-template-columns:repeat(5,1fr)}
+.proof-cell{padding:24px 20px 0 0; border-right:1px solid var(--line)}
+.proof-cell:last-child{border-right:none; padding-right:0}
+.proof-cell:not(:first-child){padding-left:20px}
+.proof-cell .n{font-family:var(--serif); font-weight:600; font-size:34px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums}
+.proof-cell .t{font-family:var(--serif); font-size:12.5px; line-height:1.5; color:var(--mute); margin-top:10px}
+
+/* ---------- 12 &middot; terms ---------- */
+.terms{flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; max-width:800px}
+.terms h2{font-size:62px; line-height:1.06}
+.terms .sub{font-family:var(--serif); font-style:italic; font-weight:300; font-size:24px; margin-top:28px; padding-top:22px; border-top:1px solid var(--line); color:var(--ink-2)}
+
+/* ---------- 13 &middot; alternatives ---------- */
+.tbl-wrap{padding:6px 10px}
+.tbl{width:100%; border-collapse:collapse}
+.tbl th,.tbl td{text-align:left; padding:15px 16px; border-bottom:1px solid var(--line); vertical-align:middle}
+.tbl thead th{font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); border-bottom:1px solid var(--line-2); vertical-align:bottom}
+.tbl thead th.win{color:var(--accent-live)}
+.tbl tbody th{font-family:var(--serif); font-weight:600; font-size:14px; color:var(--ink); width:31%}
+.tbl td{font-size:12.5px; color:var(--mute); width:23%}
+.tbl td.win{color:var(--accent-live); font-weight:600; font-size:13px}
+.tbl tbody tr:last-child td,.tbl tbody tr:last-child th{border-bottom:none}
+.tbl-note{font-size:12.5px; line-height:1.6; color:var(--mute); margin-top:18px; max-width:94ch}
+
+/* ---------- 15 &middot; the fit ---------- */
+.next{display:grid; grid-template-columns:1fr 400px; gap:54px; flex:1; min-height:0; align-items:center}
+.checks{display:flex; flex-direction:column}
+.check{display:flex; gap:14px; align-items:flex-start; padding:15px 0; border-top:1px solid var(--line); font-size:14.5px; line-height:1.5; color:var(--ink)}
+.checks .check:last-child{border-bottom:1px solid var(--line)}
+.check i{width:9px; height:9px; border-radius:50%; background:var(--accent-live); flex:none; margin-top:7px}
+.steps{padding:6px 18px}
+.step{display:grid; grid-template-columns:34px 1fr; gap:14px; align-items:baseline; padding:14px 0; border-top:1px solid var(--line)}
+.steps .step:first-child{border-top:none}
+.step .sn{font-family:var(--mono); font-weight:500; font-size:13px; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.step .st{font-family:var(--serif); font-weight:600; font-size:16px; letter-spacing:-.01em}
+.contact{margin-top:24px; padding-top:18px; border-top:2px solid var(--accent-live)}
+.contact .cn{font-family:var(--serif); font-weight:600; font-size:22px; letter-spacing:-.015em}
+.contact .ce{font-family:var(--mono); font-size:12.5px; color:var(--accent-live); margin-top:5px}
+
+/* ---------- navigation ---------- */
+#nav{
+  display:none;                      /* the nav is script chrome; hidden without it */
+  position:fixed; left:0; right:0; bottom:0; height:38px;
+  align-items:center; gap:14px; padding:0 16px;
+  background:rgba(27,29,30,.94); border-top:1px solid rgba(239,241,238,.12);
+  color:#A8ACA8; z-index:20; font-size:11px;
+}
+.js #nav{display:flex}
+#nav button{
+  font:inherit; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+  background:none; border:1px solid rgba(239,241,238,.2); color:#EFF1EE;
+  padding:5px 11px; cursor:pointer; border-radius:3px;
+}
+#nav button:hover{background:rgba(239,241,238,.09)}
+#nav button:focus-visible{outline:2px solid var(--accent-ink); outline-offset:2px}
+#count{letter-spacing:.18em; font-variant-numeric:tabular-nums; min-width:70px}
+#ticks{display:flex; gap:3px; flex:1}
+#ticks b{flex:1; height:3px; background:rgba(239,241,238,.15); cursor:pointer; border-radius:2px}
+#ticks b.on{background:var(--accent-ink)}
+#ticks b.seen{background:rgba(239,241,238,.4)}
+#ticks b:focus-visible{outline:2px solid var(--accent-ink); outline-offset:2px}
+#hint{font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; opacity:.5}
+
+@media (prefers-reduced-motion:no-preference){ .page{transition:opacity .2s ease} }
+
+@media print{
+  @page{size:13.333in 7.5in; margin:0}
+  html,body{height:auto; overflow:visible; background:#fff}
+  #nav{display:none}
+  #stage{position:static; display:block}
+  #reel{width:1280px; height:auto; transform:none!important; box-shadow:none}
+  .page{
+    position:relative; inset:auto; opacity:1!important; visibility:visible!important;
+    break-after:page; page-break-after:always;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .page:last-child{break-after:auto; page-break-after:auto}
+}
+</style>
+
+<div id="stage"><div id="reel">
+
+<!-- ==================== 1 &middot; COVER ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="cover" data-zone="0.575,0,0.46,1"></canvas>
+  <div class="folio">
+    <div class="flag">
+      <svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg>
+      <span class="fw">for publishers</span>
+    </div>
+    <div class="folio-r"><b>Confidential</b> &middot; August 2026 &middot; Prepared for [Publisher&nbsp;Name]</div>
+  </div>
+
+  <div class="cover">
+    <div class="kicker" style="margin-bottom:22px">A growth partnership proposal</div>
+    <h1>Stop depending on SEO<em>.</em><br>Start owning your growth<em>.</em></h1>
+    <p class="deck">The last time the channel moved, publishers rebuilt for someone else's platform. This time, build the one you keep.</p>
+    <p class="stand">Search referral is falling and it is not coming back. Every point of traffic you lose is a point of customer acquisition that now belongs to an algorithm you cannot see, price, or negotiate with. This is a proposal for <b>[Publisher Name]</b> to build, launch and operate a mobile product it owns outright: ndot carries the build, runs the growth, and takes payment only from the upside.</p>
+  </div>
+
+  <div class="fig-cap panel">Fig. 1 &middot; The owned system<br><span>Your content, your product, your audience, held in one box you control.</span></div>
+
+  <div class="foot">
+    <div class="src">In this issue &middot; I. The problem &middot; II. The shift &middot; III. The offer &middot; IV. Next steps</div>
+    <div class="pg">Page 1</div>
+  </div>
+</section>
+
+<!-- ==================== 2 &middot; CONTENTS ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r">Contents</div>
+  </div>
+
+  <div class="toc">
+    <div class="toc-l">
+      <h2>In this<br>issue</h2>
+      <p class="toc-note">Four sections, fifteen pages. The argument runs in order: what you are losing, where readers went, what we build, and how we start.</p>
+      <div class="colophon">
+        <div><span>Prepared for</span>[Publisher Name]</div>
+        <div><span>Prepared by</span>ndot, August 2026</div>
+        <div><span>Circulation</span>Confidential</div>
+      </div>
+    </div>
+    <div class="toc-list">
+      <div class="toc-row"><div class="toc-rn">I</div><div class="toc-t">The problem<span>Search referral is falling, and the market has already re-priced it</span></div><div class="toc-p">Page 3</div></div>
+      <div class="toc-row"><div class="toc-rn">II</div><div class="toc-t">The shift<span>Owned mobile channels are outperforming the open web</span></div><div class="toc-p">Page 6</div></div>
+      <div class="toc-row"><div class="toc-rn">III</div><div class="toc-t">The offer<span>What ndot builds, operates, and gets paid for</span></div><div class="toc-p">Page 8</div></div>
+      <div class="toc-row"><div class="toc-rn">IV</div><div class="toc-t">Next steps<span>Whether this fits, and how the first ninety days run</span></div><div class="toc-p">Page 14</div></div>
+    </div>
+  </div>
+
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 2</div></div>
+</section>
+
+<!-- ==================== 3 &middot; DIVIDER I ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="div1" data-zone="0.525,0,0.51,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r">&sect; 01</div>
+  </div>
+  <div class="divider">
+    <div class="div-rn">&sect; 01 &nbsp;/&nbsp; Section one</div>
+    <h2>The problem</h2>
+    <p class="div-line">Your customer acquisition strategy is being written by someone else's roadmap.</p>
+    <div class="div-jump">Continues on pages 4 to 5</div>
+  </div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 3</div></div>
+</section>
+
+<!-- ==================== 4 &middot; THE CHANNEL ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 01</b> The problem &middot; The channel</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The channel</span>
+    <h2>Your traffic isn't yours anymore</h2>
+    <p class="lede dim">Algorithm changes, AI-generated answers and declining click-through rates mean your acquisition is now set by a roadmap you do not control.</p>
+  </div>
+
+  <div class="main">
+    <div class="rails">
+      <div class="rail-row">
+        <div class="rail-num">&minus;33<span class="pct">%</span></div>
+        <div>
+          <div class="rail-meta"><span class="rail-lab">Global search referral traffic</span><span class="rail-when">Nov 2024 to Nov 2025</span></div>
+          <div class="rail" data-value="33"></div>
+        </div>
+      </div>
+      <div class="rail-row">
+        <div class="rail-num">&minus;60<span class="pct">%</span></div>
+        <div>
+          <div class="rail-meta"><span class="rail-lab">Small publishers' search traffic</span><span class="rail-when">Past two years</span></div>
+          <div class="rail" data-value="60"></div>
+        </div>
+      </div>
+      <div class="rail-row">
+        <div class="rail-num">&minus;25<span class="pct">%</span></div>
+        <div>
+          <div class="rail-meta"><span class="rail-lab">Referral traffic lost to AI Overviews</span><span class="rail-when">Per publisher, on average</span></div>
+          <div class="rail" data-value="25"></div>
+        </div>
+      </div>
+      <div class="rail-row">
+        <div class="rail-num">&minus;43<span class="pct">%</span></div>
+        <div>
+          <div class="rail-meta"><span class="rail-lab">Further decline publishers expect</span><span class="rail-when">Projected through 2029</span></div>
+          <div class="rail" data-value="43"></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Each dot is one percentage point. Every rail is 100.</div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Sources: Chartbeat network data via Search Engine Land (2026); Digiday/eMarketer analysis of Google AI Overviews; Digital Content Next, "The Publisher's Playbook for the Google Zero Era" (2026). Figures are drawn from different panels and periods and are not additive.</div>
+    <div class="pg">Page 4</div>
+  </div>
+</section>
+
+<!-- ==================== 5 &middot; THE PRICE ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 01</b> The problem &middot; The price</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The price</span>
+    <h2>The market has already priced this in</h2>
+    <p class="lede dim">Investors are discounting media businesses that don't own their audience. Traffic-dependent valuations have compressed sharply as search and social referral has become unreliable.</p>
+  </div>
+
+  <div class="two">
+    <div>
+      <div class="notice panel">
+        <div class="nh">Correction</div>
+        <p>An earlier reading of traffic-dependent media valued those businesses at roughly <b>10x revenue</b>. Following the collapse in search referral, the figure now clearing the market is <b>4 to 6x</b>. The multiple was never the asset. The audience was.</p>
+        <div class="reg">Filed under: things that get re-rated before they get fixed</div>
+      </div>
+      <blockquote class="pull">Owning your audience isn't just a growth strategy. It's a hedge against how the market is already re-pricing this risk.</blockquote>
+    </div>
+    <div class="mult">
+      <div class="mult-col">
+        <div class="mult-lab">Before</div>
+        <div class="mult-val">~10x</div>
+        <div>
+          <div class="stack" data-stack="10"></div>
+          <p class="mult-sub">Revenue multiple, traffic-dependent media.</p>
+        </div>
+      </div>
+      <div class="mult-col">
+        <div class="mult-lab">After</div>
+        <div class="mult-val hot">4<span class="to">to</span>6x</div>
+        <div>
+          <div class="stack" data-stack="4" data-ghost="2"></div>
+          <p class="mult-sub">Revenue multiple, once search referral craters.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Based on internal market analysis of comparable traffic-dependent media transactions and public market multiples, 2024 to 2026. Each dot represents one turn of revenue.</div>
+    <div class="pg">Page 5</div>
+  </div>
+</section>
+
+<!-- ==================== 6 &middot; DIVIDER II ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="div2" data-zone="0.525,0,0.51,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r">&sect; 02</div>
+  </div>
+  <div class="divider">
+    <div class="div-rn">&sect; 02 &nbsp;/&nbsp; Section two</div>
+    <h2>The shift</h2>
+    <p class="div-line">A reader who installs does not churn to an algorithm change.</p>
+    <div class="div-jump">Continues on page 7</div>
+  </div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 6</div></div>
+</section>
+
+<!-- ==================== 7 &middot; OWNED CHANNELS ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 02</b> The shift &middot; Owned channels</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">Owned channels</span>
+    <h2>Meanwhile, owned channels are winning</h2>
+    <p class="lede dim">Publishers who already own a mobile channel see it in engagement, conversion and open rates.</p>
+  </div>
+
+  <div class="shift">
+    <div>
+      <div class="phone panel">
+        <div class="notch"></div>
+        <div class="pm"><b>The Daily</b><i></i></div>
+        <div class="lead">
+          <canvas data-art="photo"></canvas>
+          <div class="hl"></div><div class="hl s"></div>
+          <div class="tx"></div><div class="tx s"></div>
+          <div class="tag"></div>
+        </div>
+        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+      </div>
+      <p class="phone-cap">Publisher apps retain readers 6x longer than the average app.</p>
+    </div>
+    <div>
+      <div class="gains">
+        <div class="gain">
+          <div><div class="gain-v">4<span class="to">to</span>5x</div><div class="gain-d" data-dots="4" data-ghost="1"></div></div>
+          <div class="gain-t">Higher engagement, week over week, against desktop.<span>Pugpig network, 440+ apps</span></div>
+        </div>
+        <div class="gain">
+          <div><div class="gain-v">~2x</div><div class="gain-d" data-dots="2"></div></div>
+          <div class="gain-t">In-app conversion rate after native subscriptions.<span>Financial Times</span></div>
+        </div>
+        <div class="gain">
+          <div><div class="gain-v">3x</div><div class="gain-d" data-dots="3"></div></div>
+          <div class="gain-t">Increase in push open rates from targeted personalization.<span>Boston Globe</span></div>
+        </div>
+      </div>
+      <blockquote class="pull" style="margin-top:26px">Apps are all about building habit, becoming someone's go-to source.</blockquote>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Each dot represents one multiple.</div>
+    <div class="pg">Page 7</div>
+  </div>
+</section>
+
+<!-- ==================== 8 &middot; DIVIDER III, the assembly ==================== -->
+<section class="page" data-ground="dark">
+  <canvas class="art" data-art="div3" data-zone="0.525,0,0.51,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r">&sect; 03</div>
+  </div>
+  <div class="divider">
+    <div class="div-rn">&sect; 03 &nbsp;/&nbsp; Section three</div>
+    <h2>The offer</h2>
+    <p class="div-line">We don't just advise. We build it, run it, and get paid out of what it earns.</p>
+    <div class="div-jump">Continues on pages 9 to 13 &middot; The pieces stop being someone else's</div>
+  </div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 8</div></div>
+</section>
+
+<!-- ==================== 9 &middot; THE ENGINE ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 03</b> The offer &middot; The engine</div>
+  </div>
+
+  <div class="sol">
+    <div>
+      <div class="kicker" style="margin-bottom:16px">Introducing ndot for publishers</div>
+      <h2>We don't just advise. We build and operate it, for you.</h2>
+      <p class="body" style="max-width:50ch">A fully-owned mobile growth engine for your brand, powered by more than a decade of hands-on experience turning content, product and audience data into scalable growth, validated repeatedly by our own content portfolio.</p>
+      <div class="chips">
+        <span class="chip hot">Live in weeks, not quarters</span>
+        <span class="chip">Revenue share, aligned incentives</span>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-node panel">
+        <div class="bul"></div>
+        <div><div class="fh">You bring</div><div class="ft">Your archive and daily output</div><div class="fs">The brand readers already trust, and everything you publish today.</div></div>
+      </div>
+      <div class="flow-link"></div>
+      <div class="flow-node panel mid">
+        <div class="bul"></div>
+        <div><div class="fh">ndot operates</div><div class="ft">Product, growth, AI, monetization</div><div class="fs">Built by us, run by us, tuned weekly. You keep editorial control.</div></div>
+      </div>
+      <div class="flow-link"></div>
+      <div class="flow-node panel">
+        <div class="bul"></div>
+        <div><div class="fh">You own</div><div class="ft">The audience and the revenue</div><div class="fs">Installs, sessions, subscribers and ad inventory sit on your side of the ledger.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 9</div></div>
+</section>
+
+<!-- ==================== 10 &middot; THE BUILD ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 03</b> The offer &middot; The build</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The build</span>
+    <h2>What we build for you</h2>
+    <p class="lede dim">Four workstreams, delivered together. None of them is a deliverable you have to staff.</p>
+  </div>
+
+  <div class="caps">
+    <div class="cap-item"><div class="bul"></div><h3>Content product development</h3><p>We turn your existing archive and daily output into a native app experience readers open every day.</p></div>
+    <div class="cap-item"><div class="bul"></div><h3>Growth and recommendation systems</h3><p>Personalized feeds, smart notifications and retention loops built on a decade of audience-growth expertise.</p></div>
+    <div class="cap-item"><div class="bul"></div><h3>Agentic AI</h3><p>AI-native features (summarization, personalization, conversational discovery) that keep your content ahead of the curve.</p></div>
+    <div class="cap-item"><div class="bul"></div><h3>Ad tech and monetization</h3><p>Advertising and subscription infrastructure tuned to convert engagement into revenue, from day one.</p></div>
+  </div>
+
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 10</div></div>
+</section>
+
+<!-- ==================== 11 &middot; THE RECORD ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 03</b> The offer &middot; The record</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The record</span>
+    <h2>Proven at scale. Aligned from day one.</h2>
+    <p class="lede dim">Everything we build for you, we've already built and proven for ourselves.</p>
+  </div>
+
+  <div class="main">
+    <div class="proof-hero">
+      <div class="n">No.&nbsp;1</div>
+      <div class="t">Local news app in the United States</div>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-cell"><div class="n">8M+</div><div class="t">Daily active users on the NewsBreak app</div></div>
+      <div class="proof-cell"><div class="n">55M+</div><div class="t">Registered newsletter subscribers</div></div>
+      <div class="proof-cell"><div class="n">2,500+</div><div class="t">Publishers already trust our content network</div></div>
+      <div class="proof-cell"><div class="n">1,500+</div><div class="t">Advertisers actively monetizing our platform</div></div>
+      <div class="proof-cell"><div class="n">~2M</div><div class="t">Daily active users on CrimeRadar and Scoopz, our local safety and short-video apps</div></div>
+    </div>
+  </div>
+
+  <div class="foot"><div class="src">Source: NewsBreak company data, 2026 YTD.</div><div class="pg">Page 11</div></div>
+</section>
+
+<!-- ==================== 12 &middot; THE TERMS ==================== -->
+<section class="page" data-ground="dark">
+  <canvas class="art" data-art="terms" data-zone="0.585,0,0.46,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 03</b> The offer &middot; The terms</div>
+  </div>
+
+  <div class="terms">
+    <div class="kicker" style="margin-bottom:24px">The terms</div>
+    <h2>You don't pay us upfront. We don't get paid until you do.</h2>
+    <p class="sub">Build your audience. Own your growth. Share the upside.</p>
+  </div>
+
+  <div class="foot"><div class="src">Revenue share. No licence fee, no build invoice, no minimum commitment.</div><div class="pg">Page 12</div></div>
+</section>
+
+<!-- ==================== 13 &middot; THE ALTERNATIVES ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 03</b> The offer &middot; The alternatives</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The alternatives</span>
+    <h2>Purpose-built for publishers. Not generic, not DIY.</h2>
+  </div>
+
+  <div class="main">
+    <div class="tbl-wrap panel">
+      <table class="tbl">
+        <thead><tr><th></th><th>Enterprise app platforms</th><th>Generic app wrappers</th><th class="win">ndot for publishers</th></tr></thead>
+        <tbody>
+          <tr><th>Upfront cost</th><td>High, six figures and up</td><td>Low, but limited</td><td class="win">None</td></tr>
+          <tr><th>Who operates it day to day</th><td>You do</td><td>You do</td><td class="win">We do</td></tr>
+          <tr><th>Built for editorial growth and retention</th><td>Partial</td><td>No</td><td class="win">Yes</td></tr>
+          <tr><th>Agentic AI and personalization</th><td>Limited</td><td>No</td><td class="win">Yes</td></tr>
+          <tr><th>Payment model</th><td>Licence fee</td><td>Subscription fee</td><td class="win">Revenue share</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">Six-figure enterprise builds still leave you operating the product. Generic wrappers skip the growth layer entirely. ndot is purpose-built for editorial audiences, and only paid when it works.</p>
+  </div>
+
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 13</div></div>
+</section>
+
+<!-- ==================== 14 &middot; DIVIDER IV ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="div4" data-zone="0.525,0,0.51,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r">&sect; 04</div>
+  </div>
+  <div class="divider">
+    <div class="div-rn">&sect; 04 &nbsp;/&nbsp; Section four</div>
+    <h2>Next steps</h2>
+    <p class="div-line">If this sounds like you, the first conversation is thirty minutes.</p>
+    <div class="div-jump">Concludes on page 15</div>
+  </div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 14</div></div>
+</section>
+
+<!-- ==================== 15 &middot; THE FIT ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 04</b> Next steps &middot; The fit</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The fit</span>
+    <h2>Is this you? Let's build together.</h2>
+  </div>
+
+  <div class="next">
+    <div>
+      <div class="label" style="margin-bottom:8px">What we look for</div>
+      <div class="checks">
+        <div class="check"><i></i><span>Unique content and a strong, trusted brand in your category.</span></div>
+        <div class="check"><i></i><span>Traffic has historically leaned on SEO and the open web, and it is declining.</span></div>
+        <div class="check"><i></i><span>No app today, or an app with little real user base.</span></div>
+        <div class="check"><i></i><span>Open to owning your audience: advertising, subscription, or both work for us.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="label" style="margin-bottom:8px">How we'd start</div>
+      <div class="steps panel">
+        <div class="step"><span class="sn">01</span><div class="st">Discovery call</div></div>
+        <div class="step"><span class="sn">02</span><div class="st">Prototype and demo</div></div>
+        <div class="step"><span class="sn">03</span><div class="st">Pilot launch</div></div>
+        <div class="step"><span class="sn">04</span><div class="st">Scale</div></div>
+      </div>
+      <div class="contact">
+        <div class="cn">Mary Zeng</div>
+        <div class="ce">mary.zeng@newsbreak.com</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 15</div></div>
+</section>
+
+</div></div>
+
+<nav id="nav">
+  <button id="prev" aria-label="Previous page">Prev</button>
+  <button id="next" aria-label="Next page">Next</button>
+  <span id="count">01 / 15</span>
+  <span id="ticks"></span>
+  <span id="hint">Arrow keys &middot; P to print</span>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ======================================================================
+     Collage engine. Flat cut shapes, each carrying a printed texture,
+     over a drafting grid. Deterministic: same seed, same composition.
+     ====================================================================== */
+
+  /* NewsBreak: the blues carry the mass, the red appears exactly once per
+     composition, as the dot inside the box. Greys hold the pale end so the
+     blue never turns the page corporate-navy. */
+  var PAL = {
+    navy:'#274464', blue:'#3D638C', blueLt:'#68809A', blueDk:'#1C3049',
+    d3:'#6B6B63', m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
+    ink:'#111110', paper:'#FAFAF8', accent:'#D6493D', accentInk:'#FF5A5A'
+  };
+  var LIGHT_SET = [PAL.l3, PAL.l3, PAL.l2, PAL.l2, PAL.l1, PAL.l1, PAL.m2, PAL.m2,
+                   PAL.m1, PAL.m1, PAL.blue, PAL.navy];
+  var DARK_SET  = [PAL.blueDk, PAL.blueDk, '#26405F', '#26405F', '#2E4A6B', '#2E4A6B',
+                   PAL.blue, PAL.blueLt, PAL.m2];
+
+  function mkRng(seed){
+    var s = (seed >>> 0) || 1;
+    return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  }
+  function pick(r, arr){ return arr[Math.floor(r() * arr.length) % arr.length]; }
+  function lerp(a,b,t){ return a + (b-a)*t; }
+
+  /* --- texture tiles, cached by key --- */
+  var TILES = {};
+  function tile(key, w, h, draw){
+    if(TILES[key]) return TILES[key];
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    TILES[key] = c;
+    return c;
+  }
+  function texture(ctx, kind, colour, scale){
+    var key = kind + '|' + colour + '|' + scale;
+    var t, m;
+    if(kind === 'dots'){
+      t = tile(key, scale, scale, function(c,w,h){
+        c.fillStyle = colour; c.beginPath();
+        c.arc(w/2, h/2, w*0.23, 0, Math.PI*2); c.fill();
+      });
+      m = new DOMMatrix().rotateSelf(45);
+    } else if(kind === 'hatch'){
+      t = tile(key, scale, scale, function(c,w,h){
+        c.strokeStyle = colour; c.lineWidth = 1;
+        c.beginPath(); c.moveTo(0, h + 0.5); c.lineTo(w, h + 0.5); c.stroke();
+      });
+      m = new DOMMatrix().rotateSelf(-38);
+    } else if(kind === 'cross'){
+      t = tile(key, scale, scale, function(c,w,h){
+        c.strokeStyle = colour; c.lineWidth = 0.9;
+        c.beginPath();
+        c.moveTo(0, h + 0.5); c.lineTo(w, h + 0.5);
+        c.moveTo(w + 0.5, 0); c.lineTo(w + 0.5, h);
+        c.stroke();
+      });
+      m = new DOMMatrix().rotateSelf(24);
+    } else if(kind === 'rule'){
+      t = tile(key, scale, scale, function(c,w,h){
+        c.strokeStyle = colour; c.lineWidth = 1.4;
+        c.beginPath(); c.moveTo(0, h - 1); c.lineTo(w, h - 1); c.stroke();
+      });
+      m = new DOMMatrix();
+    } else { /* grit */
+      t = tile(key, 90, 90, function(c,w,h){
+        var img = c.createImageData(w, h), d = img.data;
+        var rr = parseInt(colour.slice(1,3),16), gg = parseInt(colour.slice(3,5),16), bb = parseInt(colour.slice(5,7),16);
+        var q = mkRng(9173);
+        for(var i = 0; i < d.length; i += 4){
+          var v = q();
+          d[i] = rr; d[i+1] = gg; d[i+2] = bb;
+          d[i+3] = v > 0.76 ? Math.floor(v * 165) : 0;
+        }
+        c.putImageData(img, 0, 0);
+      });
+      m = new DOMMatrix();
+    }
+    var p = ctx.createPattern(t, 'repeat');
+    if(m && p.setTransform) p.setTransform(m);
+    return p;
+  }
+
+  /* --- one cut shape, filled then screened --- */
+  function cut(ctx, path, box, colour, kind, scale, alpha, texColour){
+    ctx.save();
+    ctx.beginPath(); path(ctx); ctx.clip();
+    ctx.globalAlpha = alpha === undefined ? 1 : alpha;
+    ctx.fillStyle = colour;
+    ctx.fillRect(box[0], box[1], box[2], box[3]);
+    if(kind){
+      ctx.globalAlpha = (alpha === undefined ? 1 : alpha) * 0.5;
+      ctx.fillStyle = texture(ctx, kind, texColour || '#FFFFFF', scale || 7);
+      ctx.fillRect(box[0], box[1], box[2], box[3]);
+    }
+    ctx.restore();
+  }
+
+  var SHAPES = ['rect','circle','half','quarter','tri','band','strip','strip'];
+  function shapePath(kind, x, y, w, h, rot){
+    return function(ctx){
+      ctx.save();
+      ctx.translate(x + w/2, y + h/2);
+      ctx.rotate(rot);
+      ctx.translate(-w/2, -h/2);
+      if(kind === 'rect'){ ctx.rect(0, 0, w, h); }
+      else if(kind === 'circle'){ ctx.arc(w/2, h/2, Math.min(w,h)/2, 0, Math.PI*2); }
+      else if(kind === 'half'){ ctx.arc(w/2, h, Math.min(w,h*2)/2, Math.PI, 0); ctx.closePath(); }
+      else if(kind === 'quarter'){ ctx.moveTo(0, h); ctx.arc(0, h, Math.min(w,h), -Math.PI/2, 0); ctx.closePath(); }
+      else if(kind === 'tri'){ ctx.moveTo(0, h); ctx.lineTo(w/2, 0); ctx.lineTo(w, h); ctx.closePath(); }
+      else if(kind === 'strip'){ ctx.rect(0, h*0.42, w * 1.7, h * 0.14); }
+      else { ctx.rect(0, h*0.36, w, h*0.28); }
+      ctx.restore();
+    };
+  }
+
+  /* --- big washed plates, the ground layer of the collage --- */
+  function plates(ctx, Z, R, opt){
+    var pale = opt.dark
+      ? ['#223751','#26405F','#2B4869','#305073','#35587D']
+      : [PAL.l3, PAL.l2, PAL.l1, PAL.m2, '#EDEDE6', '#E0E0D8'];
+    for(var i = 0; i < (opt.count || 3); i++){
+      var w = Z[2] * lerp(0.34, 0.82, R());
+      var h = Z[3] * lerp(0.3, 0.76, R());
+      var x = Math.max(Z[0] - w * 0.1, Z[0] + Z[2] * (0.5 + (R() - 0.5) * 1.15) - w / 2);
+      if(opt.clampRight) x = Math.min(x, Z[0] + Z[2] - w * 0.9);
+      var y = Z[1] + Z[3] * (0.5 + (R() - 0.5) * 1.15) - h / 2;
+      var kind = pick(R, ['rect','circle','half','tri']);
+      cut(ctx, shapePath(kind, x, y, w, h, (R() - 0.5) * 0.5), [x - w, y - h, w * 3, h * 3],
+          pick(R, pale), pick(R, ['grit','rule','cross',null]), 5 + Math.floor(R() * 4),
+          lerp(0.26, 0.58, R()), '#FFFFFF');
+    }
+  }
+
+  /* --- drafting guides ---
+     Positions come off the page's own 96px column lattice, never off a random
+     float: two lines landing 3px apart reads as a printing fault, not a grid.
+     A minimum gap of two columns is enforced on top of that. --- */
+  function pickLattice(R, lattice, n, minGap){
+    var pool = lattice.slice(), out = [], v;
+    while(out.length < n && pool.length){
+      v = pool.splice(Math.floor(R() * pool.length), 1)[0];
+      if(out.every(function(o){ return Math.abs(o - v) >= minGap; })) out.push(v);
+    }
+    return out.sort(function(a, b){ return a - b; });
+  }
+
+  var COL = 96, MARGIN = 64;
+  function guides(ctx, W, H, R, opt){
+    var line = opt.dark ? 'rgba(244,244,238,0.15)' : 'rgba(17,17,16,0.10)';
+    var node = opt.dark ? 'rgba(244,244,238,0.45)' : 'rgba(17,17,16,0.45)';
+    var xLat = [], yLat = [], v;
+    /* skip the two outer boundaries: a guide sitting exactly on the margin
+       reads as a stray rule beside the text rather than as construction */
+    for(v = MARGIN + COL; v <= W - MARGIN - COL + 1; v += COL) xLat.push(Math.round(v) + 0.5);
+    /* start below the eyebrow rule and stop above the foot rule, so a guide
+       never lands a couple of pixels off one of the layout's own hairlines */
+    for(v = 216; v <= H - 120 + 1; v += COL) yLat.push(Math.round(v) + 0.5);
+
+    var xs = pickLattice(R, xLat, opt.cols || 3, COL * 2);
+    var ys = pickLattice(R, yLat, opt.rows === 0 ? 0 : (opt.rows || 2), COL * 2);
+
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath();
+    xs.forEach(function(x){ ctx.moveTo(x, 0); ctx.lineTo(x, H); });
+    ys.forEach(function(y){ ctx.moveTo(0, y); ctx.lineTo(W, y); });
+    ctx.stroke();
+
+    /* diagonals are struck between lattice intersections, so they land on the
+       same construction as the rules rather than floating free */
+    if(opt.diagonals !== false && xLat.length > 3){
+      ctx.beginPath();
+      for(var i = 0; i < 2; i++){
+        var y0 = yLat[Math.floor(R() * yLat.length)];
+        var y1 = yLat[Math.floor(R() * yLat.length)];
+        ctx.moveTo(-40, y0); ctx.lineTo(W + 40, y1 - COL * (1 + i));
+      }
+      ctx.stroke();
+    }
+
+    /* a node only exists where two drawn rules actually cross */
+    if(xs.length && ys.length){
+      ctx.fillStyle = node;
+      var marks = Math.min(opt.nodes === undefined ? 2 : opt.nodes, xs.length * ys.length);
+      for(var k = 0; k < marks; k++){
+        ctx.beginPath();
+        ctx.arc(xs[k % xs.length], ys[Math.floor(k / xs.length) % ys.length], 4.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  /* --- the box with the dot inside it --- */
+  function isoBox(ctx, cx, cy, s, R, opt){
+    var kx = s * 0.866, ky = s * 0.5;
+    var faces = [
+      { pts:[[0,-s],[kx,-ky],[0,0],[-kx,-ky]], col: opt.top,   tex:'grit',  sc:7 },
+      { pts:[[-kx,-ky],[0,0],[0,s],[-kx,ky]],  col: opt.left,  tex:'hatch', sc:5 },
+      { pts:[[kx,-ky],[0,0],[0,s],[kx,ky]],    col: opt.right, tex:'dots',  sc:6 }
+    ];
+    faces.forEach(function(f){
+      ctx.save();
+      ctx.beginPath();
+      f.pts.forEach(function(p,i){ i ? ctx.lineTo(cx+p[0], cy+p[1]) : ctx.moveTo(cx+p[0], cy+p[1]); });
+      ctx.closePath(); ctx.clip();
+      ctx.fillStyle = f.col;
+      ctx.fillRect(cx-kx-2, cy-s-2, kx*2+4, s*2+4);
+      ctx.globalAlpha = 0.24;
+      ctx.fillStyle = texture(ctx, f.tex, opt.screen || '#FFFFFF', f.sc);
+      ctx.fillRect(cx-kx-2, cy-s-2, kx*2+4, s*2+4);
+      ctx.restore();
+    });
+    /* the dot, held at the inner corner */
+    var dr = s * 0.15;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, dr, 0, Math.PI*2);
+    ctx.fillStyle = opt.dot || PAL.ink; ctx.fill();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = texture(ctx, 'grit', '#FFFFFF', 7);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* --- paper tooth over the whole plate --- */
+  function tooth(ctx, W, H, dark){
+    ctx.save();
+    ctx.globalAlpha = dark ? 0.16 : 0.2;
+    ctx.fillStyle = texture(ctx, 'grit', dark ? '#FFFFFF' : '#6B6B63', 7);
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  /* Z is the zone the fragments live in: [x, y, w, h] in device px */
+  function scatter(ctx, Z, R, set, opt){
+    var n = opt.count || 12;
+    for(var i = 0; i < n; i++){
+      var kind = pick(R, SHAPES);
+      var t = R(), sz;
+      if(t < 0.58)      sz = lerp(opt.min || 26, (opt.max || 190) * 0.36, R());
+      else if(t < 0.88) sz = lerp((opt.max || 190) * 0.36, (opt.max || 190) * 0.68, R());
+      else              sz = lerp((opt.max || 190) * 0.68, opt.max || 190, R());
+      var w = sz, h = sz * lerp(0.5, 1.25, R());
+      var x, y;
+      if(opt.order){                      /* assembled: snapped to the grid */
+        x = Z[0] + Math.round(Z[2] * (0.02 + 0.8 * R()) / 24) * 24;
+        y = Z[1] + Math.round(Z[3] * (0.04 + 0.78 * R()) / 24) * 24;
+      } else {                            /* fragments: adrift, densest at the core */
+        x = Z[0] + Z[2] * (0.5 + (R() + R() + R() - 1.5) * 0.62);
+        y = Z[1] + Z[3] * (0.5 + (R() + R() + R() - 1.5) * 0.66);
+      }
+      x = Math.max(x, Z[0] - w * 0.12);
+      if(opt.clampRight) x = Math.min(x, Z[0] + Z[2] - w);
+      var rot = opt.order ? 0 : (R() - 0.5) * 1.05;
+      var col = pick(R, set);
+      var tex = pick(R, ['grit','hatch','dots','cross','rule', null]);
+      var al  = lerp(0.55, 1, R());
+      cut(ctx, shapePath(kind, x, y, w, h, rot), [x - w, y - h, w * 3, h * 3],
+          col, tex, 4 + Math.floor(R() * 5), al, opt.screen || '#FFFFFF');
+    }
+  }
+
+  function paint(cv){
+    var W = cv.clientWidth, H = cv.clientHeight;
+    if(!W || !H) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = W * dpr; cv.height = H * dpr;
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    var art  = cv.getAttribute('data-art');
+    var dark = cv.closest('.page').getAttribute('data-ground') === 'dark';
+    var set  = dark ? DARK_SET : LIGHT_SET;
+    var screen = '#FFFFFF';
+    var z = (cv.getAttribute('data-zone') || '0,0,1,1').split(',').map(Number);
+    var Z = [z[0] * W, z[1] * H, z[2] * W, z[3] * H];
+    var R;
+
+    if(art === 'quiet'){
+      R = mkRng(41 + Math.round(z[0] * 1000));
+      ctx.globalAlpha = 0.55;
+      guides(ctx, W, H, R, { dark: dark, cols: 2, rows: 0, nodes: 0, diagonals: false });
+      ctx.globalAlpha = 1;
+      scatter(ctx, Z, R, set, { count: 4, min: 22, max: 78, screen: screen, clampRight: z[0] < 0.2 });
+      tooth(ctx, W, H, dark);
+      return;
+    }
+
+    if(art === 'photo'){                       /* the printed picture in the app */
+      R = mkRng(5501);
+      ctx.fillStyle = PAL.l2; ctx.fillRect(0, 0, W, H);
+      cut(ctx, function(c){ c.rect(0, 0, W, H*0.62); }, [0,0,W,H], PAL.navy, 'grit', 7, 1);
+      cut(ctx, function(c){ c.arc(W*0.72, H*0.62, H*0.42, 0, Math.PI*2); }, [0,0,W,H], PAL.blue, 'dots', 5, 0.95);
+      cut(ctx, function(c){ c.moveTo(0,H); c.lineTo(W*0.42,H*0.3); c.lineTo(W*0.68,H); c.closePath(); }, [0,0,W,H], PAL.m2, 'hatch', 5, 0.9);
+      tooth(ctx, W, H, false);
+      return;
+    }
+
+    var zc = Z[0] + Z[2] * 0.5, zm = Math.min(Z[2], Z[3]);
+
+    if(art === 'cover'){
+      R = mkRng(2026);
+      plates(ctx, Z, R, { dark: dark, count: 4 });
+      guides(ctx, W, H, R, { dark: dark, cols: 4, rows: 3, nodes: 3 });
+      scatter(ctx, Z, R, set, { count: 16, min: 30, max: 175, screen: screen });
+      isoBox(ctx, zc + Z[2] * 0.05, H * 0.47, zm * 0.235, R,
+             { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
+      scatter(ctx, Z, R, set, { count: 7, min: 22, max: 78, screen: screen });
+      tooth(ctx, W, H, dark);
+      return;
+    }
+
+    /* the four dividers: fragments drifting, then aligning, then boxed */
+    if(art === 'div1' || art === 'div2' || art === 'div3' || art === 'div4'){
+      var stage = parseInt(art.slice(3), 10);
+      R = mkRng(3100 + stage * 17);
+      plates(ctx, Z, R, { dark: dark, count: stage === 1 ? 5 : 3 });
+      guides(ctx, W, H, R, { dark: dark, cols: 4, rows: 3, nodes: 3 });
+      scatter(ctx, Z, R, set, {
+        count: stage === 1 ? 26 : stage === 2 ? 20 : 12,
+        min: 26, max: stage === 1 ? 150 : 185,
+        order: stage >= 3,
+        screen: screen
+      });
+      if(stage === 2){
+        isoBox(ctx, zc + Z[2] * 0.07, H * 0.54, zm * 0.17, R,
+               { top: PAL.blue, left: PAL.m2, right: PAL.l2, dot: PAL.accent, screen: screen });
+      }
+      if(stage === 3){
+        isoBox(ctx, zc, H * 0.5, zm * 0.27, R,
+               { top: PAL.m1, left: PAL.navy, right: PAL.blueLt, dot: PAL.accentInk, screen: screen });
+      }
+      if(stage === 4){
+        isoBox(ctx, zc + Z[2] * 0.03, H * 0.5, zm * 0.24, R,
+               { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
+      }
+      tooth(ctx, W, H, dark);
+      return;
+    }
+
+    if(art === 'terms'){
+      R = mkRng(8802);
+      plates(ctx, Z, R, { dark: dark, count: 3 });
+      guides(ctx, W, H, R, { dark: dark, cols: 3, rows: 2, nodes: 2 });
+      scatter(ctx, Z, R, set, { count: 8, min: 36, max: 170, order: true, screen: screen });
+      isoBox(ctx, zc + Z[2] * 0.06, H * 0.52, zm * 0.23, R,
+             { top: PAL.m2, left: PAL.navy, right: PAL.blue, dot: PAL.accentInk, screen: screen });
+      tooth(ctx, W, H, dark);
+    }
+  }
+
+  function paintAll(){
+    document.querySelectorAll('canvas[data-art]').forEach(paint);
+  }
+
+  /* ======================================================================
+     Deck navigation
+     ====================================================================== */
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.page'));
+  var reel  = document.getElementById('reel');
+  var idx = 0;
+
+  function fit(){
+    var s = Math.min((window.innerWidth - 40) / 1280, (window.innerHeight - 78) / 720);
+    reel.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+
+  var ticks = document.getElementById('ticks');
+  pages.forEach(function(_, i){
+    var b = document.createElement('b');
+    b.tabIndex = 0;
+    b.addEventListener('click', function(){ go(i); });
+    ticks.appendChild(b);
+  });
+  var tickEls = Array.prototype.slice.call(ticks.children);
+  var count = document.getElementById('count');
+
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  /* the page number lives in the hash, so any slide is linkable: #p=7 */
+  function fromHash(){
+    var m = /(?:^|[#&])p=(\d+)/.exec(location.hash);
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+  function go(n){
+    idx = Math.max(0, Math.min(pages.length - 1, n));
+    if(history.replaceState) history.replaceState(null, '', '#p=' + (idx + 1));
+    pages.forEach(function(p, i){ p.classList.toggle('is-on', i === idx); });
+    tickEls.forEach(function(t, i){
+      t.classList.toggle('on', i === idx);
+      t.classList.toggle('seen', i < idx);
+    });
+    count.textContent = pad2(idx + 1) + ' / ' + pad2(pages.length);
+  }
+  document.getElementById('prev').addEventListener('click', function(){ go(idx - 1); });
+  document.getElementById('next').addEventListener('click', function(){ go(idx + 1); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(idx + 1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(idx - 1); }
+    else if(e.key === 'Home'){ go(0); }
+    else if(e.key === 'End'){ go(pages.length - 1); }
+    else if(e.key === 'p' || e.key === 'P'){ window.print(); }
+  });
+
+  /* --- unit dots: one dot, one unit --- */
+  document.querySelectorAll('.rail').forEach(function(r){
+    var v = parseInt(r.getAttribute('data-value'), 10), html = '', i;
+    for(i = 0; i < 100; i++) html += '<i class="' + (i < v ? 'on' : '') + '"></i>';
+    r.innerHTML = html;
+  });
+  document.querySelectorAll('.stack').forEach(function(s){
+    var n = parseInt(s.getAttribute('data-stack'), 10);
+    var g = parseInt(s.getAttribute('data-ghost') || '0', 10);
+    var hot = s.closest('.mult-col').querySelector('.mult-val.hot') !== null;
+    var html = '', i;
+    for(i = 0; i < n; i++) html += '<u class="' + (hot ? 'hot' : '') + '"></u>';
+    for(i = 0; i < g; i++) html += '<u class="ghost"></u>';
+    s.innerHTML = html;
+  });
+  document.querySelectorAll('.gain-d').forEach(function(d){
+    var n = parseInt(d.getAttribute('data-dots'), 10);
+    var g = parseInt(d.getAttribute('data-ghost') || '0', 10);
+    var html = '', i;
+    for(i = 0; i < n; i++) html += '<u></u>';
+    for(i = 0; i < g; i++) html += '<u class="ghost"></u>';
+    d.innerHTML = html;
+  });
+
+  fit();
+  go(fromHash());
+  paintAll();
+  window.addEventListener('hashchange', function(){ go(fromHash()); });
+  setTimeout(paintAll, 400);
+  window.addEventListener('resize', function(){ setTimeout(paintAll, 80); });
+})();
+</script>

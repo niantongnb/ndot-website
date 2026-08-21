@@ -72,6 +72,16 @@ h1,h2,h3{margin:0;font-family:var(--face);font-weight:300;text-wrap:balance}
 .deck{font-size:clamp(19px,1rem + .7vw,24px);line-height:1.44;font-weight:300;color:var(--ink-2);margin:0}
 .on-ink .deck,.band-ink .deck{color:var(--on-ink-2)}
 
+/* ---------- line breaking ----------
+   h1-h3 already balance, above. These are the display lines that are not
+   headings, plus the body copy, which is only asked not to strand a last
+   word. Both properties fall back to ordinary greedy wrapping where they
+   are unsupported, so nothing depends on them: the three paragraphs that
+   still stranded a word are bound with a non-breaking space in the
+   markup instead. */
+.pull,.cap-name,.stat .fig,.person .name{text-wrap:balance}
+.deck,.prose p,.mv .body,.person .bio{text-wrap:pretty}
+
 /* ---------- buttons ---------- */
 .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .btn{display:inline-flex;align-items:center;text-decoration:none;
@@ -175,34 +185,6 @@ body.embed .cap-row,body.embed .mv > div,body.embed .person,body.embed .prose > 
 body.embed .sec-head,body.embed .grid-people,body.embed .site-foot .foot-grid,
 body.embed .site-foot .colophon{animation:none}
 
-/* ============================================================
-   REVIEW-ONLY VERSION SWITCHER
-
-   Not part of the design. Two pairs: direction and round; the lit
-   cell of each pair is where you are. Its own colours rather than
-   the theme's so it looks identical on the light and dark rounds.
-   Hidden in the gallery cards and in print. Strip before launch:
-   search for "vswitch".
-   ============================================================ */
-.vswitch{position:fixed;right:16px;bottom:16px;z-index:200;display:flex;max-width:calc(100vw - 32px);
-  background:#111110;border:1px solid #52524A;
-  font-family:var(--mono);font-size:11px;font-weight:500;
-  letter-spacing:.1em;text-transform:uppercase}
-.vswitch a{display:flex;align-items:center;color:#C4C4B9;text-decoration:none;
-  padding:0 11px;min-height:34px;white-space:nowrap;
-  transition:background-color .12s ease,color .12s ease}
-.vswitch a:hover{background:#2B2B24;color:#FFF}
-.vswitch a.is-on{background:#F4F4EE;color:#111110}
-.vswitch a:focus-visible{outline:2px solid #E86A52;outline-offset:-2px;position:relative}
-.vswitch-round{border-left:1px solid #52524A}
-body.embed .vswitch{display:none}
-@media print{.vswitch{display:none}}
-@media (max-width:600px){
-  .vswitch{right:10px;bottom:10px;max-width:calc(100vw - 20px)}
-  .vswitch a{min-height:44px;padding:0 10px}
-  .vswitch-dir{letter-spacing:.06em}
-}
-
 /* ---------- mobile floor ----------
    Measured on a touch context, not eyeballed: 44px targets, the mark never
    squeezed out of the header, and mono labels never scaled down. */
@@ -216,15 +198,6 @@ body.embed .vswitch{display:none}
      invisible (the underline hangs off padding-bottom) and buys the height. */
   .mailto{padding-block:12px}
   section[id]{scroll-margin-top:18px}
-}
-
-/* The review switcher is `position:fixed` and sits over the last line of the
-   colophon at phone widths. Measured at 320 and 390 it covered "ndot.ai" and
-   "(c) 2026 NDot AI" on every page. This padding buys the footer clearance and
-   goes away with the switcher: strip it when you strip "vswitch". */
-.site-foot{padding-bottom:72px}          /* the bar occupies the bottom 50px */
-@media (max-width:600px){
-  .site-foot{padding-bottom:114px}       /* and 54px there, on a taller bar */
 }
 
 /* ============================================================
@@ -377,8 +350,15 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 .ticks a:hover::after{background:var(--accent);width:22px}
 
 /* ---------- opening panel ---------- */
+/* The opening carries the whole argument on one screen, so it is set a
+   step above the rest of the page rather than at the shared h-xl size.
+   The measures are in ch, so they grow with the type and the line breaks
+   land exactly where they did at the smaller size. */
+.opening .h-xl{font-size:clamp(36px,1rem + 3.6vw,68px);line-height:1.04;letter-spacing:-.032em}
 .opening h1{max-width:20ch}
-.opening .deck{margin-top:clamp(20px,2.6vw,30px);max-width:56ch;color:var(--ink-2)}
+.opening .deck{margin-top:clamp(20px,2.6vw,30px);max-width:56ch;color:var(--ink-2);
+               font-size:clamp(18px,1rem + .78vw,25px);line-height:1.44}
+.opening .actions{margin-top:clamp(26px,3.2vw,40px)}
 .opening .rule-t{height:2px;background:var(--accent);width:76px;margin-bottom:clamp(24px,3vw,34px)}
 
 /* ---------- proof: three figures across the plate ---------- */
@@ -395,6 +375,55 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 .panel svg{width:100%;height:auto;color:var(--ink)}
 .panel .cap{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule)}
 
+/* ---------- the two diagrams, in motion ----------
+   The routes stay drawn exactly as they were. A second copy of the same
+   geometry sits on top carrying one travelling dash, so the figures gain
+   flow without gaining a line. The gap in each dash pattern is longer
+   than the longest sub-route, which is what keeps exactly one pulse on a
+   route at a time rather than a marching-ants ladder.
+
+   The contrast between the two is the argument. Rented reach is dim,
+   arrives in three streams of different lengths, and has to be handed
+   off in the middle, so its second leg is delayed until the first has
+   landed. The owned relationship is a single unbroken stroke, it is the
+   only coloured line in either figure, and its pulse crosses more than
+   twice the distance in less time.
+
+   Decoration only. `.flow` rests at opacity:0, so with the animation off
+   (reduced motion, print, the gallery cards) the overlays are simply not
+   there and both diagrams read as they did before. */
+.flow{opacity:0;stroke-linecap:round}
+/* The routes are held one step below the boxes so a pulse crossing them has
+   something to be brighter than. Both still clear 4.5:1 on the ground. */
+.wire-rented{stroke:var(--ink-2)}
+.wire-direct{stroke:var(--accent)}
+.lbl-direct{fill:var(--accent)}
+.panel.is-solution{border-color:rgba(255,106,82,.42)}
+.panel.is-solution .cap{border-top-color:rgba(255,106,82,.42);color:var(--ink)}
+
+@media (prefers-reduced-motion:no-preference){
+  /* sub-routes are 96 and 66 long; pattern period 145 */
+  .flow-rented{stroke:var(--ink);stroke-width:2;stroke-dasharray:15 130;
+               animation:flow-rented 3.6s linear infinite}
+  .flow-late{animation-delay:1.8s}
+  /* one route, 224 long; period 280 */
+  .flow-owned{stroke:#FFCDBF;stroke-dasharray:30 250;
+              animation:flow-owned 3s cubic-bezier(.45,.05,.35,1) infinite}
+  @keyframes flow-rented{
+    0%  {stroke-dashoffset:15;opacity:0}
+    12% {opacity:1}
+    84% {opacity:1}
+    100%{stroke-dashoffset:-100;opacity:0}
+  }
+  @keyframes flow-owned{
+    0%  {stroke-dashoffset:30;opacity:0}
+    9%  {opacity:1}
+    88% {opacity:1}
+    100%{stroke-dashoffset:-230;opacity:0}
+  }
+}
+body.embed .flow{animation:none}
+
 /* ---------- capabilities, a plate of cells ---------- */
 .caps{list-style:none;margin:clamp(24px,3vw,36px) 0 0;padding:0;
       display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
@@ -404,10 +433,11 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
          padding:clamp(16px,2vw,24px);min-height:clamp(120px,15vh,168px)}
 .cap-row .mark{width:26px;height:26px;color:var(--accent)}
 .cap-name{font-size:clamp(15px,1rem + .2vw,17.5px);font-weight:500;letter-spacing:-.012em;margin-top:auto}
-/* the eighth cell completes the grid with the mark rather than filler copy */
-.cap-fill{background:var(--ink);display:grid;place-items:center;padding:clamp(16px,2vw,24px)}
-.cap-fill svg{width:clamp(56px,7vw,84px);height:auto;color:var(--paper)}
-@media (max-width:759px){ .cap-fill{display:none} }
+/* The eighth cell of a 4x2 grid holding seven capabilities. Left empty on
+   purpose: the grid stays square and the last row does not have to stretch
+   to fill the width. */
+.cap-blank{background:var(--paper)}
+@media (max-width:759px){ .cap-blank{display:none} }
 
 /* ---------- company ---------- */
 .mv{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:clamp(24px,3vw,36px)}
@@ -443,11 +473,26 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 .panel-open{min-height:auto}
 .article{padding:calc(var(--bar) + clamp(30px,4vw,52px)) var(--pad) clamp(44px,6vw,76px)}
 @media (min-width:1100px){ .article{padding-left:calc(var(--pad) + 76px)} }
-.article .plate-inner{max-width:900px;margin-inline:0}
+
+/* The prose is held to a reading measure, which on a wide screen used to
+   leave the right half of the article empty with nothing composing it.
+   Above 1000px the heading moves into a rail of its own and the column
+   sits beside it, so the plate is used edge to edge and the measure is
+   unchanged. The rail is sticky, so the heading stays with the passage
+   it names for the whole scroll. Below 1000px it stacks back to one
+   column and the heading returns to the top. */
+.article .plate-inner{max-width:1240px;margin-inline:auto}
 .prose{display:grid;gap:clamp(17px,2vw,24px);max-width:68ch;margin-top:clamp(26px,3.4vw,40px)}
+@media (min-width:1000px){
+  .article .plate-inner{display:grid;grid-template-columns:minmax(230px,1fr) minmax(0,2fr);
+                        column-gap:clamp(36px,5vw,88px)}
+  .article .sec-head{grid-column:1;position:sticky;top:calc(var(--bar) + 26px);align-self:start}
+  .article .prose{grid-column:2;margin-top:0}
+  .article .sec-head .h-l{max-width:12ch}
+}
 .pull{margin-block:clamp(12px,1.6vw,18px);padding-block:clamp(19px,2.4vw,27px);
       border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
-      font-weight:500;font-size:clamp(22px,1rem + 1.2vw,30px);letter-spacing:-.022em;max-width:22ch}
+      font-weight:500;font-size:clamp(22px,1rem + 1.2vw,30px);letter-spacing:-.022em;max-width:30ch}
 .contact-block{margin-top:clamp(28px,3.4vw,40px);padding:clamp(22px,2.6vw,30px);
                border:1px solid var(--rule)}
 .contact-block .mailto{color:var(--ink);border-bottom-color:var(--rule)}
@@ -486,7 +531,8 @@ body.embed .btn{font-size:9px;padding:7px 11px}
   html{scroll-snap-type:none}
   .panel-full{min-height:auto;padding-block:24px;break-inside:avoid}
   .topbar,.ticks{position:static;display:none}
-  .cap-fill{display:none}
+  .cap-blank{display:none}
+  .panel.is-solution,.panel.is-solution .cap{border-color:var(--rule)}
   .site-foot{background:#fff!important;color:#000!important}
   .site-foot a,.colophon span{color:#000!important}
 }

@@ -259,7 +259,7 @@ h1,h2,h3{margin:0;font-weight:400;color:var(--fg)}
    Each pane is a framed terminal window: a title bar with the tag, a run of
    dots, and an address. Body copy inside stays sentence case and grey. */
 .consoles{display:grid;gap:clamp(20px,2.6vw,28px)}
-@media (min-width:900px){ .consoles{grid-template-columns:1fr 1fr} }
+/* the two consoles stack: mission first, vision after */
 .console{border:1px solid var(--rule-2);background:var(--panel);display:flex;flex-direction:column}
 .console-bar{display:flex;align-items:center;gap:12px;padding:12px clamp(16px,2vw,22px);
              border-bottom:1px solid var(--rule-2)}

@@ -417,7 +417,7 @@ body{font-size:17px;line-height:24px}
 
 /* ---------- mission and vision, two columns of text ---------- */
 .mv{margin-top:24px}
-@media (min-width:860px){ .mv{grid-template-columns:1fr 1fr} }
+/* mission and vision stack; .cols supplies the rule between them */
 .mv .label{line-height:18px}
 .mv .h-m{margin-top:12px;font-size:22px;line-height:30px;font-weight:400;letter-spacing:-.01em}
 .mv .body{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:24px}

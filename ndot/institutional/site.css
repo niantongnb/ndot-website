@@ -570,11 +570,7 @@ body::after{
 
 /* ---------- mission / vision (the one light band) ---------- */
 .pair{display:grid;gap:var(--sp-12)}
-@media (min-width:57.5em){
-  .pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
-  .pair__col + .pair__col{border-inline-start:1px solid var(--bd);padding-inline-start:var(--gap)}
-  .pair__col:first-child{padding-inline-end:var(--gap)}
-}
+/* mission and vision stack in reading order */
 .pair h2{margin-block-end:var(--sp-5)}
 .pair .prose{margin-block-start:var(--sp-6)}
 

@@ -7,7 +7,7 @@
    metal — rules, ordinals, crop marks — never as a fill and
    never as running body copy.
 
-   The whole voice is carried by a Didone. Bodoni Moda set in
+   The whole voice is carried by a high-contrast serif. Playfair Display set in
    ALL CAPS, light weight, hairline serifs, opened up by about
    .02em and closed down to .95 leading, is the only display
    type on the site. Everything that is not display — nav,
@@ -68,7 +68,7 @@
   --rule:#7A5A34;        /* structural bronze rule       3.34:1 on void     */
 
   /* --- type --- */
-  --display:"Bodoni Moda","Bodoni 72","Didot","Playfair Display",Georgia,"Times New Roman",serif;
+  --display:"Playfair Display",ui-serif,"New York","Bodoni 72",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
 
   --pad:clamp(20px,4vw,64px);

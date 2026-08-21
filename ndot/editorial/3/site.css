@@ -267,7 +267,7 @@ body.embed .vswitch{display:none}
   --accent:#FF6A52;       /* 7.4:1 on the ground */
   --accent-ink:#A6231A;   /* for the paper inset */
 
-  --display:"Bodoni Moda",Didot,"Bodoni MT","Playfair Display",Georgia,serif;
+  --display:"Newsreader",ui-serif,"New York","Iowan Old Style",Georgia,serif;
   --face:var(--serif);
   --measure:660px;
 }
@@ -294,9 +294,21 @@ h1,h2,h3,.fig,.pull{font-family:var(--display)}
    Centred like a title page. The display line is centred because it IS the
    title; the deck below it is ranged left, because 45 words centred is a
    shape, not a sentence. */
-.opening{padding-block:clamp(34px,5vw,60px) clamp(40px,6vw,72px);text-align:center}
-.opening h1{font-weight:400;letter-spacing:-.012em;line-height:1.08;
+.opening{padding-block:clamp(34px,5vw,60px) clamp(40px,6vw,72px);text-align:center;position:relative}
+.opening>*{position:relative;z-index:1}
+/* ---------- the dot lattice ----------
+   Ambient decoration behind the opening, inverted from v4-signal:
+   sparse at the centre so the measure stays clean, denser toward the
+   edges. The overlay below re-inks the centre so no dot ever sits at
+   full strength behind the headline. */
+.opening .lattice{position:absolute;inset:0;z-index:0;pointer-events:none}
+.opening .lattice canvas{width:100%;height:100%;display:block}
+.opening .lattice::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(88% 72% at 50% 44%, var(--paper) 12%, rgba(11,11,10,.6) 52%, transparent 82%)}
+.opening h1{font-weight:400;letter-spacing:-.012em;line-height:1.16;
             font-size:clamp(31px,1rem + 2.9vw,50px)}
+.shiftline{padding-block:clamp(4px,1.2vw,14px) clamp(34px,5vw,56px)}
+.shiftline .deck{margin:0}
 .opening .rule-c{width:64px;height:1px;background:var(--accent);margin:clamp(26px,3.4vw,38px) auto}
 .opening .deck{text-align:left;font-family:var(--face);font-size:clamp(17px,1rem + .35vw,19.5px);
                line-height:1.62;color:var(--ink-2)}
@@ -387,7 +399,9 @@ body.embed .headpiece svg{height:15px}
 body.embed .quiet-nav{display:none}
 body.embed .opening{padding-block:16px 18px}
 body.embed .opening h1{font-size:19px;line-height:1.16}
-body.embed .opening .rule-c{margin-block:14px}
+body.embed .shiftline{padding-block:clamp(4px,1.2vw,14px) clamp(34px,5vw,56px)}
+.shiftline .deck{margin:0}
+.opening .rule-c{margin-block:14px}
 body.embed .opening .deck{font-size:10.5px;line-height:1.5}
 body.embed .opening .actions{margin-top:14px}
 body.embed .btn{font-size:9px;padding:7px 11px}

@@ -210,8 +210,6 @@
       es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
     }, { rootMargin:'0px 0px -8% 0px', threshold:0.01 });
     nodes.forEach(function(n){ io.observe(n); });
-    setTimeout(showAll, 1600);          /* backstop: nothing stays hidden */
-    window.addEventListener('load', function(){ setTimeout(showAll, 900); });
   }
 
   /* ---- text reveal: WORD SKEW BLUR, adapted from Flowbase's GSAP Text
@@ -301,8 +299,6 @@
         });
       }, { rootMargin:'0px 0px -20% 0px', threshold:0.01 });  /* booster offset 20 */
       split.forEach(function(el){ io2.observe(el); });
-      setTimeout(trAll, 1600);            /* backstop: no word stays hidden */
-      window.addEventListener('load', function(){ setTimeout(trAll, 900); });
     }
   }
 

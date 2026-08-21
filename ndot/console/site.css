@@ -726,3 +726,12 @@ html.js .tr.is-in .trc {
   }
   * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
 }
+
+/* ---------- print: nothing the reveal hides may stay hidden on paper ---------- */
+@media print {
+  html.js .rv, html.js .rv.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  html.js .tr .trc, html.js .tr.is-in .trc {
+    color: inherit !important; text-decoration-color: transparent !important;
+    transition: none !important; animation: none !important;
+  }
+}

@@ -468,8 +468,6 @@
     entries.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } });
   },{rootMargin:'0px 0px -8% 0px',threshold:0.01});
   els.forEach(function(el){ io.observe(el); });
-  // backstop: never let copy stay hidden, whatever the tab state
-  setTimeout(function(){ els.forEach(show); }, 1600);
 })();
 </script>
 </body>

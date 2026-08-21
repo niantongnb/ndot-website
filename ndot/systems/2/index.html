@@ -310,5 +310,32 @@
       <a class="is-on" aria-current="page" href="../../systems/2/index.html" aria-label="Round 2">2</a>
       <a href="../../systems/3/index.html" aria-label="Round 3">3</a>
     </nav>
+<script>
+  /* Section scroll reveal, fail-open: with JS off, without IntersectionObserver,
+     or under reduced motion the jsrv class is never added and nothing is ever
+     hidden. Sections settle to transform:none so sticky children work at rest. */
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.self !== window.top) return; /* gallery cards stay pinned to the finished state */
+    document.documentElement.classList.add('jsrv');
+    var els = [].slice.call(document.querySelectorAll('main > section, body > section'));
+    if (!els.length) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('srv-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    els.forEach(function (el) {
+      el.classList.add('srv');
+      if (el.getBoundingClientRect().top < vh * 0.85) {
+        el.classList.add('srv-in');   /* already on screen: no flash, no re-run */
+      } else {
+        io.observe(el);
+      }
+    });
+  })();
+</script>
 </body>
 </html>

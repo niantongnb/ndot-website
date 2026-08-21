@@ -768,6 +768,15 @@ html.js .tr.is-split.is-in .tr__c{
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
 
+/* ---------- print: nothing the reveal hides may stay hidden on paper ---------- */
+@media print{
+  html.js .rv,html.js .rv.is-in{opacity:1 !important;transform:none !important;transition:none !important}
+  html.js .tr.is-split{overflow:visible}
+  html.js .tr.is-split .tr__c,html.js .tr.is-split.is-in .tr__c{
+    opacity:1 !important;transform:none !important;filter:none !important;transition:none !important;
+  }
+}
+
 /* ---------- 320px: the header bar has to fit, so it is re-cut, not shrunk ---------- */
 @media (max-width:25.9375em){
   :root{--outer:16px;--gap:16px;--hdr:65px}

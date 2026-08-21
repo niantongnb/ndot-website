@@ -84,7 +84,7 @@ body{
 
 /* collage layers sit under the type */
 .art{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:0}
-.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.compress,.under,.retain,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
+.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.compress,.under,.retain,.shift,.sol,.caps,.next,.fit,.terms{position:relative; z-index:1}
 
 /* ---------- chrome ---------- */
 .folio{display:flex; align-items:center; justify-content:space-between; gap:20px; flex:none; padding-bottom:12px; border-bottom:1px solid var(--line-2)}
@@ -330,6 +330,23 @@ h2{font-size:41px; line-height:1.08}
 .tbl td.win{color:var(--accent-live); font-weight:600; font-size:13px}
 .tbl tbody tr:last-child td,.tbl tbody tr:last-child th{border-bottom:none}
 .tbl-note{font-size:12.5px; line-height:1.6; color:var(--mute); margin-top:18px; max-width:94ch}
+
+/* ---------- the fit: checks, then the four steps read left to right ---------- */
+.fit{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center; gap:34px; padding:10px 0}
+.fit-checks .checks{max-width:none}
+.fit-checks .check{font-size:15px; padding:13px 0}
+
+/* the timeline is a rule with a dot at each step; the dot is the mark, so the
+   sequence is drawn in the same language as the data pages */
+.timeline{list-style:none; margin:0; padding:30px 0 0; display:grid; grid-template-columns:repeat(4,1fr); position:relative}
+.tl-step{position:relative; padding-right:34px}
+.tl-step::before{content:""; position:absolute; left:0; top:-30px; width:11px; height:11px; border-radius:50%; background:var(--accent-live)}
+.tl-step::after{content:""; position:absolute; left:11px; right:0; top:-25px; height:1px; background:var(--accent-live)}
+.tl-step:last-child::after{display:none}
+.tl-n{display:block; font-family:var(--mono); font-weight:600; font-size:12px; letter-spacing:.18em; color:var(--accent-live)}
+.tl-t{display:block; font-family:var(--serif); font-weight:600; font-size:19px; letter-spacing:-.015em; color:var(--ink); margin-top:7px}
+.fit-foot{border-top:2px solid var(--accent-live); padding-top:16px; max-width:360px}
+.fit-foot .contact{margin-top:0; padding-top:0; border-top:none}
 
 /* ---------- 15 &middot; the fit ---------- */
 .next{display:grid; grid-template-columns:1fr 400px; gap:54px; flex:1; min-height:0; align-items:center}
@@ -906,8 +923,8 @@ h2{font-size:41px; line-height:1.08}
     <h2>Is this you? Let's build together.</h2>
   </div>
 
-  <div class="next">
-    <div>
+  <div class="fit">
+    <div class="fit-checks">
       <div class="label" style="margin-bottom:8px">What we look for</div>
       <div class="checks">
         <div class="check"><i></i><span>Unique content and a strong, trusted brand in your category.</span></div>
@@ -916,14 +933,18 @@ h2{font-size:41px; line-height:1.08}
         <div class="check"><i></i><span>Open to owning your audience: advertising, subscription, or both work for us.</span></div>
       </div>
     </div>
-    <div>
-      <div class="label" style="margin-bottom:8px">How we'd start</div>
-      <div class="steps panel">
-        <div class="step"><span class="sn">01</span><div class="st">Discovery call</div></div>
-        <div class="step"><span class="sn">02</span><div class="st">Prototype and demo</div></div>
-        <div class="step"><span class="sn">03</span><div class="st">Pilot launch</div></div>
-        <div class="step"><span class="sn">04</span><div class="st">Scale</div></div>
-      </div>
+
+    <div class="fit-steps">
+      <div class="label" style="margin-bottom:20px">How we'd start</div>
+      <ol class="timeline">
+        <li class="tl-step"><span class="tl-n">01</span><span class="tl-t">Discovery call</span></li>
+        <li class="tl-step"><span class="tl-n">02</span><span class="tl-t">Prototype and demo</span></li>
+        <li class="tl-step"><span class="tl-n">03</span><span class="tl-t">Pilot launch</span></li>
+        <li class="tl-step"><span class="tl-n">04</span><span class="tl-t">Scale</span></li>
+      </ol>
+    </div>
+
+    <div class="fit-foot">
       <div class="contact">
         <div class="cn">Mary Zeng</div>
         <div class="ce">mary.zeng@newsbreak.com</div>

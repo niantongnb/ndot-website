@@ -4,194 +4,137 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>NDot AI</title>
-<meta name="theme-color" content="#FAFAF8">
+<title>NDot AI — eight directions for one site</title>
+<meta name="description" content="Eight art directions for the NDot AI website, each built as a working two-page site. Hover a row to preview it live.">
+<meta name="theme-color" content="#E9E9E6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#FAFAF8; --paper-2:#F1F1EC; --ink:#111110; --ink-2:#6B6B63;
-    --rule:#D8D8CE; --accent:#A6231A;
-    --sans:Archivo,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  }
-  *,*::before,*::after{box-sizing:border-box;border-radius:0}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
-       font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1180px;margin-inline:auto;padding:clamp(26px,5vw,60px) clamp(20px,4vw,48px)}
-  .head{display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--ink)}
-  .head svg{height:20px;width:auto;color:var(--ink);flex:0 0 auto}
-  .label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
-         text-transform:uppercase;color:var(--ink-2);margin:0}
-  .head .back{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:500;
-         letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
-         text-decoration:none;padding-block:10px}
-  .head .back:hover{color:var(--accent)}
-  h1{margin:clamp(32px,4.5vw,50px) 0 0;font-weight:500;letter-spacing:-.03em;line-height:1.1;
-     font-size:clamp(27px,1rem + 2vw,40px);max-width:24ch}
-  .note{margin-top:16px;color:var(--ink-2);max-width:62ch}
-  h2.dir{margin:clamp(38px,5vw,60px) 0 0;font-family:var(--mono);font-size:11px;font-weight:500;
-         letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
-         padding-bottom:12px;border-bottom:1px solid var(--ink)}
-  .grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-top:0}
-  @media (min-width:720px){ .grid{grid-template-columns:repeat(3,1fr)} .grid.one{grid-template-columns:1fr} }
-  .card{background:var(--paper);padding:clamp(20px,2.4vw,26px);text-decoration:none;color:inherit;
-        display:flex;flex-direction:column;min-height:200px;
-        transition:background-color .12s ease}
-  .card:hover{background:var(--paper-2)}
-  .card .r{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--accent)}
-  .card h3{margin:18px 0 0;font-weight:600;font-size:20px;letter-spacing:-.02em;line-height:1.2}
-  .card .ref{margin:8px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-2)}
-  .card p{margin:10px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.5}
-  .card .go{margin-top:auto;padding-top:18px;font-family:var(--mono);font-size:10px;
-            letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
-  .sub{margin-top:14px;display:flex;gap:8px 20px;flex-wrap:wrap}
-  .sub a{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-         color:var(--ink-2);padding-block:10px}
-  .sub a:hover{color:var(--accent)}
-  footer{margin-top:clamp(40px,5vw,64px);padding-top:18px;border-top:1px solid var(--rule)}
-  footer p{margin:0 0 6px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink-2)}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="catalog.css">
 </head>
 <body>
-<div class="wrap">
+<a class="skip" href="#list">Skip to the directions</a>
 
-  <div class="head">
+<header class="bar">
+  <h1 class="cell is-title">NDot AI — eight directions</h1>
+  <a class="cell" href="../">All prototypes</a>
+  <a class="cell" href="mailto:career@ndot.ai">career@ndot.ai</a>
+  <span class="cell is-mark" aria-label="NDot AI">
     <svg viewBox="0 0 929.12 314.18" fill="currentColor" aria-hidden="true"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg>
-    <p class="label">Design directions</p>
-    <a class="back" href="../">All prototypes</a>
-  </div>
+  </span>
+</header>
 
-  <h1>Every direction built for the NDot AI site, in one place.</h1>
-  <p class="note">Two current directions &mdash; Editorial and Systems &mdash; with three
-  rounds each. The <em>direction</em> decides how much of the argument is carried by type
-  and how much by graphics. The <em>round</em> is a different page geometry, not a
-  restyling of the same one: the grid, what is pinned, and how the page advances all
-  change. Below them, the three earlier single-round directions, each taking its design
-  language from a named reference site, and the publisher deck exploration. Every version
-  is a working HTML mockup, not a picture.</p>
-  <p class="note">Inside any Editorial or Systems version, the bar in the bottom-right
-  corner switches direction and round without coming back here.</p>
-  <p class="note">Round 1 of each direction is the original stacked page. Rounds 2
-  and 3 are rebuilds, not restyles. Round 1 of Editorial and Round 1 of Systems share
-  the same two-track geometry &mdash; they differ in how much each section draws.</p>
+<main id="list" tabindex="-1">
+  <!-- Ordered by ground, lightest to darkest: the set reads as one
+       gradient from white paper down to pure black, which is the only
+       axis all eight actually share. Provenance is in README.md.
+       Publication and Schematic point at editorial/1 and systems/1 —
+       the same pages, now carrying the round switcher and two further
+       rounds each. -->
+  <ul class="list">
+    <li><a class="row v3" href="v3-index/" data-peek="v3-index/"><span class="name">Index</span><span class="kind">Light Product</span></a></li>
+    <li><a class="row v6" href="console/" data-peek="console/"><span class="name">Console</span><span class="kind">Working Surfaces</span></a></li>
+    <li><a class="row v1" href="editorial/1/" data-peek="editorial/1/"><span class="name">Publication</span><span class="kind">Editorial Print &middot; 3 rounds</span></a></li>
+    <li><a class="row v2" href="systems/1/" data-peek="systems/1/"><span class="name">Schematic</span><span class="kind">Systems Diagram &middot; 3 rounds</span></a></li>
+    <li><a class="row v8" href="lab/" data-peek="lab/"><span class="name">Lab</span><span class="kind">Specimen Bands</span></a></li>
+    <li><a class="row v4" href="v4-signal/" data-peek="v4-signal/"><span class="name">Signal</span><span class="kind">Dark Terminal</span></a></li>
+    <li><a class="row v7" href="institutional/" data-peek="institutional/"><span class="name">Prospectus</span><span class="kind">Ruled Tables</span></a></li>
+    <li><a class="row v5" href="v5-institution/" data-peek="v5-institution/"><span class="name">Institution</span><span class="kind">Black &amp; Bronze</span></a></li>
+  </ul>
+</main>
 
-  <h2 class="dir">Editorial &mdash; the site set as a publication</h2>
-  <div class="grid">
-    <a class="card" href="editorial/1/">
-      <span class="r">Round 1</span>
-      <h3>The page</h3>
-      <p>A two-track document: sticky section rail on the left, one field of
-      content, sections stacked down the page. Newsreader.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="editorial/2/">
-      <span class="r">Round 2</span>
-      <h3>Broadsheet</h3>
-      <p>A front page. Centred nameplate, then the lead three columns wide with
-      the proof boxed in the fourth. Nothing sticky, nothing in the margins.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="editorial/3/">
-      <span class="r">Round 3</span>
-      <h3>Broadside</h3>
-      <p>One centred measure, 660px, printed dark. No rail, no sidebar, no
-      columns, nothing in the margins. Bodoni Moda, the proof tipped in on paper.</p>
-      <span class="go">Open</span>
-    </a>
-  </div>
-  <div class="sub">
-    <a href="editorial/1/careers.html">R1 careers</a>
-    <a href="editorial/2/careers.html">R2 careers</a>
-    <a href="editorial/3/careers.html">R3 careers</a>
-  </div>
+<div class="peek" id="peek" aria-hidden="true"></div>
 
-  <h2 class="dir">Systems &mdash; the site as a drawing</h2>
-  <div class="grid">
-    <a class="card" href="systems/1/">
-      <span class="r">Round 1</span>
-      <h3>The system</h3>
-      <p>The same two-track document, with a graphic in every section: the mark's
-      construction, the shift to owned audience, capabilities as marks. Archivo.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="systems/2/">
-      <span class="r">Round 2</span>
-      <h3>Facing Pages</h3>
-      <p>A spread. The left leaf is a caption that changes as each right-hand
-      plate scrolls past it. One scrollbar, no script.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="systems/3/">
-      <span class="r">Round 3</span>
-      <h3>Panels</h3>
-      <p>One screen at a time. Every section is a full-viewport plate composed
-      to fill it, dark end to end, with a tick rail numbering the panels.</p>
-      <span class="go">Open</span>
-    </a>
-  </div>
-  <div class="sub">
-    <a href="systems/1/careers.html">R1 careers</a>
-    <a href="systems/2/careers.html">R2 careers</a>
-    <a href="systems/3/careers.html">R3 careers</a>
-  </div>
+<footer class="foot">
+  <span>Every direction is a working two-page site — home plus careers. Two references drew two independent takes each: exa.ai gave Index and Console, hebbia.com gave Institution and Prospectus.</span>
+  <span>Publication and Schematic continued through three rounds each — <a href="editorial/2/">Broadsheet</a>, <a href="editorial/3/">Broadside</a>, <a href="systems/2/">Facing&nbsp;Pages</a>, <a href="systems/3/">Panels</a> — the switcher inside each page moves between them. Also kept: <a href="explorations/publisher-deck/deck.html">the publisher deck</a>.</span>
+  <span>&copy; 2026 NDot AI</span>
+</footer>
 
-  <h2 class="dir">Earlier directions &mdash; one round each</h2>
-  <div class="grid">
-    <a class="card" href="institutional/">
-      <span class="r">01</span>
-      <h3>Institutional</h3>
-      <p class="ref">after hebbia.com</p>
-      <p>Cinematic dark. High contrast serif set in caps, warm near black ground,
-      one blue accent, dense prospectus type. Sells gravitas before it sells a
-      feature.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="console/">
-      <span class="r">02</span>
-      <h3>Console</h3>
-      <p class="ref">after exa.ai</p>
-      <p>Light and engineered. Warm flare serif over a grotesk, monospace micro
-      labels, hairline rules, small radii, and a working surface in the hero
-      rather than a picture of one.</p>
-      <span class="go">Open</span>
-    </a>
-    <a class="card" href="lab/">
-      <span class="r">03</span>
-      <h3>Lab</h3>
-      <p class="ref">after a1base.com</p>
-      <p>A research lab. Amber on near black against cream, square corners
-      throughout, tiny wide tracked mono labels over large tightly set serif,
-      and a key value specimen strip.</p>
-      <span class="go">Open</span>
-    </a>
-  </div>
-  <div class="sub">
-    <a href="institutional/careers.html">Institutional careers</a>
-    <a href="console/careers.html">Console careers</a>
-    <a href="lab/careers.html">Lab careers</a>
-  </div>
+<script>
+(function () {
+  /* Inside the gallery card the whole page is ~340px wide, so a click
+     should escape the iframe rather than navigate inside it. */
+  var embedded = window.self !== window.top;
+  if (embedded) document.body.classList.add('embed');
 
-  <h2 class="dir">Explorations</h2>
-  <div class="grid one">
-    <a class="card" href="explorations/publisher-deck/deck.html">
-      <span class="r">Deck</span>
-      <h3>The publisher deck</h3>
-      <p>A visual direction explored on a 15-page pitch deck: cut-paper shapes
-      with printed textures on a 96px lattice, an isometric box as the recurring
-      object, one printer's red per composition. Kept as a resource for site
-      iteration.</p>
-      <span class="go">Open</span>
-    </a>
-  </div>
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.row'));
+  if (embedded) {
+    rows.forEach(function (r) { r.target = '_blank'; r.rel = 'noopener'; });
+    return;                       /* no cursor preview inside a 340px card */
+  }
 
-  <footer>
-    <p>Copy is verbatim from the source document in every version, em dashes included.</p>
-    <p>Internal review only. Not indexed, not announced.</p>
-  </footer>
+  var peek = document.getElementById('peek');
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)');
+  var still = window.matchMedia('(prefers-reduced-motion:reduce)');
+  if (!fine.matches) return;
 
-</div>
+  /* One iframe per direction, mounted on first hover and kept. Mounting
+     all eight up front would fetch eight sites nobody has asked for yet. */
+  var frames = Object.create(null);
+  function frameFor(src, title) {
+    if (frames[src]) return frames[src];
+    var f = document.createElement('iframe');
+    f.src = src;
+    f.title = title;
+    f.tabIndex = -1;
+    f.hidden = true;
+    f.setAttribute('scrolling', 'no');
+    f.setAttribute('aria-hidden', 'true');
+    frames[src] = f;
+    peek.appendChild(f);          /* mounted once and left in place — moving
+                                     an iframe in the DOM reloads it, which
+                                     would re-fetch on every row change */
+    return f;
+  }
+
+  var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, on = false;
+
+  function place() {
+    var w = peek.offsetWidth, h = peek.offsetHeight, m = 18;
+    /* Keep the card beside the pointer, but never off-screen. */
+    var x = Math.min(Math.max(tx + m, m), window.innerWidth - w - m);
+    var y = Math.min(Math.max(ty - h - m, m), window.innerHeight - h - m);
+    cx += (x - cx) * 0.22;
+    cy += (y - cy) * 0.22;
+    if (Math.abs(x - cx) < 0.5 && Math.abs(y - cy) < 0.5) { cx = x; cy = y; }
+    peek.style.transform = 'translate3d(' + Math.round(cx) + 'px,' + Math.round(cy) + 'px,0)';
+    raf = on ? requestAnimationFrame(place) : 0;
+  }
+
+  function show(row, e) {
+    var src = row.getAttribute('data-peek');
+    var f = frameFor(src, row.querySelector('.name').textContent + ' — preview');
+    Object.keys(frames).forEach(function (k) { frames[k].hidden = (k !== src); });
+    tx = e.clientX; ty = e.clientY;
+    if (!on) {                    /* first frame: land it, do not fly it in */
+      var w = peek.offsetWidth, h = peek.offsetHeight, m = 18;
+      cx = Math.min(Math.max(tx + m, m), window.innerWidth - w - m);
+      cy = Math.min(Math.max(ty - h - m, m), window.innerHeight - h - m);
+    }
+    on = true;
+    peek.classList.add('is-on');
+    if (still.matches) {
+      peek.style.transform = 'translate3d(' + Math.round(cx) + 'px,' + Math.round(cy) + 'px,0)';
+    } else if (!raf) {
+      raf = requestAnimationFrame(place);
+    }
+  }
+
+  function hide() {
+    on = false;
+    peek.classList.remove('is-on');
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') show(row, e); });
+    row.addEventListener('pointermove',  function (e) { if (on) { tx = e.clientX; ty = e.clientY; } });
+    row.addEventListener('pointerleave', hide);
+  });
+  window.addEventListener('blur', hide);
+  document.addEventListener('scroll', hide, { passive: true });
+})();
+</script>
 </body>
 </html>

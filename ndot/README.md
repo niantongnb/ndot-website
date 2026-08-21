@@ -1,123 +1,120 @@
-# NDot AI — website
+# NDot AI — eight directions for the B2B site
 
-> **This tree lives at `/ndot/` inside the shared prototype repo.** The repo
-> root is a chooser between the two companies' sites; everything NDot is in
-> this folder. Nearby AI (the separate consumer product) is under `/nearby/`
-> and must not mix with NDot. Paths below are relative to `ndot/`; the shared
-> `serve.py` sits at the repo root.
+The B2B / publisher-growth positioning, explored as eight complete art
+directions behind one catalogue. This is a sibling of the consumer
+Nearby AI site under `/nearby/`, not a replacement for it — different
+audience, different copy, different brand voice. The repo root is a
+chooser between the two.
 
-Two current design directions for the NDot AI site, three layouts each, plus
-the three earlier single-round directions and the publisher-deck exploration.
-Every version is a working HTML mockup, not a picture: static, dependency-free,
-no build step for development. Google Fonts is the only external request.
+    ndot/
+      index.html          the catalogue
+      catalog.css
+      assets/             the mark and wordmark, shared by three directions
+      editorial/1|2|3/    Publication  · editorial print — R1 is the original
+                          v1-publication page; R2 Broadsheet and R3 Broadside
+                          are rebuilds of the same direction
+      systems/1|2|3/      Schematic    · systems diagram — R1 is the original
+                          v2-schematic page; R2 Facing Pages and R3 Panels
+                          are rebuilds of the same direction
+      v3-index/           Index        · light product surface
+      v4-signal/          Signal       · dark lab terminal
+      v5-institution/     Institution  · black and bronze
+      console/            Console      · working surfaces
+      institutional/      Prospectus   · ruled tables
+      lab/                Lab          · specimen bands
+        index.html
+        careers.html
+        site.css
+      src/ndot-css/       shared stylesheet base for editorial/systems R2+R3
+      deploy/             build script for an NDot-only deploy (editorial+systems)
+      explorations/publisher-deck/   the 15-page pitch-deck direction
 
-```
-index.html        the catalog: every direction, every round
-editorial/1|2|3/  the editorial direction
-systems/1|2|3/    the systems direction
-institutional/    earlier direction 01, after hebbia.com
-console/          earlier direction 02, after exa.ai
-lab/              earlier direction 03, after a1base.com
-explorations/publisher-deck/  the 15-page pitch-deck direction
-src/ndot-css/     shared stylesheet base + one layout layer per round
-deploy/           build script, robots.txt, _headers (covers editorial+systems only)
-assets/           normalized mark + wordmark used by the earlier directions
-```
+The Publication and Schematic rows of the catalogue link to
+`editorial/1/` and `systems/1/`, which are those same pages plus a
+bottom-right review switcher that moves between the two directions and
+their three rounds. `README-editorial-systems.md` documents that
+six-page set, its generated stylesheets and its deploy script.
 
-Each version folder holds `index.html`, `careers.html` and `site.css`.
+Note the one place a display name and a folder name differ: the
+catalogue calls `institutional/` **Prospectus**, because "Institutional"
+and "Institution" are indistinguishable in a list. Prospectus is that
+direction's own word for itself — its notes open "A prospectus, not a
+product tour."
 
-## Run it
+## Where they came from
 
-Browsers block `fetch()` on `file://`, and they cache hard during iteration, so
-use the no-store server rather than `python3 -m http.server`:
+Five directions (`v1`–`v5`) came from the interaction-prototype gallery.
+Three (`console`, `institutional`, `lab`) came from the
+`ndot-b2b-directions` branch and are unchanged here apart from being
+catalogued. Publication and Schematic were then iterated further on the
+`ndot-consolidated` branch as Editorial and Systems, three rounds each;
+those rounds replaced the original `v1-publication/` and `v2-schematic/`
+folders (round 1 of each is the identical page plus the review
+switcher). The publisher deck came from the
+`artistic-direction-publisher-deck` branch via `main`.
 
-```bash
-python3 serve.py 8000
-# http://localhost:8000/
-```
+Two references drew two independent takes each — worth comparing:
 
-## The six
+| reference    | take one              | take two                |
+|--------------|-----------------------|-------------------------|
+| exa.ai       | Index (light product) | Console (working surfaces) |
+| hebbia.com   | Institution (bronze)  | Prospectus (ruled tables)  |
+| a1base.com   | Signal (dark terminal)| —                       |
 
-Same copy, same brand rules, in all six. The **direction** decides how much of
-the argument is carried by type and how much by graphics. The **round** is a
-different page geometry, not a restyling of the same one: the grid, what is
-pinned, and how the page advances all change.
+## The catalogue
 
-| | Editorial | Systems |
-|---|---|---|
-| **1** | The page. Two-track document, sticky section rail on the left, one field of content. | The system. The same two-track document with a graphic in every section. |
-| **2** | Broadsheet. Centred nameplate, four-column front page, the lead three columns wide with the record boxed in the fourth. Nothing sticky. On a 6px baseline grid. | Facing Pages. The viewport as a spread: the left leaf is a caption that changes as each right-hand plate scrolls past. One scrollbar, no script. |
-| **3** | Broadside. One centred 660px measure, printed dark, nothing in the margins. | Panels. Every section a full-viewport plate, dark end to end, advancing a screen at a time. |
+Full-bleed ruled rows, the name set large in the direction's own colour,
+the descriptor squared off right. Hovering a row collapses it into a
+filled pill and previews that direction **live** — a real iframe of the
+page rendered at 1280px and scaled down, following the cursor. The
+preview is the actual HTML, so the catalogue cannot fall out of date
+with its contents. Rows are ordered by ground, lightest to darkest,
+which is the only axis all eight share.
 
-Inside any version, the bar in the bottom-right corner switches direction and
-round. **It is a review tool, not part of the design.** Strip it before launch:
-search for `vswitch` and remove the CSS block and the one `<nav>` per page.
+Eight hues, no two adjacent on the wheel. Each clears 4.5:1 twice over:
+as the name on the row ground, and as white on the pill fill.
 
-## Stylesheets are generated
+| direction    | colour    | on ground | white on fill |
+|--------------|-----------|-----------|---------------|
+| Publication  | `#9E241B` | 6.34      | 7.71          |
+| Schematic    | `#2447C7` | 6.16      | 7.50          |
+| Index        | `#0D6E62` | 5.04      | 6.13          |
+| Signal       | `#8F5305` | 5.07      | 6.16          |
+| Institution  | `#3F3F46` | 8.59      | 10.44         |
+| Console      | `#5A3BB5` | 6.33      | 7.70          |
+| Prospectus   | `#8E2A6B` | 6.41      | 7.80          |
+| Lab          | `#4F6B1F` | 5.00      | 6.08          |
 
-```bash
-bash src/ndot-css/build.sh
-```
+On a touch screen, or below 720px, the cursor preview is dropped
+outright rather than shrunk — there is no pointer to follow and no room
+to follow it into.
 
-`site.css` for rounds 2 and 3 is `src/ndot-css/base.css` plus one layout layer.
-The base holds tokens, type scale, components, motion and the review switcher
-and is byte-identical across those four, so the layout layer is provably the
-only difference. Round 1 of each direction predates the split and keeps its own
-self-contained stylesheet.
+## House rules
 
-**Do not edit those `site.css` files by hand.** Edit the source and rebuild.
+- **No build step, no dependencies.** Plain HTML and CSS. The only
+  remote requests are Google Fonts.
+- **Relative paths throughout**, because this is served from `/ndot/`,
+  never from a domain root.
+- **Reduced motion is honoured** and no text is animation-gated.
+- **Copy.** All eight draw on one approved set of strings. The five
+  `v*` directions use nothing outside it. The three inherited
+  directions add some headline and deck lines of their own, and each
+  carries a different subset of the approved careers copy on its home
+  page; every careers page is complete.
 
-## Deploy
+## Local
 
-```bash
-bash deploy/build.sh     # assembles _site/
-```
+From the repo root:
 
-- **Cloudflare Pages**: build command `bash deploy/build.sh`, output `_site`,
-  root `/`, production branch `main`.
-- **GitHub Pages**: point the workflow at the same script.
+    python3 serve.py 8899     # then open /ndot/
 
-The repo root is deliberately not published. `deploy/build.sh` leaves behind the
-per-folder `CLAUDE.md` notes, `serve.py` and `src/`, and fails the build if any
-of them reach the output, if a version is missing a page, if the source copy is
-missing, if a page lacks its `noindex` tag, or if any Nearby / county /
-local-geography content appears.
+The catalogue's previews are iframes, so it needs to be served over
+HTTP — opening `index.html` from the filesystem shows the rows but not
+the previews.
 
-Every page ships `noindex, nofollow` and the build writes `robots.txt` with
-`Disallow: /`. Unlisted, not secret. For real access control put the project
-behind Cloudflare Access.
+## Verified
 
-## Rules that do not change
-
-Read `editorial/1/CLAUDE.md` first, then the notes in whichever folder you are
-editing. The short version:
-
-- **NDot is not Nearby.** Two separate companies. NDot AI is a B2B growth
-  platform for media companies; Nearby AI is consumer local-life and lives in
-  its own repo. **There is no map on NDot and there must never be one.** Also
-  barred: pins, globes, coordinates, dot fields, and the words *near, local,
-  around, nearby, neighborhood, coverage*. The deploy build enforces this.
-- **Copy is verbatim** from the source document, em dashes included. Do not
-  reword, resequence or tighten any of it. Only UI chrome is authored here.
-- **No invented figures.** The source supports "more than a decade", "tens of
-  millions" and "hundreds of millions". Do not convert those into fabricated
-  precise numbers.
-- **No copy behind script.** Every word is readable with JS disabled, with rAF
-  suspended, and under `prefers-reduced-motion`. Motion is load-time only, and
-  every keyframe both starts and ends at the resting state.
-- **Verify by measuring**, not by looking. Contrast, tap targets, overflow and
-  vertical rhythm are all computed, never eyeballed.
-
-## Still open
-
-1. **Team content.** Six placeholder records per version. Names, roles, bios and
-   photographs are all template text and must be replaced before launch. Each
-   `.plate` is the photo swap point, 4:5.
-2. **The logo.** `editorial/1/assets/` holds *reconstructions* built from exact
-   Figma bounding boxes, not the real exports. Replace both files and the inline
-   `<svg>` in the `.brand` links, keeping `fill="currentColor"`.
-3. **The domain.** The brief titles the company "NDot.ai" and gives
-   `career@ndot.ai`; an older site used `career@ndotai.com`. `ndot.ai` is used
-   throughout. Needs confirming.
-4. **One page or two.** Built as two pages, with `careers.html` self-contained
-   so collapsing it into a home-page section is a small change.
+Measured on the finished files, all sixteen pages: **827 rendered text
+elements checked for contrast, zero AA failures**; no horizontal
+overflow at 360px on any page; every catalogue row mounts its preview
+exactly once and points at the right folder.

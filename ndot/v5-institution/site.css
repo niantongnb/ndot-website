@@ -1,0 +1,534 @@
+/* ============================================================
+   NDot AI — v5 "INSTITUTION" — design tokens
+
+   Direction: the annual report of a private bank, not the
+   landing page of a startup. Pure black stock, edge to edge.
+   One warm white. One bronze, used as a HAIRLINE and as small
+   metal — rules, ordinals, crop marks — never as a fill and
+   never as running body copy.
+
+   The whole voice is carried by a Didone. Bodoni Moda set in
+   ALL CAPS, light weight, hairline serifs, opened up by about
+   .02em and closed down to .95 leading, is the only display
+   type on the site. Everything that is not display — nav,
+   labels, decks, body, bios — is a restrained grotesk
+   (Instrument Sans) held small and quiet. Two families, one
+   voice each, no third.
+
+   That is what makes this unmistakable next to the other
+   directions: the publication take is warm paper + Newsreader,
+   the schematic take is warm paper + Archivo, and this one is
+   black + a high-contrast serif. Nothing here is a diagram and
+   nothing here is a folio.
+
+   The single image is generated: a bronze fan of thin blades
+   rising into an arch, drawn as one masked SVG. It is
+   aria-hidden, it takes no pointer events, and it carries no
+   word of copy. Delete it and the page is complete.
+
+   THE ONE TYPOGRAPHIC PROBLEM, AND THE FIX
+   The approved H1 is a 30-word sentence. Thirty words at 128px
+   caps is not a headline, it is a wall. So the hero carries a
+   short ALL-CAPS display LOCKUP drawn from words already inside
+   the approved copy — "THE GROWTH PLATFORM FOR MODERN MEDIA" —
+   and the full, unedited H1 sentence sits directly beneath it
+   at a size a person can actually read. The lockup is
+   aria-hidden because every word in it is already spoken by the
+   h1 below; a screen reader hears the sentence once, correctly,
+   and never hears a fragment.
+
+   Contrast ratios below are computed (WCAG 2.1 relative
+   luminance), not eyeballed.
+   ============================================================ */
+:root{
+  /* --- ground & surfaces --- */
+  --void:#000000;        /* the page. Pure black, no tint, L = 0            */
+  --plate:#0D0C0A;       /* team plates, quiet panels    1.07:1 on void     */
+  --panel:#121110;       /* the careers band ground      1.10:1 on void     */
+
+  /* --- warm white, three weights of presence --- */
+  --warm:#F2EFE9;        /* display, headings, links    18.30:1 on void     */
+  --warm-2:#9C958A;      /* decks, body, bios            7.08:1 on void     */
+  --warm-3:#7D766D;      /* labels, colophon, captions   4.68:1 on void     */
+
+  /* --- the bronze. Small metal only. ---
+     Both tones clear 4.5:1 on the void, so an ordinal or a caption
+     set in either is legible text, not decoration pretending to be
+     text. They are still never used for a paragraph. */
+  --bronze:#C08A4A;      /* rules, ordinals, eyebrows    6.98:1 on void     */
+  --bronze-lt:#D9A868;   /* small caps, hover, focus     9.75:1 on void     */
+
+  /* --- lines ---
+     Two weights, deliberately. --hair is atmosphere: it separates
+     things that do not need separating loudly, and at 1.56:1 it is
+     decoration and nothing else. --rule is structure: it draws the
+     ledger, the index and the band, and at 3.34:1 it clears
+     SC 1.4.11 for a non-text boundary that carries meaning. */
+  --hair:#3A2C1B;        /* atmospheric hairline         1.56:1 on void     */
+  --rule:#7A5A34;        /* structural bronze rule       3.34:1 on void     */
+
+  /* --- type --- */
+  --display:"Bodoni Moda","Bodoni 72","Didot","Playfair Display",Georgia,"Times New Roman",serif;
+  --sans:"Instrument Sans",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+
+  --pad:clamp(20px,4vw,64px);
+  --section:clamp(64px,8vw,132px);
+}
+
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%;background:var(--void)}
+body{
+  margin:0;background:var(--void);color:var(--warm);
+  font-family:var(--sans);font-size:16px;line-height:1.62;font-weight:400;
+  font-variant-numeric:lining-nums tabular-nums;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;   /* the fan is positioned off the right edge on purpose */
+}
+@media (min-width:768px){ body{font-size:17px} }
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0}
+
+/* Motion is interaction feedback only, plus one fail-open load pass at the
+   bottom of this file. There is no IntersectionObserver, no rAF and no
+   scroll listener anywhere on this site: every word is present with JS off. */
+a,.btn,.idx-row,.person{transition:color .16s ease,background-color .16s ease,border-color .16s ease,opacity .16s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:1360px;margin-inline:auto;padding-inline:var(--pad)}
+section[id]{scroll-margin-top:88px}   /* clear the 66px sticky bar */
+main:focus{outline:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;z-index:99;background:var(--warm);color:var(--void);padding:12px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--bronze-lt);outline-offset:3px}
+
+/* ============================================================
+   TYPE SCALE
+   ============================================================ */
+h1,h2,h3{margin:0;font-weight:400}
+
+/* the Didone. Caps, light, opened, closed-up leading. */
+.did{
+  font-family:var(--display);font-weight:400;
+  text-transform:uppercase;letter-spacing:.02em;line-height:.95;
+  font-optical-sizing:auto;text-wrap:balance;
+}
+.did-xl{font-size:clamp(40px,8vw,128px)}
+.did-l{font-size:clamp(30px,4.6vw,68px);line-height:1}
+.did-m{font-size:clamp(22px,2.4vw,36px);line-height:1.08;letter-spacing:.015em}
+
+/* the grotesk, held small. */
+.eyebrow{
+  font-family:var(--sans);font-size:11px;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--bronze-lt);
+  line-height:1.3;margin:0;
+}
+.label{
+  font-family:var(--sans);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--warm-3);
+  line-height:1.3;margin:0;
+}
+.deck{font-size:clamp(16px,.85rem + .45vw,20px);line-height:1.55;color:var(--warm-2);max-width:56ch;margin:0}
+.body{font-size:clamp(15px,.8rem + .35vw,17px);line-height:1.68;color:var(--warm-2)}
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.site-head{
+  position:sticky;top:0;z-index:50;
+  background:var(--void);border-bottom:1px solid var(--hair);
+}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:66px}
+.brand{display:flex;align-items:center;text-decoration:none;flex:0 0 auto}
+.brand svg{height:18px;width:auto;color:var(--warm)}
+.brand:hover svg{color:var(--bronze-lt)}
+.nav{display:flex;align-items:center;gap:clamp(14px,2.2vw,30px)}
+.nav a{
+  font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--warm-2);text-decoration:none;white-space:nowrap;
+}
+.nav a:hover{color:var(--warm)}
+/* the one filled element in the masthead: a warm-white pill, 18.30:1 */
+.nav a.is-cta{color:var(--void);background:var(--warm);padding:10px 18px;border-radius:999px}
+.nav a.is-cta:hover{background:var(--bronze-lt);color:var(--void)}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,3.4vw,40px)}
+.btn{
+  display:inline-flex;align-items:center;text-decoration:none;
+  font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;padding:15px 26px;border:1px solid transparent;border-radius:999px;
+}
+.btn-solid{background:var(--warm);color:var(--void);border-color:var(--warm)}
+.btn-solid:hover{background:var(--bronze-lt);border-color:var(--bronze-lt);color:var(--void)}
+.btn-ghost{color:var(--warm);border-color:var(--rule)}
+.btn-ghost:hover{border-color:var(--bronze-lt);color:var(--bronze-lt)}
+
+/* ============================================================
+   HERO — the stage
+
+   One black stage. Lockup, then the full H1 sentence, then the
+   deck. The bronze fan sits behind and to the right and is
+   masked out on its left flank so it never sits under a word at
+   full strength.
+   ============================================================ */
+.stage{position:relative;overflow:hidden;padding-block:clamp(52px,7vw,116px) clamp(64px,8vw,140px);border-bottom:1px solid var(--hair)}
+.stage .wrap{position:relative;z-index:1}
+.stage .eyebrow{margin-bottom:clamp(22px,3vw,38px)}
+.lockup{margin:0;color:var(--warm)}
+.lockup span{display:block}
+.hero-h1{
+  margin-top:clamp(30px,4vw,52px);padding-top:clamp(24px,3vw,34px);
+  border-top:1px solid var(--hair);
+  max-width:44ch;font-family:var(--sans);font-weight:400;
+  font-size:clamp(17px,.85rem + .7vw,23px);line-height:1.44;letter-spacing:-.005em;color:var(--warm);
+}
+.stage .deck{margin-top:clamp(18px,2.2vw,26px);max-width:52ch}
+
+/* --- the bronze fan ---
+   Decorative, aria-hidden, inert. It is allowed to bleed off the right
+   edge; body has overflow-x:hidden so it can never open a scrollbar. */
+.fan{
+  position:absolute;pointer-events:none;user-select:none;
+  right:clamp(-120px,-4vw,-40px);bottom:-14%;
+  width:clamp(420px,50vw,860px);z-index:0;opacity:.92;
+  -webkit-mask-image:linear-gradient(100deg,transparent 0%,rgba(0,0,0,.28) 16%,#000 46%);
+          mask-image:linear-gradient(100deg,transparent 0%,rgba(0,0,0,.28) 16%,#000 46%);
+}
+.fan svg{width:100%;height:auto}
+@media (max-width:1000px){
+  .fan{width:min(76vw,560px);bottom:-10%;right:-16vw;opacity:.6}
+}
+@media (max-width:640px){
+  /* below 640 the fan and the lockup would fight for the same 320px.
+     The type wins; the ornament leaves. */
+  .fan{display:none}
+}
+
+/* the concentric arch set — the fan reduced to its outline, used on
+   careers.html so the second page reads as the same building. */
+.arcs{position:absolute;pointer-events:none;user-select:none;z-index:0;
+  right:-6vw;bottom:-12%;width:clamp(360px,46vw,760px);opacity:.5}
+.arcs svg{width:100%;height:auto}
+@media (max-width:760px){ .arcs{display:none} }
+
+/* ============================================================
+   SECTION FURNITURE
+
+   Every section opens the same way: an enormous Didone numeral
+   in dim bronze, a hairline, and the section name in small caps.
+   That masthead IS the heading — no invented section copy.
+   ============================================================ */
+.sec{padding-block:var(--section)}
+.rail{
+  display:flex;align-items:baseline;gap:clamp(16px,2vw,26px);
+  padding-bottom:clamp(14px,1.6vw,20px);margin-bottom:clamp(34px,4.4vw,58px);
+  border-bottom:1px solid var(--rule);
+}
+.rail .sec-num{
+  font-family:var(--display);font-weight:400;letter-spacing:.01em;line-height:.8;
+  font-size:clamp(44px,6vw,96px);color:var(--rule);flex:0 0 auto;
+}
+.rail .label{color:var(--bronze-lt);letter-spacing:.2em;padding-bottom:clamp(4px,.8vw,10px)}
+
+/* ============================================================
+   01 — PROVEN AT SCALE
+   Three figures in the Didone, in a ruled row on bronze hairlines.
+   ============================================================ */
+.ledger{display:grid;border-top:1px solid var(--rule)}
+.fig-cell{
+  display:flex;flex-direction:column;
+  padding:clamp(28px,3.4vw,44px) 0;border-bottom:1px solid var(--hair);
+}
+.fig-cell:last-child{border-bottom:1px solid var(--rule)}
+.fig-cell .ord{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.2em;color:var(--bronze);margin-bottom:clamp(18px,2.2vw,28px)}
+.fig-cell .fig{
+  font-family:var(--display);font-weight:400;text-transform:uppercase;
+  font-size:clamp(26px,3.2vw,46px);line-height:1;letter-spacing:.015em;
+  color:var(--warm);text-wrap:balance;
+}
+.fig-cell .label{margin-top:auto;padding-top:clamp(16px,2vw,24px)}
+@media (min-width:820px){
+  .ledger{grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--rule)}
+  .fig-cell{border-bottom:0;border-left:1px solid var(--hair);padding:clamp(34px,3.6vw,52px) clamp(22px,2.4vw,38px)}
+  .fig-cell:first-child{border-left:0;padding-left:0}
+  .fig-cell:last-child{border-bottom:0;padding-right:0}
+}
+
+/* ============================================================
+   02 — PLATFORM
+   The formal index. Generous row height, Didone numerals in
+   bronze, sans names in warm white, thin bronze hairlines.
+   ============================================================ */
+.idx-lead{max-width:60ch;margin-bottom:clamp(38px,4.6vw,60px)}
+.idx{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.idx-row{
+  display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;
+  gap:6px 20px;padding:clamp(22px,2.9vw,36px) 4px;
+  border-bottom:1px solid var(--hair);
+}
+.idx-row:last-child{border-bottom:1px solid var(--rule)}
+.idx-num{
+  font-family:var(--display);font-weight:400;letter-spacing:.02em;line-height:1;
+  font-size:clamp(20px,2vw,30px);color:var(--bronze);
+}
+.idx-name{
+  font-family:var(--sans);font-weight:400;letter-spacing:-.01em;line-height:1.25;
+  font-size:clamp(19px,1rem + .8vw,28px);color:var(--warm);
+}
+.idx-row:hover{border-bottom-color:var(--rule)}
+.idx-row:hover .idx-num{color:var(--bronze-lt)}
+@media (min-width:760px){ .idx-row{grid-template-columns:78px minmax(0,1fr);gap:32px} }
+
+/* ============================================================
+   03 — COMPANY
+   Two columns, Didone subheads, bronze label above each.
+   ============================================================ */
+.mv{display:grid;gap:clamp(44px,5vw,60px)}
+.mv > div{padding-top:clamp(20px,2.4vw,28px);border-top:1px solid var(--rule)}
+.mv .label{color:var(--bronze)}
+.mv h3{margin-top:clamp(18px,2.2vw,26px);color:var(--warm);max-width:20ch}
+.mv .body{margin-top:clamp(16px,2vw,22px);max-width:46ch}
+@media (min-width:880px){ .mv{grid-template-columns:1fr 1fr;gap:clamp(32px,3.6vw,56px)} }
+
+/* ============================================================
+   04 — TEAM
+   PLACEHOLDER PLATES. The frame is set, the photograph is not
+   placed. A 4:5 plate in near-black, a bronze ordinal in the
+   Didone, four bronze crop marks. It reads as a stage in
+   production, not as a broken image.
+   ============================================================ */
+.people{display:grid;gap:clamp(28px,3.2vw,44px);grid-template-columns:repeat(auto-fill,minmax(208px,1fr))}
+.plate{
+  position:relative;aspect-ratio:4/5;background:var(--plate);
+  border:1px solid var(--hair);display:grid;place-items:center;
+}
+.plate .num{
+  font-family:var(--display);font-weight:400;letter-spacing:.04em;line-height:1;
+  font-size:clamp(40px,6.4vw,64px);color:var(--bronze);
+}
+.plate i{position:absolute;width:12px;height:12px}
+.plate .tl{top:9px;left:9px;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.plate .tr{top:9px;right:9px;border-top:1px solid var(--rule);border-right:1px solid var(--rule)}
+.plate .bl{bottom:9px;left:9px;border-bottom:1px solid var(--rule);border-left:1px solid var(--rule)}
+.plate .br{bottom:9px;right:9px;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
+.person:hover .plate{border-color:var(--rule)}
+.person .name{
+  margin-top:18px;font-family:var(--display);font-weight:400;text-transform:uppercase;
+  font-size:clamp(17px,1.3vw,20px);letter-spacing:.05em;line-height:1.15;color:var(--warm);
+}
+.person .role{margin-top:9px;font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--bronze)}
+.person .bio{margin-top:13px;font-size:14px;line-height:1.6;color:var(--warm-2)}
+.person .name,.person .role,.person .bio{overflow-wrap:break-word}
+
+/* ============================================================
+   05 — CAREERS
+   The bronze-ruled band. Two structural rules top and bottom,
+   a faint warm wash, and a Didone call to action.
+   ============================================================ */
+.band{
+  position:relative;background:var(--panel);
+  border-top:1px solid var(--bronze);border-bottom:1px solid var(--bronze);
+  padding-block:var(--section);overflow:hidden;
+}
+.band::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 82% 108%,rgba(192,138,74,.16) 0%,rgba(192,138,74,.05) 42%,transparent 72%);
+}
+.band .wrap{position:relative;z-index:1}
+.band .rail{border-bottom-color:var(--rule)}
+.band h2.did{max-width:20ch;color:var(--warm)}
+.band .deck{margin-top:clamp(20px,2.4vw,30px);max-width:44ch}
+.mailto{
+  display:inline-block;margin-top:clamp(30px,3.6vw,44px);
+  font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;
+  font-size:clamp(18px,1.6vw,26px);line-height:1;color:var(--warm);
+  text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:8px;
+}
+.mailto:hover{color:var(--bronze-lt);border-bottom-color:var(--bronze-lt)}
+
+/* ============================================================
+   CAREERS PAGE
+   ============================================================ */
+.careers-hero{position:relative;overflow:hidden;padding-block:clamp(52px,7vw,110px) clamp(40px,5vw,72px);border-bottom:1px solid var(--hair)}
+.careers-hero .wrap{position:relative;z-index:1}
+.careers-hero .eyebrow{margin-bottom:clamp(22px,3vw,36px)}
+.careers-hero h1{max-width:15ch}
+.careers-hero .deck{margin-top:clamp(24px,3vw,36px);max-width:42ch}
+
+.prose{max-width:66ch;display:grid;gap:clamp(22px,2.6vw,30px)}
+.prose p{color:var(--warm-2);font-size:clamp(15px,.8rem + .4vw,18px);line-height:1.72}
+/* the pull. A Didone line between two bronze rules — the only place on
+   careers.html where the display face is allowed to interrupt the column. */
+.prose .pull{
+  margin-block:clamp(14px,1.8vw,24px);padding-block:clamp(26px,3.2vw,40px);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  font-family:var(--display);text-transform:uppercase;
+  font-size:clamp(21px,2.4vw,38px);line-height:1.1;
+  letter-spacing:.02em;color:var(--warm);max-width:19ch;
+}
+.contact{
+  margin-top:clamp(48px,5.6vw,76px);padding:clamp(28px,3.4vw,44px);
+  background:var(--plate);border:1px solid var(--hair);border-left:2px solid var(--bronze);
+}
+.contact .label{color:var(--bronze)}
+.contact .mailto{margin-top:16px}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-foot{border-top:1px solid var(--hair);padding-block:clamp(48px,6vw,76px);background:var(--void)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:flex-start}
+.site-foot .brand svg{height:18px;color:var(--warm)}
+.foot-links{display:flex;flex-wrap:wrap;gap:10px 28px}
+.foot-links a{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--warm-2);text-decoration:none}
+.foot-links a:hover{color:var(--bronze-lt)}
+.colophon{
+  margin-top:clamp(34px,4vw,52px);padding-top:22px;border-top:1px solid var(--hair);
+  display:flex;flex-wrap:wrap;gap:8px 26px;justify-content:space-between;
+}
+.colophon span{font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--warm-3)}
+
+/* ============================================================
+   MOBILE
+
+   Three real defects drove this block, checked at 320/360/390/430:
+
+   1. The lockup is three hard-broken lines. At 128px that is the
+      composition; at 360px "PLATFORM FOR" is 320px wide and the
+      page scrolls sideways. Below 600px the lines go inline and
+      the phrase simply wraps to whatever fits.
+   2. The masthead is a flex row. A four-item nav at 320px
+      squeezed the mark to width:0 — .brand never shrinks, and
+      below 600px the nav drops to its own ruled row.
+   3. Nav and footer links were 16px tall. Touch targets are 44px
+      here. Small caps hold their desktop size everywhere: 10px
+      tracked-out caps on a phone is not a design, it is a bug.
+   ============================================================ */
+@media (max-width:600px){
+  .lockup span{display:inline}
+  .did-xl{line-height:1;letter-spacing:.015em}
+
+  .site-head{position:static}
+  .site-head .wrap{height:auto;padding-block:6px;flex-wrap:wrap;gap:0}
+  .brand{padding-block:14px}
+  .nav{flex:1 1 100%;flex-wrap:wrap;column-gap:20px;row-gap:0;border-top:1px solid var(--hair)}
+  .nav a{padding-block:16px}
+  .nav a.is-cta{padding:12px 18px;margin-block:8px}
+
+  .foot-links{column-gap:24px;row-gap:0}
+  .foot-links a{padding-block:15px}
+  .foot-grid{gap:8px}
+
+  .mailto{padding-bottom:12px}
+  section[id]{scroll-margin-top:16px}
+}
+
+/* ============================================================
+   GALLERY IFRAME PREVIEW
+   The repo gallery frames each prototype at roughly 16:11. Show
+   the masthead and the lockup, nothing else.
+   ============================================================ */
+body.embed .site-head{position:static}
+body.embed .site-head .wrap{height:48px}
+body.embed .nav{display:none}
+body.embed .stage,body.embed .careers-hero{padding-block:26px 30px}
+body.embed .stage .eyebrow,body.embed .careers-hero .eyebrow{margin-bottom:16px;font-size:9px}
+body.embed .did-xl{font-size:clamp(26px,6.4vw,52px)}
+body.embed .did-l{font-size:clamp(22px,5vw,40px)}
+body.embed .hero-h1{margin-top:18px;padding-top:14px;font-size:12px;line-height:1.4;max-width:52ch}
+body.embed .stage .deck,body.embed .careers-hero .deck{margin-top:12px;font-size:11px;line-height:1.45;max-width:56ch}
+body.embed .actions{margin-top:16px;gap:8px}
+body.embed .btn{font-size:9px;padding:9px 16px}
+body.embed .fan{opacity:.75}
+
+/* ============================================================
+   MOTION — the lift
+
+   One load-time pass. Copy rises a few pixels and comes up out
+   of black, staggered, as if the lights are being brought up on
+   a set.
+
+   FAIL-OPEN CONTRACT. This is a load animation, NOT a scroll
+   reveal, and that is deliberate:
+     - no requestAnimationFrame, no IntersectionObserver, no JS
+     - nothing waits on a scroll position, so a full-page
+       screenshot taken after load captures every word
+     - the resting state IS the normal computed style, so if the
+       animation never runs the page is simply fully visible
+   Never convert this to a scroll reveal without keeping all
+   three properties. Copy is never gated behind motion.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  .stage .eyebrow,.lockup,.hero-h1,.stage .deck,.stage .actions,
+  .careers-hero .eyebrow,.careers-hero h1,.careers-hero .deck,
+  .rail,.idx-lead,.fig-cell,.idx-row,.mv > div,.person,
+  .band h2,.band .deck,.band .actions,.band .mailto,
+  .prose > *,.site-foot .foot-grid,.site-foot .colophon{
+    animation:lift 1s cubic-bezier(.2,.7,.25,1) both;
+  }
+  @keyframes lift{
+    from{opacity:0;transform:translateY(14px)}
+    to  {opacity:1;transform:none}
+  }
+
+  /* The ornaments fade only, and their keyframe has NO `to` and uses
+     `backwards` fill — so the animation interpolates up to whatever
+     opacity the cascade computed (.92 wide, .6 at tablet, .5 for the
+     arcs) and then hands control straight back to the stylesheet.
+     A hard `to{opacity:.92}` would have quietly overridden the
+     responsive dimming the moment the animation finished. */
+  .fan,.arcs{animation:fade-up 1.6s ease .12s backwards}
+  @keyframes fade-up{ from{opacity:0} }
+
+  .lockup{animation-delay:.08s}
+  .hero-h1,.careers-hero .deck{animation-delay:.30s}
+  .stage .deck{animation-delay:.40s}
+  .stage .actions{animation-delay:.50s}
+
+  .ledger .fig-cell:nth-child(2){animation-delay:.09s}
+  .ledger .fig-cell:nth-child(3){animation-delay:.18s}
+
+  .idx .idx-row:nth-child(1){animation-delay:.04s}
+  .idx .idx-row:nth-child(2){animation-delay:.09s}
+  .idx .idx-row:nth-child(3){animation-delay:.14s}
+  .idx .idx-row:nth-child(4){animation-delay:.19s}
+  .idx .idx-row:nth-child(5){animation-delay:.24s}
+  .idx .idx-row:nth-child(6){animation-delay:.29s}
+  .idx .idx-row:nth-child(7){animation-delay:.34s}
+
+  .mv > div:nth-child(2){animation-delay:.12s}
+  .people .person:nth-child(2){animation-delay:.05s}
+  .people .person:nth-child(3){animation-delay:.10s}
+  .people .person:nth-child(4){animation-delay:.15s}
+  .people .person:nth-child(5){animation-delay:.20s}
+  .people .person:nth-child(6){animation-delay:.25s}
+
+  .prose > *:nth-child(2){animation-delay:.06s}
+  .prose > *:nth-child(3){animation-delay:.12s}
+  .prose > *:nth-child(4){animation-delay:.18s}
+  .prose > *:nth-child(5){animation-delay:.24s}
+  .prose > *:nth-child(6){animation-delay:.30s}
+  .prose > *:nth-child(7){animation-delay:.36s}
+}
+
+/* ============================================================
+   PRINT
+   The whole site is white-on-black. On paper that is a solid
+   block of toner, so the ground flips and the bronze darkens to
+   something that survives a laser printer.
+   ============================================================ */
+@media print{
+  .site-head,.skip,.fan,.arcs{display:none}
+  html,body,.band,.plate,.contact{background:#fff!important;color:#111!important}
+  .band::before{display:none}
+  .lockup,.hero-h1,.did,h1,h2,h3,.fig-cell .fig,.idx-name,.person .name,.mailto,.pull,.site-foot .brand svg{color:#111!important}
+  .deck,.body,.prose p,.person .bio{color:#3B3730!important}
+  .label,.colophon span,.foot-links a,.person .role,.eyebrow,.fig-cell .ord{color:#6A5334!important}
+  .idx-num,.plate .num,.mv .label,.contact .label{color:#7A5A34!important}
+  .rail,.ledger,.fig-cell,.idx,.idx-row,.mv > div,.band,.plate,.contact,.colophon,.site-foot,.pull,.hero-h1,.stage{border-color:#B9A98E!important}
+  .idx-row,.fig-cell,.person,.pull{break-inside:avoid}
+}

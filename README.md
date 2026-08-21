@@ -6,10 +6,11 @@ chooser; each site has its own catalog of every direction built for it.
 | Path | Project | What |
 |---|---|---|
 | `/` | — | The chooser: one preview card per site. |
-| `/ndot/` | **NDot AI** | The catalog. B2B growth platform for media companies. See `ndot/README.md`. |
-| `/ndot/editorial/1..3/` | NDot AI | The page, the broadsheet, the broadside. |
-| `/ndot/systems/1..3/` | NDot AI | The system, facing pages, panels. |
-| `/ndot/institutional/` `/ndot/console/` `/ndot/lab/` | NDot AI | The three earlier single-round directions. |
+| `/ndot/` | **NDot AI** | The catalogue: eight directions, full-bleed rows, live hover previews. See `ndot/README.md`. |
+| `/ndot/editorial/1..3/` | NDot AI | Publication — the original page plus the Broadsheet and Broadside rounds. |
+| `/ndot/systems/1..3/` | NDot AI | Schematic — the original page plus the Facing Pages and Panels rounds. |
+| `/ndot/v3-index/` `/ndot/v4-signal/` `/ndot/v5-institution/` | NDot AI | Index, Signal, Institution. |
+| `/ndot/console/` `/ndot/institutional/` `/ndot/lab/` | NDot AI | Console, Prospectus, Lab. |
 | `/ndot/explorations/publisher-deck/` | NDot AI | The 15-page pitch-deck direction. |
 | `/nearby/` | **Nearby AI** | The catalog. Consumer local-life product. See `nearby/HANDOFF.md`. |
 | `/nearby/v1..v4/` | Nearby AI | The four Nearby directions. V4 is the picked one. |

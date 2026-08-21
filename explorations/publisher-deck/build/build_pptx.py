@@ -82,7 +82,7 @@ def add_block(slide, b):
 
 def build(kind, plate_prefix, with_text):
     prs = new_deck()
-    for i in range(15):
+    for i in range(len(PAGES)):
         s = blank(prs)
         full_bleed(s, os.path.join(SLIDES, "%s-%02d.png" % (plate_prefix, i + 1)))
         if with_text:

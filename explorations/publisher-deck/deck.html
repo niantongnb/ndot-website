@@ -26,11 +26,8 @@
   --line:#D8D8CE;         /* hairline on paper                          */
   --line-2:#C9C9C0;       /* plate numerals, decoration                 */
 
-  /* NewsBreak palette. Dark Red carries the accent on paper; Primary Red is
-     too light there (2.93:1) and is reserved for the inverted band, where it
-     reads at 4.38:1. */
-  --accent:#D6493D;       /* NewsBreak secondary dark red   4.12:1 on paper */
-  --accent-ink:#FF5A5A;   /* NewsBreak primary red          4.38:1 on band  */
+  --accent:#A6231A;       /* folios, ordinals        6.98:1 on paper    */
+  --accent-ink:#E86A52;   /* the same hue lifted for the band 5.80:1    */
   --accent-live:var(--accent);
 
   --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
@@ -76,19 +73,18 @@ body{
 }
 .js .page{position:absolute; inset:0; margin:0; opacity:0; visibility:hidden}
 .js .page.is-on{opacity:1; visibility:visible}
-/* The inverted band is NewsBreak primary blue taken down to #1C3049 so type
-   clears on it. Dark Red is a banned pair here (2.33:1), so the accent flips
-   to Primary Red, and the hairline is lifted to #68809A: the warm grey rule
-   measures 2.46:1 on this ground and would vanish. */
+/* the inverted band. --accent is a banned pair on this ground (2.55:1),
+   so the accent token flips to --accent-ink, and hairlines use a solid
+   #6A6A63 rather than a low-alpha rgba that measures 1.37:1. */
 .page[data-ground="dark"]{
-  --paper:#1C3049; --panel:#26405F; --ink:#EEF2F6; --ink-2:#CBD6E0;
-  --mute:#93A4B5; --line:#68809A; --line-2:#7A93AC;
+  --paper:#131310; --panel:#1D1D19; --ink:#F4F4EE; --ink-2:#DCDCD4;
+  --mute:#9A9A90; --line:#6A6A63; --line-2:#7C7C74;
   --accent-live:var(--accent-ink);
 }
 
 /* collage layers sit under the type */
 .art{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:0}
-.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
+.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.compress,.under,.retain,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
 
 /* ---------- chrome ---------- */
 .folio{display:flex; align-items:center; justify-content:space-between; gap:20px; flex:none; padding-bottom:12px; border-bottom:1px solid var(--line-2)}
@@ -176,13 +172,42 @@ h2{font-size:41px; line-height:1.08}
 .rail i.on::after{background:var(--accent-live)}
 .cap{font-family:var(--mono); font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:14px}
 
+/* ---------- the channel, four-column variant ---------- */
+.waffles{display:grid; grid-template-columns:repeat(4,1fr); gap:0}
+.waffle{padding:0 22px; border-left:1px solid var(--line)}
+.waffle:first-child{padding-left:0; border-left:none}
+.waffle:last-child{padding-right:0}
+.w-num{font-family:var(--serif); font-weight:600; font-size:52px; line-height:1; letter-spacing:-.035em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.w-num .pct{font-size:29px}
+.w-lab{font-size:16px; font-weight:600; line-height:1.3; color:var(--ink); margin-top:14px; min-height:2.7em}
+.w-when{font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:2px}
+.w-grid{display:grid; grid-template-columns:repeat(10,9px); gap:8px; margin-top:20px}
+.w-grid i{display:block; width:9px; height:9px; border-radius:50%; background:#CFD1CB}
+.w-grid i.on{background:var(--accent-live)}
+
 /* ---------- 5 &middot; valuation ---------- */
+/* ---------- valuation: the drop leads, the notice explains ---------- */
+.compress{flex:none; display:grid; grid-template-columns:1fr 148px 1fr; align-items:start; padding:16px 0 18px; border-bottom:1px solid var(--line)}
+.cmp-lab{font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--mute); padding-bottom:10px; border-bottom:1px solid var(--line); margin-bottom:14px}
+.cmp-val{font-family:var(--serif); font-weight:600; font-size:66px; line-height:.88; letter-spacing:-.04em; font-variant-numeric:tabular-nums}
+.cmp-val .to{font-size:28px; padding:0 5px; color:var(--mute)}
+.cmp-val.hot{color:var(--accent-live)}
+.compress .stack{margin:12px 0 0}
+.compress .stack u{width:13px; height:13px}
+.cmp-sub{font-size:12.5px; line-height:1.45; color:var(--mute); margin-top:10px; max-width:34ch; min-height:2.9em}
+.cmp-gap{align-self:stretch; display:flex; align-items:center; justify-content:center; text-align:center; position:relative}
+.cmp-gap::before{content:""; position:absolute; left:50%; top:6%; bottom:6%; width:1px; background:var(--line)}
+.cmp-gap span{position:relative; background:var(--paper); padding:8px 0; font-family:var(--mono); font-size:9px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-live); line-height:1.7}
+.under{flex:1; min-height:0; display:grid; grid-template-columns:1fr 392px; gap:40px; align-items:center; padding-top:16px}
+.under .notice{padding:14px 18px}
+.under .pull{margin-top:0}
+
 .two{display:grid; grid-template-columns:1fr 420px; gap:44px; flex:1; min-height:0; align-items:center}
 .notice{padding:20px 22px}
-.notice .nh{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--accent-live); padding-bottom:11px; margin-bottom:13px; border-bottom:1px solid var(--line)}
-.notice p{font-family:var(--serif); font-size:14.5px; line-height:1.62; color:var(--ink)}
+.notice .nh{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--accent-live); padding-bottom:9px; margin-bottom:10px; border-bottom:1px solid var(--line)}
+.notice p{font-family:var(--serif); font-size:13.5px; line-height:1.55; color:var(--ink)}
 .notice p b{font-weight:600}
-.notice .reg{font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); margin-top:13px}
+.notice .reg{font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); margin-top:10px}
 .pull{margin-top:24px; padding-left:20px; border-left:2px solid var(--accent-live); font-family:var(--serif); font-style:italic; font-weight:300; font-size:19px; line-height:1.45; color:var(--ink)}
 .mult{display:flex; flex-direction:column; gap:30px}
 .mult-col{display:grid; grid-template-columns:138px 1fr; gap:20px; align-items:center}
@@ -197,6 +222,32 @@ h2{font-size:41px; line-height:1.08}
 .mult-sub{font-size:12px; line-height:1.45; color:var(--mute); max-width:30ch}
 
 /* ---------- 7 &middot; owned channels ---------- */
+/* ---------- the three multiples, one column each ---------- */
+.metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:0}
+.metric{padding:0 40px; border-left:1px solid var(--line)}
+.metric:first-child{padding-left:0; border-left:none}
+.metric:last-child{padding-right:0}
+.m-val{font-family:var(--serif); font-weight:600; font-size:58px; line-height:1; letter-spacing:-.04em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.m-val .to{font-size:26px; padding:0 3px; color:var(--mute)}
+.m-dots{display:flex; gap:7px; margin-top:18px}
+.m-dots u{width:10px; height:10px; border-radius:50%; background:var(--accent-live); display:block}
+.m-dots u.ghost{background:none; border:1.5px solid var(--accent-live); opacity:.45}
+.m-txt{font-size:17px; line-height:1.4; color:var(--ink); margin-top:24px}
+.m-src{font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:12px}
+.metrics + .cap{margin-top:30px; padding-top:14px; border-top:1px solid var(--line)}
+
+/* ---------- retention ---------- */
+.retain{flex:1; min-height:0; display:grid; grid-template-columns:1fr 268px; gap:52px; align-items:center; padding:14px 0}
+.ret-figs{display:grid; grid-template-columns:1fr 1fr; gap:44px}
+.ret-num{font-family:var(--serif); font-weight:600; font-size:60px; line-height:1; letter-spacing:-.04em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.ret-num.muted{color:var(--mute)}
+.ret-num .pct{font-size:32px}
+.ret-lab{font-size:16px; font-weight:600; line-height:1.3; color:var(--ink); margin-top:14px}
+.ret-when{font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:3px}
+.w-grid.grey i.on{background:var(--ink)}
+.ret-side{display:flex; flex-direction:column}
+.ret-side .phone{width:100%}
+
 .shift{display:grid; grid-template-columns:244px 1fr; gap:48px; flex:1; min-height:0; align-items:center}
 .phone{padding:11px 10px 14px}
 .phone .notch{width:46px; height:4px; background:var(--line-2); margin:1px auto 11px}
@@ -369,7 +420,7 @@ h2{font-size:41px; line-height:1.08}
   <div class="toc">
     <div class="toc-l">
       <h2>In this<br>issue</h2>
-      <p class="toc-note">Four sections, fifteen pages. The argument runs in order: what you are losing, where readers went, what we build, and how we start.</p>
+      <p class="toc-note">Four sections, seventeen pages. The argument runs in order: what you are losing, where readers went, what we build, and how we start.</p>
       <div class="colophon">
         <div><span>Prepared for</span>[Publisher Name]</div>
         <div><span>Prepared by</span>ndot, August 2026</div>
@@ -378,9 +429,9 @@ h2{font-size:41px; line-height:1.08}
     </div>
     <div class="toc-list">
       <div class="toc-row"><div class="toc-rn">I</div><div class="toc-t">The problem<span>Search referral is falling, and the market has already re-priced it</span></div><div class="toc-p">Page 3</div></div>
-      <div class="toc-row"><div class="toc-rn">II</div><div class="toc-t">The shift<span>Owned mobile channels are outperforming the open web</span></div><div class="toc-p">Page 6</div></div>
-      <div class="toc-row"><div class="toc-rn">III</div><div class="toc-t">The offer<span>What ndot builds, operates, and gets paid for</span></div><div class="toc-p">Page 8</div></div>
-      <div class="toc-row"><div class="toc-rn">IV</div><div class="toc-t">Next steps<span>Whether this fits, and how the first ninety days run</span></div><div class="toc-p">Page 14</div></div>
+      <div class="toc-row"><div class="toc-rn">II</div><div class="toc-t">The shift<span>Owned mobile channels are outperforming the open web</span></div><div class="toc-p">Page 7</div></div>
+      <div class="toc-row"><div class="toc-rn">III</div><div class="toc-t">The offer<span>What ndot builds, operates, and gets paid for</span></div><div class="toc-p">Page 10</div></div>
+      <div class="toc-row"><div class="toc-rn">IV</div><div class="toc-t">Next steps<span>Whether this fits, and how the first ninety days run</span></div><div class="toc-p">Page 16</div></div>
     </div>
   </div>
 
@@ -398,7 +449,7 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 01 &nbsp;/&nbsp; Section one</div>
     <h2>The problem</h2>
     <p class="div-line">Your customer acquisition strategy is being written by someone else's roadmap.</p>
-    <div class="div-jump">Continues on pages 4 to 5</div>
+    <div class="div-jump">Continues on pages 4 to 6</div>
   </div>
   <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 3</div></div>
 </section>
@@ -457,6 +508,56 @@ h2{font-size:41px; line-height:1.08}
   </div>
 </section>
 
+<!-- ==================== 5 &middot; THE CHANNEL, four-column variant ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 01</b> The problem &middot; The channel</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">The channel</span>
+    <h2>Your traffic isn't yours anymore</h2>
+    <p class="lede dim">Algorithm changes, AI-generated answers and declining click-through rates mean your acquisition is now set by a roadmap you do not control.</p>
+  </div>
+
+  <div class="main">
+    <div class="waffles">
+      <div class="waffle">
+        <div class="w-num">&minus;33<span class="pct">%</span></div>
+        <div class="w-lab">Global search referral traffic</div>
+        <div class="w-when">Nov 2024 to Nov 2025</div>
+        <div class="w-grid" data-waffle="33"></div>
+      </div>
+      <div class="waffle">
+        <div class="w-num">&minus;60<span class="pct">%</span></div>
+        <div class="w-lab">Small publishers' search traffic</div>
+        <div class="w-when">Past two years</div>
+        <div class="w-grid" data-waffle="60"></div>
+      </div>
+      <div class="waffle">
+        <div class="w-num">&minus;25<span class="pct">%</span></div>
+        <div class="w-lab">Referral traffic lost to AI Overviews</div>
+        <div class="w-when">Per publisher, on average</div>
+        <div class="w-grid" data-waffle="25"></div>
+      </div>
+      <div class="waffle">
+        <div class="w-num">&minus;43<span class="pct">%</span></div>
+        <div class="w-lab">Further decline publishers expect</div>
+        <div class="w-when">Projected through 2029</div>
+        <div class="w-grid" data-waffle="43"></div>
+      </div>
+    </div>
+    <div class="cap">Each dot is one percentage point. Every block is 100.</div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Sources: Chartbeat network data via Search Engine Land (2026); Digiday/eMarketer analysis of Google AI Overviews; Digital Content Next, "The Publisher's Playbook for the Google Zero Era" (2026). Figures are drawn from different panels and periods and are not additive.</div>
+    <div class="pg">Page 5</div>
+  </div>
+</section>
+
 <!-- ==================== 5 &middot; THE PRICE ==================== -->
 <section class="page" data-ground="light">
   <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
@@ -471,38 +572,34 @@ h2{font-size:41px; line-height:1.08}
     <p class="lede dim">Investors are discounting media businesses that don't own their audience. Traffic-dependent valuations have compressed sharply as search and social referral has become unreliable.</p>
   </div>
 
-  <div class="two">
-    <div>
-      <div class="notice panel">
-        <div class="nh">Correction</div>
-        <p>An earlier reading of traffic-dependent media valued those businesses at roughly <b>10x revenue</b>. Following the collapse in search referral, the figure now clearing the market is <b>4 to 6x</b>. The multiple was never the asset. The audience was.</p>
-        <div class="reg">Filed under: things that get re-rated before they get fixed</div>
-      </div>
-      <blockquote class="pull">Owning your audience isn't just a growth strategy. It's a hedge against how the market is already re-pricing this risk.</blockquote>
+  <div class="compress">
+    <div class="cmp-col">
+      <div class="cmp-lab">Before</div>
+      <div class="cmp-val">~10x</div>
+      <div class="stack" data-stack="10"></div>
+      <p class="cmp-sub">Revenue multiple, traffic-dependent media.</p>
     </div>
-    <div class="mult">
-      <div class="mult-col">
-        <div class="mult-lab">Before</div>
-        <div class="mult-val">~10x</div>
-        <div>
-          <div class="stack" data-stack="10"></div>
-          <p class="mult-sub">Revenue multiple, traffic-dependent media.</p>
-        </div>
-      </div>
-      <div class="mult-col">
-        <div class="mult-lab">After</div>
-        <div class="mult-val hot">4<span class="to">to</span>6x</div>
-        <div>
-          <div class="stack" data-stack="4" data-ghost="2"></div>
-          <p class="mult-sub">Revenue multiple, once search referral craters.</p>
-        </div>
-      </div>
+    <div class="cmp-gap"><span>Compression<br>40 to 60%</span></div>
+    <div class="cmp-col">
+      <div class="cmp-lab">After</div>
+      <div class="cmp-val hot">4<span class="to">to</span>6x</div>
+      <div class="stack" data-stack="4" data-ghost="2"></div>
+      <p class="cmp-sub">Revenue multiple, once search referral craters.</p>
     </div>
+  </div>
+
+  <div class="under">
+    <div class="notice panel">
+      <div class="nh">Correction</div>
+      <p>An earlier reading of traffic-dependent media valued those businesses at roughly <b>10x revenue</b>. Following the collapse in search referral, the figure now clearing the market is <b>4 to 6x</b>. The multiple was never the asset. The audience was.</p>
+      <div class="reg">Filed under: things that get re-rated before they get fixed</div>
+    </div>
+    <blockquote class="pull">Owning your audience isn't just a growth strategy. It's a hedge against how the market is already re-pricing this risk.</blockquote>
   </div>
 
   <div class="foot">
     <div class="src">Based on internal market analysis of comparable traffic-dependent media transactions and public market multiples, 2024 to 2026. Each dot represents one turn of revenue.</div>
-    <div class="pg">Page 5</div>
+    <div class="pg">Page 6</div>
   </div>
 </section>
 
@@ -517,14 +614,65 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 02 &nbsp;/&nbsp; Section two</div>
     <h2>The shift</h2>
     <p class="div-line">A reader who installs does not churn to an algorithm change.</p>
-    <div class="div-jump">Continues on page 7</div>
+    <div class="div-jump">Continues on pages 8 to 9</div>
   </div>
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 6</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 7</div></div>
 </section>
 
-<!-- ==================== 7 &middot; OWNED CHANNELS ==================== -->
+<!-- ==================== 8 &middot; RETENTION ==================== -->
 <section class="page" data-ground="light">
   <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 02</b> The shift &middot; Retention</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">Retention</span>
+    <h2>A reader who installs is still there a month later</h2>
+    <p class="lede dim">Publisher apps retain readers 6x longer than the average app. On day 30 that is the difference between a habit and a bounce.</p>
+  </div>
+
+  <div class="retain">
+    <div class="ret-figs">
+      <div class="ret-col">
+        <div class="ret-num">46<span class="pct">%</span></div>
+        <div class="ret-lab">Publisher apps</div>
+        <div class="ret-when">Day-30 retention</div>
+        <div class="w-grid" data-waffle="46"></div>
+      </div>
+      <div class="ret-col">
+        <div class="ret-num muted">8<span class="pct">%</span></div>
+        <div class="ret-lab">The average app</div>
+        <div class="ret-when">Day-30 retention</div>
+        <div class="w-grid grey" data-waffle="8"></div>
+      </div>
+    </div>
+    <div class="ret-side">
+      <div class="phone panel">
+        <div class="notch"></div>
+        <div class="pm"><b>The Daily</b><i></i></div>
+        <div class="lead">
+          <canvas data-art="photo"></canvas>
+          <div class="hl"></div><div class="hl s"></div>
+          <div class="tx"></div><div class="tx s"></div>
+          <div class="tag"></div>
+        </div>
+        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+      </div>
+      <blockquote class="pull" style="margin-top:22px">Apps are all about building habit, becoming someone's go-to source.</blockquote>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Each dot is one reader in a hundred.</div>
+    <div class="pg">Page 8</div>
+  </div>
+</section>
+
+<!-- ==================== 9 &middot; OWNED CHANNELS ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
   <div class="folio">
     <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
     <div class="folio-r"><b>&sect; 02</b> The shift &middot; Owned channels</div>
@@ -536,44 +684,33 @@ h2{font-size:41px; line-height:1.08}
     <p class="lede dim">Publishers who already own a mobile channel see it in engagement, conversion and open rates.</p>
   </div>
 
-  <div class="shift">
-    <div>
-      <div class="phone panel">
-        <div class="notch"></div>
-        <div class="pm"><b>The Daily</b><i></i></div>
-        <div class="lead">
-          <canvas data-art="photo"></canvas>
-          <div class="hl"></div><div class="hl s"></div>
-          <div class="tx"></div><div class="tx s"></div>
-          <div class="tag"></div>
-        </div>
-        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
-        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+  <div class="main">
+    <div class="metrics">
+      <div class="metric">
+        <div class="m-val">4<span class="to">to</span>5x</div>
+        <div class="m-dots" data-dots="4" data-ghost="1"></div>
+        <p class="m-txt">Higher engagement, week over week, against desktop.</p>
+        <div class="m-src">Pugpig network, 440+ apps</div>
       </div>
-      <p class="phone-cap">Publisher apps retain readers 6x longer than the average app.</p>
-    </div>
-    <div>
-      <div class="gains">
-        <div class="gain">
-          <div><div class="gain-v">4<span class="to">to</span>5x</div><div class="gain-d" data-dots="4" data-ghost="1"></div></div>
-          <div class="gain-t">Higher engagement, week over week, against desktop.<span>Pugpig network, 440+ apps</span></div>
-        </div>
-        <div class="gain">
-          <div><div class="gain-v">~2x</div><div class="gain-d" data-dots="2"></div></div>
-          <div class="gain-t">In-app conversion rate after native subscriptions.<span>Financial Times</span></div>
-        </div>
-        <div class="gain">
-          <div><div class="gain-v">3x</div><div class="gain-d" data-dots="3"></div></div>
-          <div class="gain-t">Increase in push open rates from targeted personalization.<span>Boston Globe</span></div>
-        </div>
+      <div class="metric">
+        <div class="m-val">~2x</div>
+        <div class="m-dots" data-dots="2"></div>
+        <p class="m-txt">In-app conversion rate after native subscriptions.</p>
+        <div class="m-src">Financial Times</div>
       </div>
-      <blockquote class="pull" style="margin-top:26px">Apps are all about building habit, becoming someone's go-to source.</blockquote>
+      <div class="metric">
+        <div class="m-val">3x</div>
+        <div class="m-dots" data-dots="3"></div>
+        <p class="m-txt">Increase in push open rates from targeted personalization.</p>
+        <div class="m-src">Boston Globe</div>
+      </div>
     </div>
+    <div class="cap">Each dot is one multiple.</div>
   </div>
 
   <div class="foot">
-    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Each dot represents one multiple.</div>
-    <div class="pg">Page 7</div>
+    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Figures are from separate publishers and are not additive.</div>
+    <div class="pg">Page 9</div>
   </div>
 </section>
 
@@ -588,9 +725,9 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 03 &nbsp;/&nbsp; Section three</div>
     <h2>The offer</h2>
     <p class="div-line">We don't just advise. We build it, run it, and get paid out of what it earns.</p>
-    <div class="div-jump">Continues on pages 9 to 13 &middot; The pieces stop being someone else's</div>
+    <div class="div-jump">Continues on pages 11 to 15 &middot; The pieces stop being someone else's</div>
   </div>
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 8</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 10</div></div>
 </section>
 
 <!-- ==================== 9 &middot; THE ENGINE ==================== -->
@@ -629,7 +766,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 9</div></div>
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 11</div></div>
 </section>
 
 <!-- ==================== 10 &middot; THE BUILD ==================== -->
@@ -653,7 +790,7 @@ h2{font-size:41px; line-height:1.08}
     <div class="cap-item"><div class="bul"></div><h3>Ad tech and monetization</h3><p>Advertising and subscription infrastructure tuned to convert engagement into revenue, from day one.</p></div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 10</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 12</div></div>
 </section>
 
 <!-- ==================== 11 &middot; THE RECORD ==================== -->
@@ -684,7 +821,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">Source: NewsBreak company data, 2026 YTD.</div><div class="pg">Page 11</div></div>
+  <div class="foot"><div class="src">Source: NewsBreak company data, 2026 YTD.</div><div class="pg">Page 13</div></div>
 </section>
 
 <!-- ==================== 12 &middot; THE TERMS ==================== -->
@@ -701,7 +838,7 @@ h2{font-size:41px; line-height:1.08}
     <p class="sub">Build your audience. Own your growth. Share the upside.</p>
   </div>
 
-  <div class="foot"><div class="src">Revenue share. No licence fee, no build invoice, no minimum commitment.</div><div class="pg">Page 12</div></div>
+  <div class="foot"><div class="src">Revenue share. No licence fee, no build invoice, no minimum commitment.</div><div class="pg">Page 14</div></div>
 </section>
 
 <!-- ==================== 13 &middot; THE ALTERNATIVES ==================== -->
@@ -733,7 +870,7 @@ h2{font-size:41px; line-height:1.08}
     <p class="tbl-note">Six-figure enterprise builds still leave you operating the product. Generic wrappers skip the growth layer entirely. ndot is purpose-built for editorial audiences, and only paid when it works.</p>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 13</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 15</div></div>
 </section>
 
 <!-- ==================== 14 &middot; DIVIDER IV ==================== -->
@@ -747,9 +884,9 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 04 &nbsp;/&nbsp; Section four</div>
     <h2>Next steps</h2>
     <p class="div-line">If this sounds like you, the first conversation is thirty minutes.</p>
-    <div class="div-jump">Concludes on page 15</div>
+    <div class="div-jump">Concludes on page 17</div>
   </div>
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 14</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 16</div></div>
 </section>
 
 <!-- ==================== 15 &middot; THE FIT ==================== -->
@@ -790,7 +927,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 15</div></div>
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 17</div></div>
 </section>
 
 </div></div>
@@ -812,18 +949,17 @@ h2{font-size:41px; line-height:1.08}
      over a drafting grid. Deterministic: same seed, same composition.
      ====================================================================== */
 
-  /* NewsBreak: the blues carry the mass, the red appears exactly once per
-     composition, as the dot inside the box. Greys hold the pale end so the
-     blue never turns the page corporate-navy. */
+  /* Achromatic, because the brand's source of truth is black and white.
+     The printer's red appears exactly once per composition: the dot. */
   var PAL = {
-    navy:'#274464', blue:'#3D638C', blueLt:'#68809A', blueDk:'#1C3049',
-    d3:'#6B6B63', m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
-    ink:'#111110', paper:'#FAFAF8', accent:'#D6493D', accentInk:'#FF5A5A'
+    ink:'#111110', d1:'#2A2A26', d2:'#43433C', d3:'#6B6B63',
+    m1:'#9A9A90', m2:'#C9C9C0', l1:'#D8D8CE', l2:'#E6E6DF', l3:'#F1F1EC',
+    paper:'#FAFAF8', accent:'#A6231A', accentInk:'#E86A52'
   };
   var LIGHT_SET = [PAL.l3, PAL.l3, PAL.l2, PAL.l2, PAL.l1, PAL.l1, PAL.m2, PAL.m2,
-                   PAL.m1, PAL.m1, PAL.blue, PAL.navy];
-  var DARK_SET  = [PAL.blueDk, PAL.blueDk, '#26405F', '#26405F', '#2E4A6B', '#2E4A6B',
-                   PAL.blue, PAL.blueLt, PAL.m2];
+                   PAL.m1, PAL.m1, PAL.d3, PAL.d2];
+  var DARK_SET  = [PAL.d1, PAL.d1, PAL.d2, PAL.d2, '#33332E', '#33332E',
+                   PAL.d3, PAL.m1, PAL.m2];
 
   function mkRng(seed){
     var s = (seed >>> 0) || 1;
@@ -927,7 +1063,7 @@ h2{font-size:41px; line-height:1.08}
   /* --- big washed plates, the ground layer of the collage --- */
   function plates(ctx, Z, R, opt){
     var pale = opt.dark
-      ? ['#223751','#26405F','#2B4869','#305073','#35587D']
+      ? ['#1E1E1A','#262622','#2E2E29','#33332E','#3A3A34']
       : [PAL.l3, PAL.l2, PAL.l1, PAL.m2, '#EDEDE6', '#E0E0D8'];
     for(var i = 0; i < (opt.count || 3); i++){
       var w = Z[2] * lerp(0.34, 0.82, R());
@@ -1079,7 +1215,9 @@ h2{font-size:41px; line-height:1.08}
     ctx.clearRect(0, 0, W, H);
 
     var art  = cv.getAttribute('data-art');
-    var dark = cv.closest('.page').getAttribute('data-ground') === 'dark';
+    var host = cv.closest('.page');
+    var pageIndex = Array.prototype.indexOf.call(document.querySelectorAll('.page'), host);
+    var dark = host.getAttribute('data-ground') === 'dark';
     var set  = dark ? DARK_SET : LIGHT_SET;
     var screen = '#FFFFFF';
     var z = (cv.getAttribute('data-zone') || '0,0,1,1').split(',').map(Number);
@@ -1087,7 +1225,7 @@ h2{font-size:41px; line-height:1.08}
     var R;
 
     if(art === 'quiet'){
-      R = mkRng(41 + Math.round(z[0] * 1000));
+      R = mkRng(41 + Math.round(z[0] * 1000) + pageIndex * 37);
       ctx.globalAlpha = 0.55;
       guides(ctx, W, H, R, { dark: dark, cols: 2, rows: 0, nodes: 0, diagonals: false });
       ctx.globalAlpha = 1;
@@ -1099,8 +1237,8 @@ h2{font-size:41px; line-height:1.08}
     if(art === 'photo'){                       /* the printed picture in the app */
       R = mkRng(5501);
       ctx.fillStyle = PAL.l2; ctx.fillRect(0, 0, W, H);
-      cut(ctx, function(c){ c.rect(0, 0, W, H*0.62); }, [0,0,W,H], PAL.navy, 'grit', 7, 1);
-      cut(ctx, function(c){ c.arc(W*0.72, H*0.62, H*0.42, 0, Math.PI*2); }, [0,0,W,H], PAL.blue, 'dots', 5, 0.95);
+      cut(ctx, function(c){ c.rect(0, 0, W, H*0.62); }, [0,0,W,H], PAL.d2, 'grit', 7, 1);
+      cut(ctx, function(c){ c.arc(W*0.72, H*0.62, H*0.42, 0, Math.PI*2); }, [0,0,W,H], PAL.m1, 'dots', 5, 0.95);
       cut(ctx, function(c){ c.moveTo(0,H); c.lineTo(W*0.42,H*0.3); c.lineTo(W*0.68,H); c.closePath(); }, [0,0,W,H], PAL.m2, 'hatch', 5, 0.9);
       tooth(ctx, W, H, false);
       return;
@@ -1114,7 +1252,7 @@ h2{font-size:41px; line-height:1.08}
       guides(ctx, W, H, R, { dark: dark, cols: 4, rows: 3, nodes: 3 });
       scatter(ctx, Z, R, set, { count: 16, min: 30, max: 175, screen: screen });
       isoBox(ctx, zc + Z[2] * 0.05, H * 0.47, zm * 0.235, R,
-             { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
+             { top: PAL.d1, left: PAL.d2, right: PAL.m2, dot: PAL.accent, screen: screen });
       scatter(ctx, Z, R, set, { count: 7, min: 22, max: 78, screen: screen });
       tooth(ctx, W, H, dark);
       return;
@@ -1134,15 +1272,15 @@ h2{font-size:41px; line-height:1.08}
       });
       if(stage === 2){
         isoBox(ctx, zc + Z[2] * 0.07, H * 0.54, zm * 0.17, R,
-               { top: PAL.blue, left: PAL.m2, right: PAL.l2, dot: PAL.accent, screen: screen });
+               { top: PAL.d3, left: PAL.m2, right: PAL.l2, dot: PAL.accent, screen: screen });
       }
       if(stage === 3){
         isoBox(ctx, zc, H * 0.5, zm * 0.27, R,
-               { top: PAL.m1, left: PAL.navy, right: PAL.blueLt, dot: PAL.accentInk, screen: screen });
+               { top: PAL.m1, left: PAL.d2, right: PAL.m2, dot: PAL.accentInk, screen: screen });
       }
       if(stage === 4){
         isoBox(ctx, zc + Z[2] * 0.03, H * 0.5, zm * 0.24, R,
-               { top: PAL.navy, left: PAL.blue, right: PAL.m2, dot: PAL.accent, screen: screen });
+               { top: PAL.d1, left: PAL.d2, right: PAL.m2, dot: PAL.accent, screen: screen });
       }
       tooth(ctx, W, H, dark);
       return;
@@ -1154,7 +1292,7 @@ h2{font-size:41px; line-height:1.08}
       guides(ctx, W, H, R, { dark: dark, cols: 3, rows: 2, nodes: 2 });
       scatter(ctx, Z, R, set, { count: 8, min: 36, max: 170, order: true, screen: screen });
       isoBox(ctx, zc + Z[2] * 0.06, H * 0.52, zm * 0.23, R,
-             { top: PAL.m2, left: PAL.navy, right: PAL.blue, dot: PAL.accentInk, screen: screen });
+             { top: PAL.m1, left: PAL.d1, right: PAL.d3, dot: PAL.accentInk, screen: screen });
       tooth(ctx, W, H, dark);
     }
   }
@@ -1218,16 +1356,22 @@ h2{font-size:41px; line-height:1.08}
     for(i = 0; i < 100; i++) html += '<i class="' + (i < v ? 'on' : '') + '"></i>';
     r.innerHTML = html;
   });
+  document.querySelectorAll('.w-grid').forEach(function(w){
+    var v = parseInt(w.getAttribute('data-waffle'), 10), html = '', i;
+    for(i = 0; i < 100; i++) html += '<i class="' + (i < v ? 'on' : '') + '"></i>';
+    w.innerHTML = html;
+  });
   document.querySelectorAll('.stack').forEach(function(s){
     var n = parseInt(s.getAttribute('data-stack'), 10);
     var g = parseInt(s.getAttribute('data-ghost') || '0', 10);
-    var hot = s.closest('.mult-col').querySelector('.mult-val.hot') !== null;
+    var col = s.closest('.mult-col') || s.closest('.cmp-col');
+    var hot = col.querySelector('.mult-val.hot, .cmp-val.hot') !== null;
     var html = '', i;
     for(i = 0; i < n; i++) html += '<u class="' + (hot ? 'hot' : '') + '"></u>';
     for(i = 0; i < g; i++) html += '<u class="ghost"></u>';
     s.innerHTML = html;
   });
-  document.querySelectorAll('.gain-d').forEach(function(d){
+  document.querySelectorAll('.gain-d, .m-dots').forEach(function(d){
     var n = parseInt(d.getAttribute('data-dots'), 10);
     var g = parseInt(d.getAttribute('data-ghost') || '0', 10);
     var html = '', i;

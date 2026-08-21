@@ -1,7 +1,7 @@
-# ndot for publishers, build spec
+# ndot for publishers : build spec
 
 Everything needed to rebuild the deck by hand. Slide size **13.333 × 7.5 in (1280 × 720 pt)**.
-All plates are **2560 × 1440 px @2x = 192 DPI** on that slide.
+All plates are **2560 × 720 px @2x = 192 DPI** on that slide.
 
 ## Folders
 
@@ -10,12 +10,14 @@ All plates are **2560 × 1440 px @2x = 192 DPI** on that slide.
 | `backgrounds/` | Slide plates with **no text**. Drop one behind each slide and set your own type. |
 | `backgrounds-transparent/` | The same plates with the paper ground knocked out. Use these over your own colour. |
 | `reference/` | The finished slide, text and all. Layout reference only. |
-| `elements/` | The isometric box, transparent, ~970 × 1120 px. `box-navy` and `box-mid` for paper, `box-onband` and `box-pale` for the blue band. |
+| `textures/` | The paper grain on its own: flat fields at 2560 x 1440 and the seamless 90px tile, opaque and transparent. Same alphas the deck uses. |
+| `elements/` | The isometric box, transparent, ~970 × 1120 px. Four value recipes. |
 | `brand/` | `wordmark.svg`, `mark.svg`. Both use `fill="currentColor"` so they invert. |
 
 ## Colour
 
-**NewsBreak palette.** Contrast ratios are computed (WCAG 2.1), not eyeballed.
+From `prototypes/ndot-site/site.css` in `Nianthony/n-interactive-prototype`, which is
+the source of truth for NDot brand. Contrast ratios are computed, not eyeballed.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -26,34 +28,22 @@ All plates are **2560 × 1440 px @2x = 192 DPI** on that slide.
 | mute | `#6B6B63` | decks, captions (5.14:1) |
 | rule | `#D8D8CE` | hairlines |
 | plate-grey | `#C9C9C0` | decoration, empty dots |
-| **accent** | **`#D6493D`** | NewsBreak secondary dark red: folios, key numbers, dot rails |
+| **accent** | **`#A6231A`** | folios, ordinals, key numbers (6.98:1) |
 
-The inverted band is NewsBreak primary blue taken down so type clears on it:
+Inverted band (slides 8 and 12):
 
 | Token | Hex |
 |---|---|
-| ground | `#1C3049` |
-| plate | `#26405F` |
-| text | `#EEF2F6` (12.13:1) |
-| secondary | `#CBD6E0` |
-| labels | `#93A4B5` (5.24:1) |
-| hairline | `#68809A` (3.28:1) |
-| **accent-ink** | **`#FF5A5A`** NewsBreak primary red (4.38:1) |
+| ground | `#131310` |
+| text | `#F4F4EE` |
+| labels | `#9A9A90` |
+| hairline | `#6A6A63` |
+| **accent-ink** | **`#E86A52`** |
 
-Collage tones: navy `#274464`, blue `#3D638C`, light blue `#68809A`, plus the greys.
-
-Three rules that are not preferences:
-
-- **Primary Red `#FF5A5A` is not usable on paper**: 2.93:1. It only works on the
-  inverted band. Dark Red `#D6493D` carries the accent on light.
-- **Dark Red is a banned pair on the band**: 2.33:1. It flips to Primary Red there.
-- **The warm grey hairline vanishes on navy**: 2.46:1. The band uses `#68809A`.
-
-One caveat worth knowing: `#D6493D` on paper is **4.12:1**, just under the 4.5
-threshold for text below 18px. It clears comfortably for the big numbers, the dot
-rails and any large type. If the small mono kickers need to be strictly AA, move them
-to primary blue `#274464` (9.58:1), which is the natural second home for the system
-layer.
+Two rules that are not preferences:
+- **`#A6231A` is a banned pair on the dark ground** (2.55:1). Use `#E86A52` there.
+- **Never a low-alpha white hairline on dark.** Solid `#6A6A63` clears SC 1.4.11; the
+  transparent version measured 1.37:1 and was invisible.
 
 ## Type
 
@@ -85,23 +75,26 @@ Numbers are lining and tabular throughout.
 
 ## Structure
 
-15 pages: cover, contents, then four sections with a divider each.
+17 pages: cover, contents, then four sections with a divider each.
 
 | | Pages |
 |---|---|
-| § 01 The problem | 3–5 |
-| § 02 The shift | 6–7 |
-| § 03 The offer | 8–13 |
-| § 04 Next steps | 14–15 |
+| § 01 The problem | 3 to 6 |
+| § 02 The shift | 7 to 9 |
+| § 03 The offer | 10 to 15 |
+| § 04 Next steps | 16 to 17 |
 
-The dividers carry the argument: fragments adrift → gathering → assembled on ink →
-solid and settled. Pages 8 and 12 are the two dark beats.
+The dividers carry the argument: fragments adrift to gathering to assembled on ink to
+solid and settled. Pages 10 and 14 are the two dark beats.
 
 ## The data language
 
 One dot, one unit, everywhere:
-- traffic page: one dot = one percentage point, every rail is 100
+- traffic page: one dot = one percentage point. Page 4 sets it as four rails of
+  100; page 5 is the same data as four 10 x 10 blocks, for comparing the four
+  figures against each other rather than reading them one at a time. Pick one.
 - valuation page: one dot = one turn of revenue
+- retention page: one dot = one reader in a hundred, Day-30
 - engagement page: one dot = one multiple
 
 Keep it if you add a data page. It is also why the accent red only ever appears once

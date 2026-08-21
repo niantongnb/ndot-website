@@ -66,7 +66,7 @@ Two references drew two independent takes each — worth comparing:
 The masthead's two middle cells are a view switch. **Selected directions**
 (the default) shows the three moving forward — Schematic on its Panels
 round, Console, and Prospectus. **Archived directions** shows the other
-five. Without script both groups render under label rows. The back-link
+five, plus Schematic's first two rounds as their own rows. Without script both groups render under label rows. The back-link
 to the root chooser, the deck, and the careers address moved to the foot.
 
 

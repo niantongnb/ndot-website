@@ -182,8 +182,8 @@ h1,h2,h3{margin:0;font-family:var(--serif);font-weight:300;text-wrap:balance}
 /* ---------- 03 mission & vision (spec table) ---------- */
 .mv{display:grid;gap:clamp(36px,4.5vw,44px);margin-top:clamp(30px,4vw,40px)}
 .mv > div{padding-top:22px;border-top:2px solid var(--ink)}
-.mv .h-m{margin-top:16px;max-width:34ch}
-.mv .body{margin-top:14px;color:var(--ink-2);max-width:46ch;font-size:16px;line-height:1.6}
+.mv .h-m{margin-top:16px;max-width:60ch}
+.mv .body{margin-top:14px;color:var(--ink-2);max-width:64ch;font-size:16px;line-height:1.6}
 /* mission and vision read in sequence, not in parallel */
 
 /* ---------- 04 the masthead (team) ----------

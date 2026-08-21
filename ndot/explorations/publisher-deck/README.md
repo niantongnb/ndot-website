@@ -70,6 +70,7 @@ NDot.guides(ctx, w, h, NDot.rng(41), { dark:false, cols:4, rows:3, nodes:3 });
 | `assets/elements/` | The isometric box alone, transparent, four value recipes. |
 | `assets/textures/` | The paper grain alone: flat fields and the seamless 90px tile, opaque and transparent, on light and on ink. |
 | `assets/brand/` | `wordmark.svg`, `mark.svg`, both `fill="currentColor"` so they invert. |
+| `assets/illustrations/` | Paper-collage artwork, four concepts, transparent cut-outs and opaque versions. Its own README names them. Two map images from the same batch are parked in `_barred-map-imagery/` and must not go on NDot. |
 
 ---
 

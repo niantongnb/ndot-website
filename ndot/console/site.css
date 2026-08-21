@@ -169,6 +169,23 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 .prose { font-size: 1rem; line-height: 1.62; color: var(--body); max-width: 62ch; }
 .prose--wide { max-width: 68ch; }
 
+/* ---------- line breaking ----------
+   No block on either page ends on a single word. Short blocks (mono labels,
+   captions, record names, roles) balance, so their two or three lines come
+   out even; running copy uses `pretty`, which keeps the browser from
+   dropping one word onto the last line. Both are layout only. No text node
+   is touched and no non-breaking space is introduced, so every string still
+   matches COPY.md character for character, and the settled DOM is the one
+   the copy audit reads. `.display`, `.head`, `.lead` and `.fig` already
+   carry their own value and are not repeated here. */
+.mono, .role, .fig-cap, .foot__blurb { text-wrap: balance; }
+.hero__sub, .prose, .panel__frame, .panel__body, dd { text-wrap: pretty; }
+/* standfirsts run two to four lines from 640px up, which is inside the range
+   the browser will balance. Balanced they end level instead of trailing a
+   two word stub. Below 640px they run long enough that balancing is dropped,
+   so they keep the `pretty` they inherit from `.lead`. */
+@media (min-width: 640px) { .lead--sub { text-wrap: balance; } }
+
 /* ---------- skip link ---------- */
 .skip {
   position: absolute;
@@ -299,14 +316,12 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 }
 .hero__act { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s6); }
 @media (max-width: 479px) { .hero__act > * { flex: 1 1 100%; } }
-.hero__note { margin-top: var(--s7); display: flex; align-items: center; gap: var(--s3); }
-.hero__note .rule { flex: 1; height: 1px; background: var(--hair); }
 
 /* in-page index, mobile only. The nav drops section links below 720px and
    this replaces them rather than hiding them behind a hamburger. */
 .jump {
   display: flex; flex-wrap: wrap; gap: var(--s1);
-  margin-top: var(--s5);
+  margin-top: var(--s7);
   border-top: 1px solid var(--hair); padding-top: var(--s2);
 }
 .jump a {
@@ -429,8 +444,8 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 .fig-key { display: block; color: var(--blue); margin-bottom: var(--s4); }
 .fig {
   font-family: "Fraunces", Georgia, serif; font-weight: 400;
-  font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem);
-  line-height: 1.06; letter-spacing: -.028em; color: var(--ink);
+  font-size: clamp(1.44rem, 1.16rem + 1.24vw, 2rem);
+  line-height: 1.14; letter-spacing: -.024em; color: var(--ink);
   font-variation-settings: "SOFT" 22, "WONK" 1;
   text-wrap: balance;
 }
@@ -458,6 +473,33 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
   font-size: clamp(1.02rem, .95rem + .38vw, 1.22rem);
   line-height: 1.3; letter-spacing: -.018em; color: var(--ink);
 }
+
+/* the schematic under each comparison value: the same two endpoints drawn
+   twice, once with a party standing in the middle and once without. It is a
+   diagram, not art: hairlines, the node vocabulary the console already uses,
+   and no label the row does not already carry. The row's mono key names the
+   picture as well as the phrase, so nothing is printed twice.
+   Below 720px there is no room for a five-node row, and the phrase carries
+   the row on its own, so the drawing is dropped rather than shrunk. */
+.flow { display: none; }
+@media (min-width: 720px) {
+  .flow { display: block; width: 100%; max-width: 520px; height: auto; margin-top: var(--s5); }
+}
+.flow__node { fill: var(--field); stroke: var(--edge); stroke-width: 1; }
+/* the party the publisher does not own: dashed edge, quieter ground */
+.flow__node--out { fill: var(--bar); stroke: var(--hair-2); stroke-dasharray: 3 3; }
+.flow__link { fill: none; stroke: var(--edge); stroke-width: 1; }
+.flow__link--out { stroke: var(--hair-2); stroke-dasharray: 3 4; }
+.flow__link--own { stroke: var(--blue); }
+.flow__tip { fill: none; stroke: var(--edge); stroke-width: 1; stroke-linecap: square; }
+.flow__tip--out { stroke: var(--hair-2); }
+.flow__tip--own { stroke: var(--blue); }
+.flow__t {
+  font-family: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: .105em;
+  text-transform: uppercase; fill: var(--ink);
+}
+.flow__t--out { fill: var(--muted); }
 
 /* ---------- mission / vision two-up ---------- */
 .duo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
@@ -667,18 +709,17 @@ html.js .rv.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
    IntersectionObserver, GSAP replaced by a CSS transition.
 
    This direction is a console, so the reveal is a record resolving: chars
-   step from the muted token to the settled ink, left to right, with an
-   underscore cursor riding the leading edge and stopping at the end of the
-   line. Nothing moves, nothing blurs, nothing fades. The pieces write only
-   `color` and `text-decoration-color`; the element reveal above writes only
+   step from the muted token to the settled ink, left to right. Nothing
+   moves, nothing blurs, nothing fades, and nothing is drawn under the text.
+   The pieces write only `color`; the element reveal above writes only
    `opacity` and `transform`, and the script strips `.rv` off every element
    it splits, so the two never meet on one element.
 
-   The cursor is a decoration, not a background. A background block was tried
-   first and the audit caught it: mid-sweep it lifted the dark ground to
-   rgb(61,61,58) under text still sitting at `--muted`, which measured 4.37:1.
-   A decoration cannot change the ground a character is measured against, so
-   the transient state is now unmeasurable rather than nearly passing.
+   The blue underscore cursor that used to ride the leading edge is gone. It
+   was the one mark on the page that read as an effect rather than as the
+   page settling, and it drew the eye along the line instead of letting the
+   line arrive. Removing it takes `text-decoration-*`, `--tr-hit`,
+   `--tr-scan-d` and the `tr-cursor` keyframes out with it.
 
    The pre state is `--muted`, not transparent and not zero opacity, so a
    heading that never receives `is-in` is still readable at 7:1 or better.
@@ -688,27 +729,12 @@ html.js .rv.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
    are left as real text nodes, never wrapped. ---------- */
 html.js .tr {
   --tr-from: var(--muted);   /* start of the walk, re-points on dark ground */
-  --tr-hit:  var(--blue);    /* the cursor, re-points on dark ground        */
 }
-html.js .tr .trc {
-  color: var(--tr-from);
-  /* declared at rest but painted in nothing, so the settled character is
-     byte for byte the character that shipped before this file changed */
-  text-decoration-line: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: max(1px, .07em);
-  text-underline-offset: .14em;
-}
+html.js .tr .trc { color: var(--tr-from); }
 html.js .tr.is-in .trc {
   color: inherit;            /* exactly the settled colour, by construction */
   transition: color .5s cubic-bezier(.25, .46, .45, .94);
   transition-delay: calc(var(--rv-d, 0ms) + var(--tr-i, 0) * var(--tr-step, 50ms));
-  animation: tr-cursor var(--tr-scan-d, 150ms) steps(1, end) forwards;
-  animation-delay: calc(var(--rv-d, 0ms) + var(--tr-i, 0) * var(--tr-step, 50ms));
-}
-@keyframes tr-cursor {
-  from { text-decoration-color: var(--tr-hit); }
-  to   { text-decoration-color: transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -716,8 +742,7 @@ html.js .tr.is-in .trc {
   /* the script bails before splitting, so this only covers the case where the
      setting is turned on after the page has already been split */
   html.js .tr .trc, html.js .tr.is-in .trc {
-    color: inherit !important; text-decoration-color: transparent !important;
-    transition: none !important; animation: none !important;
+    color: inherit !important; transition: none !important;
   }
   * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
 }
@@ -726,7 +751,6 @@ html.js .tr.is-in .trc {
 @media print {
   html.js .rv, html.js .rv.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
   html.js .tr .trc, html.js .tr.is-in .trc {
-    color: inherit !important; text-decoration-color: transparent !important;
-    transition: none !important; animation: none !important;
+    color: inherit !important; transition: none !important;
   }
 }

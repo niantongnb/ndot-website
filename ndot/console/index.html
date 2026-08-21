@@ -53,11 +53,6 @@
         <a class="btn btn--ghost" href="careers.html">Read the careers page</a>
       </div>
 
-      <div class="hero__note rv" style="--rv-d:180ms">
-        <span class="mono">Sections</span>
-        <span class="rule" aria-hidden="true"></span>
-        <span class="mono mono--md">Shift, proof, capabilities, mission, vision, team, careers</span>
-      </div>
       <nav class="jump" aria-label="Sections">
         <a href="#shift">Shift</a>
         <a href="#proof">Proof</a>
@@ -83,11 +78,37 @@
           <dl class="compare rv" style="--rv-d:120ms">
             <div class="row">
               <dt class="mono">Depended on</dt>
-              <dd>Search, social platforms, and other third-party channels</dd>
+              <dd>Search, social platforms, and other third-party channels
+                <svg class="flow" viewBox="0 0 520 80" role="img"
+                  aria-label="Publisher, then third-party channels, then readers. The last leg is dashed: the publisher does not own it.">
+                  <rect class="flow__node" x=".5" y="28.5" width="103" height="35" rx="2"/>
+                  <text class="flow__t" x="52" y="49.5" text-anchor="middle">Publisher</text>
+                  <path class="flow__link" d="M104 46.5h65"/>
+                  <path class="flow__tip" d="M169 42l4.5 4.5-4.5 4.5"/>
+                  <rect class="flow__node flow__node--out" x="176.5" y="28.5" width="175" height="35" rx="2"/>
+                  <text class="flow__t flow__t--out" x="264" y="49.5" text-anchor="middle">Third-party channels</text>
+                  <path class="flow__link flow__link--out" d="M352 46.5h57"/>
+                  <path class="flow__tip flow__tip--out" d="M409 42l4.5 4.5-4.5 4.5"/>
+                  <rect class="flow__node" x="416.5" y="28.5" width="103" height="35" rx="2"/>
+                  <text class="flow__t" x="468" y="49.5" text-anchor="middle">Readers</text>
+                </svg>
+              </dd>
             </div>
             <div class="row">
               <dt class="mono">Building instead</dt>
-              <dd>Direct audience relationships</dd>
+              <dd>Direct audience relationships
+                <svg class="flow" viewBox="0 0 520 80" role="img"
+                  aria-label="Publisher and readers, connected directly in both directions, with nothing standing in between.">
+                  <rect class="flow__node" x=".5" y="28.5" width="103" height="35" rx="2"/>
+                  <text class="flow__t" x="52" y="49.5" text-anchor="middle">Publisher</text>
+                  <path class="flow__link flow__link--own" d="M104 38.5h305"/>
+                  <path class="flow__tip flow__tip--own" d="M409 34l4.5 4.5-4.5 4.5"/>
+                  <path class="flow__link flow__link--own" d="M416 54.5H111"/>
+                  <path class="flow__tip flow__tip--own" d="M111 50l-4.5 4.5 4.5 4.5"/>
+                  <rect class="flow__node" x="416.5" y="28.5" width="103" height="35" rx="2"/>
+                  <text class="flow__t" x="468" y="49.5" text-anchor="middle">Readers</text>
+                </svg>
+              </dd>
             </div>
           </dl>
         </div>
@@ -136,7 +157,7 @@
           <span class="rule" aria-hidden="true"></span>
         </div>
         <h3 class="head band__lead rv">Seven capabilities, one platform.</h3>
-        <p class="lead lead--sub band__sub rv" style="--rv-d:60ms">Our platform spans app and newsletter development, audience growth, personalization, engagement, monetization, and publisher-advertiser networks — all proven at scale.</p>
+        <p class="lead lead--sub band__sub rv" style="--rv-d:60ms">They group into the surfaces a publisher owns, the audience on those surfaces, the trust that holds it, and the revenue it carries. All of it is proven at scale.</p>
 
         <!-- ---- the console ---- -->
         <div class="console rv" style="--rv-d:120ms">
@@ -367,7 +388,6 @@
         el.textContent = '';
         el.appendChild(inner);
         el.style.setProperty('--tr-step', step.toFixed(2) + 'ms');
-        el.style.setProperty('--tr-scan-d', Math.max(90, step * 3).toFixed(0) + 'ms');
         /* replace, do not compose: the element drift is removed from every
            split element so no two rules write the same property. */
         el.classList.remove('rv');

@@ -22,17 +22,22 @@
   --ink-2:#63635C;       /* secondary nav type    4.90:1 on ground         */
   --white:#FFFFFF;
 
-  /* One colour per direction. First ratio is the name on the row
-     ground; second is white on the pill fill. Both must clear 4.5. */
+  /* One colour per direction — eight hues, no two adjacent on the wheel.
+     First ratio is the name on the row ground; second is white on the
+     pill fill. Both must clear 4.5, because the colour has to carry the
+     name in each state. */
   --c-v1:#9E241B;        /* Publication  — printer's red   6.34 / 7.71     */
   --c-v2:#2447C7;        /* Schematic    — drafting blue   6.16 / 7.50     */
   --c-v3:#0D6E62;        /* Index        — lab teal        5.04 / 6.13     */
   --c-v4:#8F5305;        /* Signal       — burnt amber     5.07 / 6.16     */
   --c-v5:#3F3F46;        /* Institution  — graphite        8.59 / 10.44    */
+  --c-v6:#5A3BB5;        /* Console      — violet          6.33 / 7.70     */
+  --c-v7:#8E2A6B;        /* Prospectus   — plum            6.41 / 7.80     */
+  --c-v8:#4F6B1F;        /* Lab          — moss            5.00 / 6.08     */
 
   --ui:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --pad:clamp(18px,3vw,56px);
-  --row:clamp(84px,10.5vw,150px);
+  --row:clamp(74px,8.4vw,118px);
   --nav:clamp(58px,6.4vw,92px);
 }
 
@@ -137,6 +142,9 @@ a.cell:hover{background:var(--ink);color:var(--ground)}
 .row.v3{--c:var(--c-v3)}
 .row.v4{--c:var(--c-v4)}
 .row.v5{--c:var(--c-v5)}
+.row.v6{--c:var(--c-v6)}
+.row.v7{--c:var(--c-v7)}
+.row.v8{--c:var(--c-v8)}
 
 /* ============ THE LIVE PREVIEW ============
    A real iframe of the direction, rendered at desktop width and

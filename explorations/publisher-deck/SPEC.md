@@ -10,6 +10,7 @@ All plates are **2560 × 720 px @2x = 192 DPI** on that slide.
 | `backgrounds/` | Slide plates with **no text**. Drop one behind each slide and set your own type. |
 | `backgrounds-transparent/` | The same plates with the paper ground knocked out. Use these over your own colour. |
 | `reference/` | The finished slide, text and all. Layout reference only. |
+| `textures/` | The paper grain on its own: flat fields at 2560 x 1440 and the seamless 90px tile, opaque and transparent. Same alphas the deck uses. |
 | `elements/` | The isometric box, transparent, ~970 × 1120 px. Four value recipes. |
 | `brand/` | `wordmark.svg`, `mark.svg`. Both use `fill="currentColor"` so they invert. |
 
@@ -74,17 +75,17 @@ Numbers are lining and tabular throughout.
 
 ## Structure
 
-16 pages: cover, contents, then four sections with a divider each.
+17 pages: cover, contents, then four sections with a divider each.
 
 | | Pages |
 |---|---|
 | § 01 The problem | 3 to 6 |
-| § 02 The shift | 7 to 8 |
-| § 03 The offer | 9 to 14 |
-| § 04 Next steps | 15 to 16 |
+| § 02 The shift | 7 to 9 |
+| § 03 The offer | 10 to 15 |
+| § 04 Next steps | 16 to 17 |
 
 The dividers carry the argument: fragments adrift to gathering to assembled on ink to
-solid and settled. Pages 9 and 13 are the two dark beats.
+solid and settled. Pages 10 and 14 are the two dark beats.
 
 ## The data language
 
@@ -93,6 +94,7 @@ One dot, one unit, everywhere:
   100; page 5 is the same data as four 10 x 10 blocks, for comparing the four
   figures against each other rather than reading them one at a time. Pick one.
 - valuation page: one dot = one turn of revenue
+- retention page: one dot = one reader in a hundred, Day-30
 - engagement page: one dot = one multiple
 
 Keep it if you add a data page. It is also why the accent red only ever appears once

@@ -84,7 +84,7 @@ body{
 
 /* collage layers sit under the type */
 .art{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:0}
-.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.compress,.under,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
+.folio,.foot,.cover,.toc,.divider,.head,.main,.two,.compress,.under,.retain,.shift,.sol,.caps,.next,.terms{position:relative; z-index:1}
 
 /* ---------- chrome ---------- */
 .folio{display:flex; align-items:center; justify-content:space-between; gap:20px; flex:none; padding-bottom:12px; border-bottom:1px solid var(--line-2)}
@@ -187,16 +187,16 @@ h2{font-size:41px; line-height:1.08}
 
 /* ---------- 5 &middot; valuation ---------- */
 /* ---------- valuation: the drop leads, the notice explains ---------- */
-.compress{flex:none; display:grid; grid-template-columns:1fr 148px 1fr; align-items:end; padding:16px 0 18px; border-bottom:1px solid var(--line)}
+.compress{flex:none; display:grid; grid-template-columns:1fr 148px 1fr; align-items:start; padding:16px 0 18px; border-bottom:1px solid var(--line)}
 .cmp-lab{font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--mute); padding-bottom:10px; border-bottom:1px solid var(--line); margin-bottom:14px}
 .cmp-val{font-family:var(--serif); font-weight:600; font-size:66px; line-height:.88; letter-spacing:-.04em; font-variant-numeric:tabular-nums}
 .cmp-val .to{font-size:28px; padding:0 5px; color:var(--mute)}
 .cmp-val.hot{color:var(--accent-live)}
 .compress .stack{margin:12px 0 0}
 .compress .stack u{width:13px; height:13px}
-.cmp-sub{font-size:12.5px; line-height:1.45; color:var(--mute); margin-top:10px; max-width:34ch}
+.cmp-sub{font-size:12.5px; line-height:1.45; color:var(--mute); margin-top:10px; max-width:34ch; min-height:2.9em}
 .cmp-gap{align-self:stretch; display:flex; align-items:center; justify-content:center; text-align:center; position:relative}
-.cmp-gap::before{content:""; position:absolute; left:50%; top:14%; bottom:0; width:1px; background:var(--line)}
+.cmp-gap::before{content:""; position:absolute; left:50%; top:6%; bottom:6%; width:1px; background:var(--line)}
 .cmp-gap span{position:relative; background:var(--paper); padding:8px 0; font-family:var(--mono); font-size:9px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-live); line-height:1.7}
 .under{flex:1; min-height:0; display:grid; grid-template-columns:1fr 392px; gap:40px; align-items:center; padding-top:16px}
 .under .notice{padding:14px 18px}
@@ -222,6 +222,32 @@ h2{font-size:41px; line-height:1.08}
 .mult-sub{font-size:12px; line-height:1.45; color:var(--mute); max-width:30ch}
 
 /* ---------- 7 &middot; owned channels ---------- */
+/* ---------- the three multiples, one column each ---------- */
+.metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:0}
+.metric{padding:0 40px; border-left:1px solid var(--line)}
+.metric:first-child{padding-left:0; border-left:none}
+.metric:last-child{padding-right:0}
+.m-val{font-family:var(--serif); font-weight:600; font-size:58px; line-height:1; letter-spacing:-.04em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.m-val .to{font-size:26px; padding:0 3px; color:var(--mute)}
+.m-dots{display:flex; gap:7px; margin-top:18px}
+.m-dots u{width:10px; height:10px; border-radius:50%; background:var(--accent-live); display:block}
+.m-dots u.ghost{background:none; border:1.5px solid var(--accent-live); opacity:.45}
+.m-txt{font-size:17px; line-height:1.4; color:var(--ink); margin-top:24px}
+.m-src{font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:12px}
+.metrics + .cap{margin-top:30px; padding-top:14px; border-top:1px solid var(--line)}
+
+/* ---------- retention ---------- */
+.retain{flex:1; min-height:0; display:grid; grid-template-columns:1fr 268px; gap:52px; align-items:center; padding:14px 0}
+.ret-figs{display:grid; grid-template-columns:1fr 1fr; gap:44px}
+.ret-num{font-family:var(--serif); font-weight:600; font-size:60px; line-height:1; letter-spacing:-.04em; color:var(--accent-live); font-variant-numeric:tabular-nums}
+.ret-num.muted{color:var(--mute)}
+.ret-num .pct{font-size:32px}
+.ret-lab{font-size:16px; font-weight:600; line-height:1.3; color:var(--ink); margin-top:14px}
+.ret-when{font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--mute); margin-top:3px}
+.w-grid.grey i.on{background:var(--ink)}
+.ret-side{display:flex; flex-direction:column}
+.ret-side .phone{width:100%}
+
 .shift{display:grid; grid-template-columns:244px 1fr; gap:48px; flex:1; min-height:0; align-items:center}
 .phone{padding:11px 10px 14px}
 .phone .notch{width:46px; height:4px; background:var(--line-2); margin:1px auto 11px}
@@ -394,7 +420,7 @@ h2{font-size:41px; line-height:1.08}
   <div class="toc">
     <div class="toc-l">
       <h2>In this<br>issue</h2>
-      <p class="toc-note">Four sections, sixteen pages. The argument runs in order: what you are losing, where readers went, what we build, and how we start.</p>
+      <p class="toc-note">Four sections, seventeen pages. The argument runs in order: what you are losing, where readers went, what we build, and how we start.</p>
       <div class="colophon">
         <div><span>Prepared for</span>[Publisher Name]</div>
         <div><span>Prepared by</span>ndot, August 2026</div>
@@ -404,8 +430,8 @@ h2{font-size:41px; line-height:1.08}
     <div class="toc-list">
       <div class="toc-row"><div class="toc-rn">I</div><div class="toc-t">The problem<span>Search referral is falling, and the market has already re-priced it</span></div><div class="toc-p">Page 3</div></div>
       <div class="toc-row"><div class="toc-rn">II</div><div class="toc-t">The shift<span>Owned mobile channels are outperforming the open web</span></div><div class="toc-p">Page 7</div></div>
-      <div class="toc-row"><div class="toc-rn">III</div><div class="toc-t">The offer<span>What ndot builds, operates, and gets paid for</span></div><div class="toc-p">Page 9</div></div>
-      <div class="toc-row"><div class="toc-rn">IV</div><div class="toc-t">Next steps<span>Whether this fits, and how the first ninety days run</span></div><div class="toc-p">Page 15</div></div>
+      <div class="toc-row"><div class="toc-rn">III</div><div class="toc-t">The offer<span>What ndot builds, operates, and gets paid for</span></div><div class="toc-p">Page 10</div></div>
+      <div class="toc-row"><div class="toc-rn">IV</div><div class="toc-t">Next steps<span>Whether this fits, and how the first ninety days run</span></div><div class="toc-p">Page 16</div></div>
     </div>
   </div>
 
@@ -588,14 +614,65 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 02 &nbsp;/&nbsp; Section two</div>
     <h2>The shift</h2>
     <p class="div-line">A reader who installs does not churn to an algorithm change.</p>
-    <div class="div-jump">Continues on page 8</div>
+    <div class="div-jump">Continues on pages 8 to 9</div>
   </div>
   <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 7</div></div>
 </section>
 
-<!-- ==================== 7 &middot; OWNED CHANNELS ==================== -->
+<!-- ==================== 8 &middot; RETENTION ==================== -->
 <section class="page" data-ground="light">
   <canvas class="art" data-art="quiet" data-zone="0.955,0,0.09,1"></canvas>
+  <div class="folio">
+    <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
+    <div class="folio-r"><b>&sect; 02</b> The shift &middot; Retention</div>
+  </div>
+
+  <div class="head">
+    <span class="kicker">Retention</span>
+    <h2>A reader who installs is still there a month later</h2>
+    <p class="lede dim">Publisher apps retain readers 6x longer than the average app. On day 30 that is the difference between a habit and a bounce.</p>
+  </div>
+
+  <div class="retain">
+    <div class="ret-figs">
+      <div class="ret-col">
+        <div class="ret-num">46<span class="pct">%</span></div>
+        <div class="ret-lab">Publisher apps</div>
+        <div class="ret-when">Day-30 retention</div>
+        <div class="w-grid" data-waffle="46"></div>
+      </div>
+      <div class="ret-col">
+        <div class="ret-num muted">8<span class="pct">%</span></div>
+        <div class="ret-lab">The average app</div>
+        <div class="ret-when">Day-30 retention</div>
+        <div class="w-grid grey" data-waffle="8"></div>
+      </div>
+    </div>
+    <div class="ret-side">
+      <div class="phone panel">
+        <div class="notch"></div>
+        <div class="pm"><b>The Daily</b><i></i></div>
+        <div class="lead">
+          <canvas data-art="photo"></canvas>
+          <div class="hl"></div><div class="hl s"></div>
+          <div class="tx"></div><div class="tx s"></div>
+          <div class="tag"></div>
+        </div>
+        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+      </div>
+      <blockquote class="pull" style="margin-top:22px">Apps are all about building habit, becoming someone's go-to source.</blockquote>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Each dot is one reader in a hundred.</div>
+    <div class="pg">Page 8</div>
+  </div>
+</section>
+
+<!-- ==================== 9 &middot; OWNED CHANNELS ==================== -->
+<section class="page" data-ground="light">
+  <canvas class="art" data-art="quiet" data-zone="-0.05,0,0.088,1"></canvas>
   <div class="folio">
     <div class="flag"><svg viewBox="0 0 929.12 320" fill="currentColor" role="img" aria-label="NDot"><rect x="0" y="1.13" width="78.325" height="313.3"/><rect x="161.19" y="0" width="78.325" height="313.3"/><rect x="77.162" y="0.297" width="85.136" height="313.3" transform="rotate(-30 119.73 156.947)"/><rect x="450.16" y="1.15" width="78.33" height="313.03"/><path fill-rule="evenodd" d="M271.30 185.60a128.60 128.60 0 1 0 257.20 0a128.60 128.60 0 1 0 -257.20 0ZM349.63 185.60a50.27 50.27 0 1 1 100.54 0a50.27 50.27 0 1 1 -100.54 0Z"/><circle cx="628.05" cy="192.60" r="52.35"/><rect x="703.50" y="62" width="225.62" height="78.33"/><path d="M752 1.47L830.33 1.47L830.33 200A41.67 41.67 0 0 0 886.25 239.15L913 312.80A120 120 0 0 1 752 200Z"/></svg><span class="fw">for publishers</span></div>
     <div class="folio-r"><b>&sect; 02</b> The shift &middot; Owned channels</div>
@@ -607,44 +684,33 @@ h2{font-size:41px; line-height:1.08}
     <p class="lede dim">Publishers who already own a mobile channel see it in engagement, conversion and open rates.</p>
   </div>
 
-  <div class="shift">
-    <div>
-      <div class="phone panel">
-        <div class="notch"></div>
-        <div class="pm"><b>The Daily</b><i></i></div>
-        <div class="lead">
-          <canvas data-art="photo"></canvas>
-          <div class="hl"></div><div class="hl s"></div>
-          <div class="tx"></div><div class="tx s"></div>
-          <div class="tag"></div>
-        </div>
-        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
-        <div class="row"><div class="thumb"></div><div class="rc"><div class="hl" style="height:4px"></div><div class="tx"></div><div class="tx s"></div></div></div>
+  <div class="main">
+    <div class="metrics">
+      <div class="metric">
+        <div class="m-val">4<span class="to">to</span>5x</div>
+        <div class="m-dots" data-dots="4" data-ghost="1"></div>
+        <p class="m-txt">Higher engagement, week over week, against desktop.</p>
+        <div class="m-src">Pugpig network, 440+ apps</div>
       </div>
-      <p class="phone-cap">Publisher apps retain readers 6x longer than the average app.</p>
-    </div>
-    <div>
-      <div class="gains">
-        <div class="gain">
-          <div><div class="gain-v">4<span class="to">to</span>5x</div><div class="gain-d" data-dots="4" data-ghost="1"></div></div>
-          <div class="gain-t">Higher engagement, week over week, against desktop.<span>Pugpig network, 440+ apps</span></div>
-        </div>
-        <div class="gain">
-          <div><div class="gain-v">~2x</div><div class="gain-d" data-dots="2"></div></div>
-          <div class="gain-t">In-app conversion rate after native subscriptions.<span>Financial Times</span></div>
-        </div>
-        <div class="gain">
-          <div><div class="gain-v">3x</div><div class="gain-d" data-dots="3"></div></div>
-          <div class="gain-t">Increase in push open rates from targeted personalization.<span>Boston Globe</span></div>
-        </div>
+      <div class="metric">
+        <div class="m-val">~2x</div>
+        <div class="m-dots" data-dots="2"></div>
+        <p class="m-txt">In-app conversion rate after native subscriptions.</p>
+        <div class="m-src">Financial Times</div>
       </div>
-      <blockquote class="pull" style="margin-top:26px">Apps are all about building habit, becoming someone's go-to source.</blockquote>
+      <div class="metric">
+        <div class="m-val">3x</div>
+        <div class="m-dots" data-dots="3"></div>
+        <p class="m-txt">Increase in push open rates from targeted personalization.</p>
+        <div class="m-src">Boston Globe</div>
+      </div>
     </div>
+    <div class="cap">Each dot is one multiple.</div>
   </div>
 
   <div class="foot">
-    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Each dot represents one multiple.</div>
-    <div class="pg">Page 8</div>
+    <div class="src">Source: Pugpig Media App Report 2025 (analysis of 440+ apps across 140 publishers, including FT, Boston Globe, BBC). Figures are from separate publishers and are not additive.</div>
+    <div class="pg">Page 9</div>
   </div>
 </section>
 
@@ -659,9 +725,9 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 03 &nbsp;/&nbsp; Section three</div>
     <h2>The offer</h2>
     <p class="div-line">We don't just advise. We build it, run it, and get paid out of what it earns.</p>
-    <div class="div-jump">Continues on pages 10 to 14 &middot; The pieces stop being someone else's</div>
+    <div class="div-jump">Continues on pages 11 to 15 &middot; The pieces stop being someone else's</div>
   </div>
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 9</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 10</div></div>
 </section>
 
 <!-- ==================== 9 &middot; THE ENGINE ==================== -->
@@ -700,7 +766,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 10</div></div>
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 11</div></div>
 </section>
 
 <!-- ==================== 10 &middot; THE BUILD ==================== -->
@@ -724,7 +790,7 @@ h2{font-size:41px; line-height:1.08}
     <div class="cap-item"><div class="bul"></div><h3>Ad tech and monetization</h3><p>Advertising and subscription infrastructure tuned to convert engagement into revenue, from day one.</p></div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 11</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 12</div></div>
 </section>
 
 <!-- ==================== 11 &middot; THE RECORD ==================== -->
@@ -755,7 +821,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">Source: NewsBreak company data, 2026 YTD.</div><div class="pg">Page 12</div></div>
+  <div class="foot"><div class="src">Source: NewsBreak company data, 2026 YTD.</div><div class="pg">Page 13</div></div>
 </section>
 
 <!-- ==================== 12 &middot; THE TERMS ==================== -->
@@ -772,7 +838,7 @@ h2{font-size:41px; line-height:1.08}
     <p class="sub">Build your audience. Own your growth. Share the upside.</p>
   </div>
 
-  <div class="foot"><div class="src">Revenue share. No licence fee, no build invoice, no minimum commitment.</div><div class="pg">Page 13</div></div>
+  <div class="foot"><div class="src">Revenue share. No licence fee, no build invoice, no minimum commitment.</div><div class="pg">Page 14</div></div>
 </section>
 
 <!-- ==================== 13 &middot; THE ALTERNATIVES ==================== -->
@@ -804,7 +870,7 @@ h2{font-size:41px; line-height:1.08}
     <p class="tbl-note">Six-figure enterprise builds still leave you operating the product. Generic wrappers skip the growth layer entirely. ndot is purpose-built for editorial audiences, and only paid when it works.</p>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 14</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 15</div></div>
 </section>
 
 <!-- ==================== 14 &middot; DIVIDER IV ==================== -->
@@ -818,9 +884,9 @@ h2{font-size:41px; line-height:1.08}
     <div class="div-rn">&sect; 04 &nbsp;/&nbsp; Section four</div>
     <h2>Next steps</h2>
     <p class="div-line">If this sounds like you, the first conversation is thirty minutes.</p>
-    <div class="div-jump">Concludes on page 16</div>
+    <div class="div-jump">Concludes on page 17</div>
   </div>
-  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 15</div></div>
+  <div class="foot"><div class="src">ndot for publishers</div><div class="pg">Page 16</div></div>
 </section>
 
 <!-- ==================== 15 &middot; THE FIT ==================== -->
@@ -861,7 +927,7 @@ h2{font-size:41px; line-height:1.08}
     </div>
   </div>
 
-  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 16</div></div>
+  <div class="foot"><div class="src">ndot for publishers &middot; Build your audience. Own your growth. Share the upside.</div><div class="pg">Page 17</div></div>
 </section>
 
 </div></div>
@@ -1305,7 +1371,7 @@ h2{font-size:41px; line-height:1.08}
     for(i = 0; i < g; i++) html += '<u class="ghost"></u>';
     s.innerHTML = html;
   });
-  document.querySelectorAll('.gain-d').forEach(function(d){
+  document.querySelectorAll('.gain-d, .m-dots').forEach(function(d){
     var n = parseInt(d.getAttribute('data-dots'), 10);
     var g = parseInt(d.getAttribute('data-ghost') || '0', 10);
     var html = '', i;

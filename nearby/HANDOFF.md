@@ -1,9 +1,13 @@
 # Nearby AI one-pager: handoff
 
-> **This repo is now Nearby, not NDot.** NDot AI repositioned to a B2B growth
-> platform for media companies and is being built separately from scratch. All
-> five pages here are Nearby AI: consumer, local-life, county-map. The repo name
-> and URL still say "ndot" and are the next thing to fix. The NDot brief lives in
+> **Update (2026-08-21): the repo now hosts both companies.** Everything Nearby
+> lives under `/nearby/`: this document, the catalog (`nearby/index.html`) and
+> the four versions (`nearby/v1..v4/`). NDot AI — the separate B2B growth
+> platform for media companies — lives under `/ndot/`. The repo root is a
+> chooser between the two. The old root-level `/v1/../v4/` URLs redirect to
+> `/nearby/v1..v4/`. Path references below predate the move: read `v3/` as
+> `nearby/v3/`, and "the repo root shows the current design" as "the current
+> design is `/nearby/v3/`; the root shows the chooser". The NDot brief lives in
 > `Vibe_Code/ndot-v2-brief/START-HERE.md`.
 >
 > Careful when editing: several county names contain the string "ndot"
@@ -17,11 +21,11 @@ step: every page is one self-contained HTML file plus the county dataset.
 
 | URL | What |
 |---|---|
-| https://niantongnb.github.io/ndot-website/ | Current design. Same file as `/v3/`. |
-| https://niantongnb.github.io/ndot-website/v4/ | **New.** Static hero, one page. The one Rebecca picked the direction for. |
-| https://niantongnb.github.io/ndot-website/v3/ | Street-atlas treatment on paper. |
-| https://niantongnb.github.io/ndot-website/v2/ | Black and white editorial build, from a Codex handoff. v4's parent. |
-| https://niantongnb.github.io/ndot-website/v1/ | First take: dark, cinematic, typewriter headline. |
+| https://niantongnb.github.io/ndot-website/nearby/ | The Nearby catalog. |
+| https://niantongnb.github.io/ndot-website/nearby/v4/ | Static hero, one page. The one Rebecca picked the direction for. |
+| https://niantongnb.github.io/ndot-website/nearby/v3/ | Street-atlas treatment on paper. Previously the homepage. |
+| https://niantongnb.github.io/ndot-website/nearby/v2/ | Black and white editorial build, from a Codex handoff. v4's parent. |
+| https://niantongnb.github.io/ndot-website/nearby/v1/ | First take: dark, cinematic, typewriter headline. |
 
 Repo: `niantongnb/ndot-website` (public, GitHub Pages from `main`, root).
 Push to `main` and it redeploys in about a minute. Both `noindex` meta and

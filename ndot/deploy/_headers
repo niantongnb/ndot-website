@@ -1,0 +1,3 @@
+# Cloudflare Pages: keep the review site out of search results.
+/*
+  X-Robots-Tag: noindex, nofollow

@@ -1,0 +1,431 @@
+/* ============================================================
+   NDot AI — design tokens
+
+   Direction: the site is set as a publication. NDot sells the
+   infrastructure publishers run on, so the page argues by being
+   properly set: masthead, folios, ruled index, a black spread
+   spent on proof, a colophon. Every element is one of four
+   things — TYPE, a RULE, a piece of DATA, or a numbered record.
+
+   No map, no geography, no dot field, no gradient, no shadow,
+   no illustration.
+
+   Contrast ratios below are computed (WCAG 2.1), not eyeballed.
+   ============================================================ */
+:root{
+  --paper:#FAFAF8;        /* page ground, cool near-white stock              */
+  --paper-2:#F1F1EC;      /* flat surfaces: plates, hovered rows             */
+  --ink:#111110;          /* headlines, body          18.08:1 on paper       */
+  --ink-2:#6B6B63;        /* decks, captions, bios     5.14:1 on paper       */
+  --rule:#D8D8CE;         /* hairline on paper — decorative separation only  */
+  --plate:#C9C9C0;        /* plate numerals; aria-hidden decoration          */
+
+  --ink-field:#131310;    /* inverted full-bleed band                        */
+  --on-ink:#F4F4EE;       /* text on the band         16.86:1                */
+  --on-ink-2:#9A9A90;     /* labels on the band        6.56:1                */
+  --rule-ink:#6A6A63;     /* hairline on the band      3.38:1 (SC 1.4.11)    */
+
+  /* The brand's source of truth (Figma "NDot Branding") is pure black and
+     white; no colour variables are defined there. This single printer's red
+     is editorial chrome, not a brand colour — delete these two tokens and the
+     site is fully achromatic. NEVER use --accent inside an inverted band:
+     #A6231A on --ink-field is 2.55:1, a banned pair. Use --accent-ink. */
+  --accent:#A6231A;       /* folios, ordinals, underlines  6.98:1 on paper   */
+  --accent-ink:#E86A52;   /* the same hue lifted for the band 5.80:1         */
+
+  --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  --pad:clamp(20px,4vw,64px);
+  --section:clamp(56px,7vw,104px);
+}
+
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.62; font-weight:400;
+  font-variant-numeric:lining-nums tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+@media (min-width:768px){ body{font-size:19px} }
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0}
+
+/* Motion: text never animates, and nothing animates on scroll. There is no
+   IntersectionObserver and no requestAnimationFrame anywhere on this site, so
+   every word is present and readable with JS disabled or rAF suspended.
+   Only interaction feedback transitions. */
+a,.btn{transition:color .12s ease,background-color .12s ease,border-color .12s ease}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.wrap{max-width:1312px;margin-inline:auto;padding-inline:var(--pad)}
+/* the masthead is 64px and sticky, so anchor jumps must clear it */
+section[id]{scroll-margin-top:84px}
+main:focus{outline:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--on-ink);padding:12px 18px;z-index:99}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:0}
+.on-ink :focus-visible{outline-color:var(--accent-ink)}
+
+/* ---------- the system layer (mono) ---------- */
+.label{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+  line-height:1.3;margin:0;
+}
+.on-ink .label{color:var(--on-ink-2)}
+.folio{
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;
+  color:var(--accent);margin:0;
+}
+.on-ink .folio{color:var(--accent-ink)}
+
+/* ---------- display type ---------- */
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:300;text-wrap:balance}
+.h-xl{font-size:clamp(34px,1.2rem + 3.4vw,62px);line-height:1.02;letter-spacing:-.022em}
+.h-l{font-size:clamp(28px,1rem + 2.2vw,44px);line-height:1.06;letter-spacing:-.018em}
+.h-m{font-size:clamp(21px,1rem + 1vw,28px);line-height:1.18;letter-spacing:-.01em;font-weight:400}
+.deck{font-size:clamp(19px,1rem + .7vw,24px);line-height:1.44;font-weight:300;color:var(--ink);max-width:52ch;margin:0}
+.on-ink .deck{color:var(--on-ink)}
+.body-2{color:var(--ink-2)}
+
+/* ---------- masthead ---------- */
+.site-head{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--ink)}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.brand{display:flex;align-items:center;text-decoration:none}
+.brand svg{height:19px;width:auto;color:var(--ink)}
+.nav{display:flex;align-items:center;gap:clamp(14px,2.4vw,32px)}
+.nav a{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;
+}
+.nav a:hover{color:var(--ink)}
+.nav a.is-cta{color:var(--paper);background:var(--ink);padding:9px 14px}
+.nav a.is-cta:hover{background:var(--accent);color:var(--paper)}
+
+/* ---------- two-track page: rail | void | field ---------- */
+.sec-grid{display:grid;gap:0}
+/* Default (and the only form used on full-bleed bands): a horizontal folio
+   band above the content. The rail's label IS the section heading, so no
+   invented headline copy is needed anywhere on the page. */
+.rail{display:flex;align-items:baseline;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--rule);margin-bottom:clamp(28px,4vw,44px)}
+.on-ink .rail{border-bottom-color:var(--rule-ink)}
+@media (min-width:1200px){
+  .sec-grid{grid-template-columns:200px 88px minmax(0,1fr)}
+  .sec-grid > .rail{
+    grid-column:1;display:block;position:sticky;top:88px;align-self:start;
+    border-bottom:0;padding-bottom:0;margin-bottom:0;
+  }
+  .sec-grid > .rail .label{margin-top:10px}
+  .sec-grid > .field{grid-column:3;border-left:1px solid var(--rule);padding-left:40px}
+}
+
+/* ---------- buttons ---------- */
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(30px,4vw,42px)}
+.btn{
+  display:inline-flex;align-items:center;text-decoration:none;
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;padding:14px 22px;border:1px solid var(--ink);
+}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.on-ink .btn{border-color:var(--on-ink);color:var(--on-ink)}
+.on-ink .btn-solid{background:var(--on-ink);color:var(--ink-field)}
+.on-ink .btn-solid:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--ink-field)}
+.on-ink .btn-ghost:hover{background:var(--on-ink);color:var(--ink-field)}
+
+/* ---------- inverted band ---------- */
+.band-ink{background:var(--ink-field);color:var(--on-ink)}
+.band-ink h1,.band-ink h2,.band-ink h3{color:var(--on-ink)}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(56px,8vw,108px) clamp(52px,7vw,96px)}
+.hero h1{max-width:30ch}
+.hero .deck{margin-top:clamp(26px,3vw,36px);color:var(--ink-2)}
+.hero-rule{height:2px;background:var(--ink);margin-bottom:clamp(30px,4vw,44px)}
+
+/* ---------- 01 proof ledger (full-bleed spread) ---------- */
+.proof{padding-block:var(--section)}
+.stats{display:grid;gap:0;border-top:1px solid var(--rule-ink)}
+.stat{display:flex;flex-direction:column;padding:clamp(26px,3.4vw,38px) 0;border-bottom:1px solid var(--rule-ink)}
+.stat .ord{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--accent-ink);display:block;margin-bottom:14px}
+.stat .fig{font-size:clamp(30px,1rem + 2.6vw,50px);font-weight:300;letter-spacing:-.02em;line-height:1;text-wrap:balance;color:var(--on-ink)}
+.stat .label{display:block;margin-top:auto;padding-top:16px}
+@media (min-width:720px){
+  .stats{grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--rule-ink)}
+  .stat{border-bottom:0;border-right:1px solid var(--rule-ink);padding:clamp(30px,3.4vw,44px) clamp(22px,2.6vw,36px)}
+  .stat:first-child{padding-left:0}
+  .stat:last-child{border-right:0;padding-right:0}
+}
+
+/* ---------- 02 the index (capabilities) ---------- */
+.sec{padding-block:var(--section)}
+.caps{border-top:1px solid var(--ink);list-style:none;margin:clamp(36px,4.5vw,56px) 0 0;padding:0}
+.cap-row{
+  display:grid;grid-template-columns:auto 1fr;gap:12px 20px;align-items:baseline;
+  padding:clamp(19px,2.2vw,25px) 10px;border-bottom:1px solid var(--rule);
+}
+.cap-num{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.06em}
+.cap-name{font-size:clamp(20px,1rem + .9vw,28px);font-weight:400;letter-spacing:-.012em;line-height:1.2}
+@media (min-width:720px){ .cap-row{grid-template-columns:64px 1fr;gap:24px} }
+
+/* ---------- 03 mission & vision (spec table) ---------- */
+.mv{display:grid;gap:clamp(36px,4.5vw,44px);margin-top:clamp(30px,4vw,40px)}
+.mv > div{padding-top:22px;border-top:2px solid var(--ink)}
+.mv .h-m{margin-top:16px}
+.mv .body{margin-top:14px;color:var(--ink-2);max-width:46ch;font-size:16px;line-height:1.6}
+@media (min-width:860px){ .mv{grid-template-columns:1fr 1fr;gap:clamp(28px,3vw,44px)} }
+
+/* ---------- 04 the masthead (team) ----------
+   The photo slot is a PRE-PRESS PLATE: the frame is set, the image is not
+   placed yet. Crop marks + a record numeral read as a stage in production,
+   not a broken image, and the furniture survives the photo's arrival. */
+.grid-people{display:grid;gap:clamp(26px,3vw,36px);grid-template-columns:repeat(auto-fill,minmax(210px,1fr));margin-top:clamp(36px,4.5vw,52px)}
+.plate{
+  position:relative;aspect-ratio:4/5;background:var(--paper-2);
+  border:1px solid var(--rule);display:grid;place-items:center;
+}
+.plate .num{font-size:clamp(38px,6vw,60px);font-weight:300;color:var(--plate);letter-spacing:.02em;line-height:1}
+.plate i{position:absolute;width:11px;height:11px}
+.plate i{--cm:#8F8F86}
+.plate .tl{top:8px;left:8px;border-top:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .tr{top:8px;right:8px;border-top:1px solid var(--cm);border-right:1px solid var(--cm)}
+.plate .bl{bottom:8px;left:8px;border-bottom:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .br{bottom:8px;right:8px;border-bottom:1px solid var(--cm);border-right:1px solid var(--cm)}
+.person .name{margin-top:16px;font-size:20px;font-weight:400;letter-spacing:-.01em;line-height:1.2}
+.person .role{margin-top:6px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.person .bio{margin-top:12px;font-size:15px;line-height:1.55;color:var(--ink-2)}
+.person .name,.person .role,.person .bio,.mailto{overflow-wrap:break-word}
+
+/* ---------- 05 careers block ---------- */
+.careers-cta{padding-block:var(--section)}
+.careers-cta .deck{margin-top:20px;color:var(--on-ink-2)}
+.mailto{
+  display:inline-block;font-weight:400;letter-spacing:-.012em;text-decoration:none;
+  font-size:clamp(21px,1rem + 1vw,30px);border-bottom:1px solid currentColor;padding-bottom:4px;
+}
+.on-ink .mailto{color:var(--on-ink);border-bottom-color:var(--rule-ink)}
+.on-ink .mailto:hover{border-bottom-color:var(--accent-ink);color:var(--accent-ink)}
+
+/* ---------- careers page ---------- */
+.careers-hero{padding-block:clamp(56px,8vw,104px) clamp(34px,4.5vw,52px)}
+.careers-hero h1{max-width:16ch}
+.careers-hero .deck{margin-top:clamp(24px,3vw,32px);max-width:44ch}
+.prose{max-width:64ch;display:grid;gap:clamp(20px,2.4vw,28px)}
+.prose p{color:var(--ink-2);line-height:1.68}
+.pull{
+  margin-block:clamp(12px,1.6vw,20px);padding-block:clamp(24px,3.2vw,36px);
+  border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  font-size:clamp(25px,1rem + 1.9vw,40px);font-weight:300;font-style:italic;
+  line-height:1.16;color:var(--ink)!important;max-width:20ch;letter-spacing:-.014em;
+}
+.contact-block{margin-top:clamp(40px,5vw,64px);padding:clamp(26px,3.2vw,36px);background:var(--paper-2);border:1px solid var(--rule)}
+.contact-block .mailto{color:var(--ink);border-bottom-color:var(--ink-2);margin-top:14px}
+.contact-block .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- colophon / footer ---------- */
+.site-foot{background:var(--ink-field);color:var(--on-ink);border-top:1px solid var(--rule-ink);padding-block:clamp(44px,5.5vw,64px)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:flex-start}
+.site-foot svg{height:19px;width:auto;color:var(--on-ink)}
+.foot-links{display:flex;flex-wrap:wrap;gap:10px 26px}
+.foot-links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--on-ink-2);text-decoration:none}
+.foot-links a:hover{color:var(--on-ink)}
+.colophon{margin-top:clamp(30px,4vw,44px);padding-top:20px;border-top:1px solid var(--rule-ink);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+.colophon span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--on-ink-2)}
+
+/* ---------- gallery iframe preview ----------
+   The repo gallery frames each prototype at ~16:11. Show the masthead + hero. */
+body.embed .site-head{position:static}
+body.embed .site-head .wrap{height:46px}
+body.embed .nav{display:none}
+body.embed .hero{padding-block:20px}
+body.embed .hero-rule{margin-bottom:18px}
+body.embed .h-xl{font-size:19px;line-height:1.16;max-width:34ch}
+body.embed .hero .deck{margin-top:14px;font-size:11px;line-height:1.45;max-width:46ch}
+body.embed .actions{margin-top:16px}
+body.embed .btn{font-size:9px;padding:8px 12px}
+
+/* ============================================================
+   MOBILE
+
+   Measured across 320/360/390/414/430 on a touch context, not
+   eyeballed. Three real defects drove this block:
+
+   1. The masthead is a flex row, so at 320px a four-item nav
+      squeezed the brand to width:0 and the wordmark vanished
+      entirely. .brand never shrinks now.
+   2. Nav, footer and brand links were 16-19px tall. Touch
+      targets are 44px minimum here.
+   3. Mono labels were being scaled DOWN on small screens, which
+      is backwards: 10px uppercase mono on a phone is too small.
+      They now hold their desktop size everywhere.
+   ============================================================ */
+
+/* the mark must never be squeezed out of the masthead */
+.brand{flex:0 0 auto}
+
+@media (max-width:600px){
+  /* a sticky bar costs ~8% of a phone viewport for the whole scroll */
+  .site-head{position:static}
+  .site-head .wrap{height:auto;padding-block:6px;flex-wrap:wrap;gap:0}
+  .brand{padding-block:13px}
+
+  .nav{flex:1 1 100%;flex-wrap:wrap;column-gap:22px;row-gap:0;
+       border-top:1px solid var(--rule)}
+  .nav a{padding-block:15px}
+  .nav a.is-cta{padding:15px 14px}
+
+  .foot-links{column-gap:24px;row-gap:0}
+  .foot-links a{padding-block:15px}
+
+  .mailto{padding-block:12px}
+
+  /* the header no longer overlaps anchor targets */
+  section[id]{scroll-margin-top:16px}
+}
+
+/* ============================================================
+   MOTION: the drift-in
+
+   Copy settles into place rather than snapping: it arrives from
+   slightly below, slightly out of focus, and comes to rest. One
+   pass on load, staggered, so the page reads as it assembles.
+
+   FAIL-OPEN CONTRACT. This is a load-time animation, NOT a
+   scroll-driven one, and that is deliberate:
+     - no requestAnimationFrame, no IntersectionObserver, no JS
+     - nothing waits for a scroll position, so a full-page
+       screenshot after load captures every word
+     - the resting state IS the normal computed style, so if the
+       animation never runs the page is simply fully visible
+   Never convert this to a scroll reveal without keeping those
+   three properties. Copy must never be gated behind motion.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  .hero-rule,.hero h1,.hero .deck,.hero .actions,
+  .careers-hero h1,.careers-hero .deck,
+  .rail,.field > .h-l,.stat,.cap-row,.mv > div,.person,
+  .careers-cta h3,.careers-cta .deck,.careers-cta .actions,.careers-cta .mailto,
+  .prose > *,.grid-people,.site-foot .foot-grid,.site-foot .colophon{
+    animation:drift-in .95s cubic-bezier(.22,.68,.24,1) both;
+  }
+  @keyframes drift-in{
+    from{opacity:0;transform:translateY(15px);filter:blur(9px)}
+    55% {filter:blur(0)}
+    to  {opacity:1;transform:none;filter:none}
+  }
+
+  /* stagger, so it arrives as a wave rather than all at once */
+  .hero-rule{animation-delay:.02s}
+  .hero h1,.careers-hero h1{animation-delay:.10s}
+  .hero .deck,.careers-hero .deck{animation-delay:.26s}
+  .hero .actions{animation-delay:.38s}
+
+  .stats .stat:nth-child(1){animation-delay:.06s}
+  .stats .stat:nth-child(2){animation-delay:.14s}
+  .stats .stat:nth-child(3){animation-delay:.22s}
+
+  .caps .cap-row:nth-child(1){animation-delay:.06s}
+  .caps .cap-row:nth-child(2){animation-delay:.12s}
+  .caps .cap-row:nth-child(3){animation-delay:.18s}
+  .caps .cap-row:nth-child(4){animation-delay:.24s}
+  .caps .cap-row:nth-child(5){animation-delay:.30s}
+  .caps .cap-row:nth-child(6){animation-delay:.36s}
+  .caps .cap-row:nth-child(7){animation-delay:.42s}
+
+  .mv > div:nth-child(2){animation-delay:.12s}
+  .prose > *:nth-child(2){animation-delay:.06s}
+  .prose > *:nth-child(3){animation-delay:.12s}
+  .prose > *:nth-child(4){animation-delay:.18s}
+  .prose > *:nth-child(5){animation-delay:.24s}
+  .prose > *:nth-child(6){animation-delay:.30s}
+  .prose > *:nth-child(7){animation-delay:.36s}
+}
+
+/* The repo gallery frames each prototype in a lazy-loaded iframe, so a card
+   begins its entrance the moment you scroll past it. That makes a thumbnail's
+   appearance depend on timing: caught mid-drift, the blur smears the copy and
+   punctuation reads as though it has spaces around it. A thumbnail should be
+   the finished state, so the drift is off in embed mode. The perpetual SVG
+   motion stays, because that is worth seeing in a card. */
+body.embed .hero-rule,
+body.embed .hero h1,
+body.embed .hero .deck,
+body.embed .hero .actions,
+body.embed .careers-hero h1,
+body.embed .careers-hero .deck,
+body.embed .rail,
+body.embed .field > .h-l,
+body.embed .stat,
+body.embed .cap-row,
+body.embed .mv > div,
+body.embed .person,
+body.embed .careers-cta h3,
+body.embed .careers-cta .deck,
+body.embed .careers-cta .actions,
+body.embed .careers-cta .mailto,
+body.embed .prose > *,
+body.embed .grid-people,
+body.embed .site-foot .foot-grid,
+body.embed .site-foot .colophon{animation:none}
+
+/* ---------- review-only version switcher ----------
+   Not part of the design. Fixed chrome so both directions and all three rounds
+   can be flipped through while checking a page: the left pair swaps direction
+   at the same round, the numbers swap round within the direction, and the lit
+   cell of each pair says where you are. It uses its own colours rather than
+   the theme's, deliberately: it must read as an overlay and look identical on
+   the light and the dark versions. Hidden in the gallery cards and in print.
+   Strip before launch: search for "vswitch". */
+.vswitch{
+  position:fixed;right:16px;bottom:16px;z-index:200;display:flex;max-width:calc(100vw - 32px);
+  background:#111110;border:1px solid #52524A;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.vswitch a{
+  display:flex;align-items:center;color:#C4C4B9;text-decoration:none;
+  padding:0 11px;min-height:34px;white-space:nowrap;
+  transition:background-color .12s ease,color .12s ease;
+}
+.vswitch a:hover{background:#2B2B24;color:#FFF}
+.vswitch a.is-on{background:#F4F4EE;color:#111110}
+.vswitch a:focus-visible{outline:2px solid #E86A52;outline-offset:-2px;position:relative}
+.vswitch-round{border-left:1px solid #52524A}   /* divides the two pairs */
+body.embed .vswitch{display:none}
+@media print{.vswitch{display:none}}
+@media (max-width:600px){
+  .vswitch{right:10px;bottom:10px;max-width:calc(100vw - 20px)}
+  .vswitch a{min-height:44px;padding:0 10px}   /* touch target, same rule as the site */
+  .vswitch-dir{letter-spacing:.06em}           /* buys back the width the pair costs */
+}
+
+/* ---------- print ----------
+   The proof spread, the careers spread and the colophon are inverted on
+   screen. Printed, they would come out white on white, so flip them back. */
+@media print{
+  .site-head,.skip{display:none}
+  .band-ink,.site-foot{background:#fff!important;color:#111110!important}
+  .site-foot{border-top:1px solid #111110}
+  .band-ink h1,.band-ink h2,.band-ink h3,.stat .fig,
+  .on-ink .deck,.on-ink .mailto,.site-foot svg{color:#111110!important}
+  .on-ink .label,.stat .ord,.foot-links a,.colophon span,.on-ink .folio{color:#444440!important}
+  .stats,.stat,.on-ink .rail,.colophon{border-color:#111110!important}
+  .on-ink .mailto{border-bottom-color:#111110!important}
+  .sec-grid>.rail{position:static}
+  .sec-grid>.field{border-left:0;padding-left:0}
+  .caps,.cap-row{break-inside:avoid}
+}
+
+/* The review switcher is `position:fixed` and sits over the last line of the
+   colophon at phone widths. Measured at 320 and 390 it covered "ndot.ai" and
+   "(c) 2026 NDot AI" on every page. This padding buys the footer clearance and
+   goes away with the switcher: strip it when you strip "vswitch". */
+.site-foot{padding-bottom:72px}          /* the bar occupies the bottom 50px */
+@media (max-width:600px){
+  .site-foot{padding-bottom:114px}       /* and 54px there, on a taller bar */
+}

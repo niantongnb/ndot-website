@@ -1,0 +1,436 @@
+/* ============================================================
+   NDot AI — shared base
+
+   Tokens, type scale, components, motion and the review switcher.
+   Everything here is the SAME across rounds: it is what makes the
+   rounds read as one brand. The LAYOUT layer that follows this
+   block is what differs, and it is the only thing that differs.
+
+   No map, no geography, no dot field, no gradient, no shadow.
+   Contrast ratios are computed (WCAG 2.1), not eyeballed.
+   ============================================================ */
+:root{
+  --paper:#FAFAF8;
+  --paper-2:#F1F1EC;
+  --ink:#111110;          /* 18.08:1 on paper */
+  --ink-2:#6B6B63;        /*  5.14:1 on paper */
+  --rule:#D8D8CE;
+  --plate:#C9C9C0;
+
+  --ink-field:#131310;
+  --on-ink:#F4F4EE;       /* 16.86:1 on the band */
+  --on-ink-2:#9A9A90;     /*  6.56:1 on the band */
+  --rule-ink:#6A6A63;     /*  3.38:1, clears SC 1.4.11 */
+
+  /* Editorial chrome, not a brand colour. NEVER use --accent inside an
+     inverted band: #A6231A on --ink-field is 2.55:1. Use --accent-ink. */
+  --accent:#A6231A;       /* 6.98:1 on paper */
+  --accent-ink:#E86A52;   /* 5.80:1 on the band */
+
+  --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:Archivo,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --face:var(--serif);
+
+  --pad:clamp(20px,4vw,64px);
+  --section:clamp(56px,7vw,104px);
+}
+
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--face);font-size:17px;line-height:1.62;font-weight:400;
+  font-variant-numeric:lining-nums tabular-nums;-webkit-font-smoothing:antialiased;
+}
+@media (min-width:768px){ body{font-size:19px} }
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0}
+a,.btn{transition:color .12s ease,background-color .12s ease,border-color .12s ease}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--on-ink);padding:12px 18px;z-index:99}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.on-ink :focus-visible,.band-ink :focus-visible{outline-color:var(--accent-ink)}
+main:focus{outline:none}
+
+/* ---------- the system layer (mono) ---------- */
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+       text-transform:uppercase;color:var(--ink-2);line-height:18px;margin:0}
+.on-ink .label,.band-ink .label{color:var(--on-ink-2)}
+.folio{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--accent);margin:0}
+.on-ink .folio,.band-ink .folio{color:var(--accent-ink)}
+
+/* ---------- display type ---------- */
+h1,h2,h3{margin:0;font-family:var(--face);font-weight:300;text-wrap:balance}
+.h-xl{font-size:clamp(34px,1.2rem + 3.4vw,62px);line-height:1.02;letter-spacing:-.022em}
+.h-l{font-size:clamp(28px,1rem + 2.2vw,44px);line-height:1.06;letter-spacing:-.018em}
+.h-m{font-size:clamp(21px,1rem + 1vw,28px);line-height:1.18;letter-spacing:-.01em;font-weight:400}
+.deck{font-size:clamp(19px,1rem + .7vw,24px);line-height:1.44;font-weight:300;color:var(--ink-2);margin:0}
+.on-ink .deck,.band-ink .deck{color:var(--on-ink-2)}
+
+/* ---------- buttons ---------- */
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;text-decoration:none;
+     font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;
+     text-transform:uppercase;height:48px;padding:0 22px;line-height:18px;
+     border:1px solid var(--ink)}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.on-ink .btn,.band-ink .btn{border-color:var(--on-ink);color:var(--on-ink)}
+.on-ink .btn-solid,.band-ink .btn-solid{background:var(--on-ink);color:var(--ink-field)}
+.on-ink .btn-solid:hover,.band-ink .btn-solid:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--ink-field)}
+.on-ink .btn-ghost:hover,.band-ink .btn-ghost:hover{background:var(--on-ink);color:var(--ink-field)}
+
+.band-ink{background:var(--ink-field);color:var(--on-ink)}
+.band-ink h1,.band-ink h2,.band-ink h3{color:var(--on-ink)}
+
+/* ---------- record components ----------
+   The internals are shared; each layout supplies its own container grid. */
+.stat .ord{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;
+           color:var(--accent);display:block;margin-bottom:12px}
+.on-ink .stat .ord,.band-ink .stat .ord{color:var(--accent-ink)}
+.stat .fig{font-size:clamp(30px,1rem + 2.6vw,50px);font-weight:300;letter-spacing:-.02em;
+           line-height:1;text-wrap:balance;color:inherit}
+.stat .label{display:block;margin-top:auto;padding-top:18px}
+
+.cap-num{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.06em}
+.on-ink .cap-num,.band-ink .cap-num{color:var(--accent-ink)}
+.cap-name{font-size:clamp(20px,1rem + .9vw,28px);font-weight:400;letter-spacing:-.012em;line-height:1.2}
+
+/* The photo slot is a PRE-PRESS PLATE: the frame is set, the image is not
+   placed yet. Crop marks read as a stage in production, not a broken image. */
+.plate{position:relative;aspect-ratio:4/5;background:var(--paper-2);
+       border:1px solid var(--rule);display:grid;place-items:center}
+.plate .num{font-size:clamp(38px,6vw,60px);font-weight:300;color:var(--plate);letter-spacing:.02em;line-height:1}
+.plate i{position:absolute;width:11px;height:11px;--cm:#8F8F86}
+.plate .tl{top:8px;left:8px;border-top:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .tr{top:8px;right:8px;border-top:1px solid var(--cm);border-right:1px solid var(--cm)}
+.plate .bl{bottom:8px;left:8px;border-bottom:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .br{bottom:8px;right:8px;border-bottom:1px solid var(--cm);border-right:1px solid var(--cm)}
+.person .name{margin-top:18px;font-size:20px;font-weight:400;letter-spacing:-.01em;line-height:1.2}
+.person .role{margin-top:6px;font-family:var(--mono);font-size:11px;font-weight:500;
+              letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.on-ink .person .role,.band-ink .person .role{color:var(--accent-ink)}
+.person .bio{margin-top:12px;font-size:15px;line-height:1.55;color:var(--ink-2)}
+.on-ink .person .bio,.band-ink .person .bio{color:var(--on-ink-2)}
+.person .name,.person .role,.person .bio,.mailto{overflow-wrap:break-word}
+
+.mailto{display:inline-block;font-weight:400;letter-spacing:-.012em;text-decoration:none;
+        font-size:clamp(21px,1rem + 1vw,30px);border-bottom:1px solid currentColor;padding-bottom:6px}
+.on-ink .mailto,.band-ink .mailto{color:var(--on-ink);border-bottom-color:var(--rule-ink)}
+.on-ink .mailto:hover,.band-ink .mailto:hover{border-bottom-color:var(--accent-ink);color:var(--accent-ink)}
+
+/* ---------- careers prose ---------- */
+.prose p{color:var(--ink-2);line-height:1.68}
+.on-ink .prose p,.band-ink .prose p{color:var(--on-ink-2)}
+.pull{font-size:clamp(25px,1rem + 1.9vw,40px);font-weight:300;line-height:1.16;
+      color:var(--ink)!important;letter-spacing:-.014em}
+.on-ink .pull,.band-ink .pull{color:var(--on-ink)!important}
+.contact-block .mailto{color:var(--ink);border-bottom-color:var(--ink-2);margin-top:12px}
+.contact-block .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- colophon / footer ---------- */
+.site-foot{background:var(--ink-field);color:var(--on-ink);border-top:1px solid var(--rule-ink);
+           padding-block:48px}
+.site-foot .wrap{max-width:1312px;margin-inline:auto;padding-inline:var(--pad)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between;align-items:flex-start}
+.site-foot svg{height:19px;width:auto;color:var(--on-ink)}
+.foot-links{display:flex;flex-wrap:wrap;gap:12px 26px}
+.foot-links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+              color:var(--on-ink-2);text-decoration:none}
+.foot-links a:hover{color:var(--on-ink)}
+.colophon{margin-top:36px;padding-top:18px;border-top:1px solid var(--rule-ink);
+          display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
+.colophon span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--on-ink-2)}
+
+/* ============================================================
+   MOTION: the drift-in
+
+   FAIL-OPEN CONTRACT. A load-time animation, never a scroll-driven
+   one: no requestAnimationFrame, no IntersectionObserver, no JS.
+   Every keyframe starts AND ends at the resting state, so if the
+   animation never runs the copy is simply there. Killed under
+   prefers-reduced-motion and in the gallery cards.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  .h-xl,.deck,.actions,.stat,.cap-row,.mv > div,.person,
+  .prose > *,.sec-head,.grid-people,.site-foot .foot-grid,.site-foot .colophon{
+    animation:drift-in .95s cubic-bezier(.22,.68,.24,1) both;
+  }
+  @keyframes drift-in{
+    from{opacity:0;transform:translateY(15px);filter:blur(9px)}
+    55% {filter:blur(0)}
+    to  {opacity:1;transform:none;filter:none}
+  }
+}
+/* Cards are framed and lazy-loaded, so a card caught mid-drift smears its
+   punctuation. In the gallery every element is pinned to its finished state. */
+body.embed .h-xl,body.embed .deck,body.embed .actions,body.embed .stat,
+body.embed .cap-row,body.embed .mv > div,body.embed .person,body.embed .prose > *,
+body.embed .sec-head,body.embed .grid-people,body.embed .site-foot .foot-grid,
+body.embed .site-foot .colophon{animation:none}
+
+/* ============================================================
+   REVIEW-ONLY VERSION SWITCHER
+
+   Not part of the design. Two pairs: direction and round; the lit
+   cell of each pair is where you are. Its own colours rather than
+   the theme's so it looks identical on the light and dark rounds.
+   Hidden in the gallery cards and in print. Strip before launch:
+   search for "vswitch".
+   ============================================================ */
+.vswitch{position:fixed;right:16px;bottom:16px;z-index:200;display:flex;max-width:calc(100vw - 32px);
+  background:#111110;border:1px solid #52524A;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase}
+.vswitch a{display:flex;align-items:center;color:#C4C4B9;text-decoration:none;
+  padding:0 11px;min-height:34px;white-space:nowrap;
+  transition:background-color .12s ease,color .12s ease}
+.vswitch a:hover{background:#2B2B24;color:#FFF}
+.vswitch a.is-on{background:#F4F4EE;color:#111110}
+.vswitch a:focus-visible{outline:2px solid #E86A52;outline-offset:-2px;position:relative}
+.vswitch-round{border-left:1px solid #52524A}
+body.embed .vswitch{display:none}
+@media print{.vswitch{display:none}}
+@media (max-width:600px){
+  .vswitch{right:10px;bottom:10px;max-width:calc(100vw - 20px)}
+  .vswitch a{min-height:44px;padding:0 10px}
+  .vswitch-dir{letter-spacing:.06em}
+}
+
+/* ---------- mobile floor ----------
+   Measured on a touch context, not eyeballed: 44px targets, the mark never
+   squeezed out of the header, and mono labels never scaled down. */
+.brand{flex:0 0 auto}
+@media (max-width:600px){
+  .brand{padding-block:14px}      /* the wordmark link is 17-20px of glyph on its own */
+  .nav a{padding-block:15px}
+  .nav a.is-cta{padding:15px 14px}  /* the CTA's own padding outranks .nav a */
+  .foot-links a{padding-block:15px}
+  /* the address is a link, so it needs a 44px target. Padding-top is
+     invisible (the underline hangs off padding-bottom) and buys the height. */
+  .mailto{padding-block:12px}
+  section[id]{scroll-margin-top:18px}
+}
+
+/* The review switcher is `position:fixed` and sits over the last line of the
+   colophon at phone widths. Measured at 320 and 390 it covered "ndot.ai" and
+   "(c) 2026 NDot AI" on every page. This padding buys the footer clearance and
+   goes away with the switcher: strip it when you strip "vswitch". */
+.site-foot{padding-bottom:72px}          /* the bar occupies the bottom 50px */
+@media (max-width:600px){
+  .site-foot{padding-bottom:114px}       /* and 54px there, on a taller bar */
+}
+
+/* ============================================================
+   LAYOUT: PANELS  (Systems, round 3)
+
+   One screen at a time. Against the other systems rounds the
+   change is structural:
+
+     R1  stacked sections, sticky rail per section, one column
+     R2  fixed split, a pinned pane and a streaming pane
+     R3  every section is its own full-viewport panel, composed
+         to fill it, and the page advances a screen at a time.
+         There is no continuous column of text anywhere: each
+         panel is a self-contained plate with its own geometry.
+
+   Scroll snapping is PROXIMITY, never mandatory, and it is off
+   below 900px wide or 680px tall. Mandatory snapping traps any
+   panel taller than the viewport, and a phone is exactly where
+   that happens. Panels use min-height, so a panel that needs
+   more room simply takes it and the snap lets go.
+   ============================================================ */
+:root{
+  --face:var(--sans);
+  --paper:#0C0C0A;
+  --paper-2:#19191600;
+  --ink:#F4F4EE;          /* 17.6:1 on the ground */
+  --ink-2:#A3A399;        /*  7.9:1 on the ground */
+  --rule:#45453E;         /*  3.0:1, clears SC 1.4.11 */
+  --plate:#45453E;
+
+  --ink-field:#050504;
+  --on-ink:#F4F4EE;
+  --on-ink-2:#9A9A90;
+  --rule-ink:#45453E;
+
+  --accent:#FF6A52;       /* 7.6:1 on the ground */
+  --accent-ink:#FF6A52;
+
+  --bar:56px;
+}
+body{font-size:16px;line-height:1.55}
+@media (min-width:768px){ body{font-size:17px} }
+h1,h2,h3{font-weight:500;letter-spacing:-.024em}
+.h-xl{font-size:clamp(30px,1rem + 2.6vw,50px);line-height:1.06;letter-spacing:-.03em}
+.h-l{font-size:clamp(26px,1rem + 1.8vw,38px);line-height:1.1}
+.h-m{font-size:clamp(19px,1rem + .7vw,25px);line-height:1.24;font-weight:500}
+.deck{font-weight:400;font-size:clamp(16px,1rem + .4vw,19px);line-height:1.5}
+
+/* ---------- the snap track ----------
+   Proximity, and only where a full-viewport panel is a reasonable unit.
+   Never mandatory: mandatory snapping strands any panel taller than the
+   screen, which is precisely what happens on a phone. */
+@media (min-width:900px) and (min-height:680px){
+  html{scroll-snap-type:y proximity}
+  .panel-full{scroll-snap-align:start;min-height:100dvh}
+}
+.panel-full{
+  display:grid;align-content:center;position:relative;
+  padding:calc(var(--bar) + clamp(34px,5vw,64px)) var(--pad) clamp(40px,6vw,72px);
+  border-bottom:1px solid var(--rule);
+}
+@media (min-width:1100px){ .panel-full{padding-left:calc(var(--pad) + 76px)} }
+.plate-inner{max-width:1240px;margin-inline:auto;width:100%}
+
+/* the panel's own folio, set large in the corner: on a page with no
+   continuous column, the number is how you know where you are */
+.panel-full > .stamp{
+  position:absolute;top:calc(var(--bar) + clamp(16px,2.4vw,26px));right:var(--pad);
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-2);margin:0;
+}
+.panel-full > .stamp b{color:var(--accent);font-weight:500}
+
+/* ---------- fixed chrome ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:60;
+        background:var(--paper);border-bottom:1px solid var(--rule);
+        display:flex;align-items:center;justify-content:space-between;
+        gap:16px;padding-inline:var(--pad)}
+.topbar .brand svg{height:17px;width:auto;color:var(--ink)}
+.nav{display:flex;align-items:center;gap:clamp(13px,2.2vw,28px)}
+.nav a{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;
+       text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a.is-cta{color:var(--paper);background:var(--ink);padding:8px 13px}
+.nav a.is-cta:hover{background:var(--accent)}
+
+/* the tick rail: six marks down the left edge, one per panel */
+.ticks{position:fixed;left:0;top:var(--bar);bottom:0;width:76px;z-index:55;
+       display:none;flex-direction:column;justify-content:center;gap:2px;
+       border-right:1px solid var(--rule);background:var(--paper)}
+@media (min-width:1100px){ .ticks{display:flex} }
+.ticks a{display:flex;align-items:center;gap:9px;padding:9px 0 9px 18px;text-decoration:none;
+         font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.1em;color:var(--ink-2)}
+.ticks a::after{content:"";width:14px;height:1px;background:var(--rule)}
+.ticks a:hover{color:var(--ink)}
+.ticks a:hover::after{background:var(--accent);width:22px}
+
+/* ---------- opening panel ---------- */
+.opening h1{max-width:20ch}
+.opening .deck{margin-top:clamp(20px,2.6vw,30px);max-width:56ch;color:var(--ink-2)}
+.opening .rule-t{height:2px;background:var(--accent);width:76px;margin-bottom:clamp(24px,3vw,34px)}
+
+/* ---------- proof: three figures across the plate ---------- */
+.stats{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:820px){ .stats{grid-template-columns:repeat(3,1fr)} }
+.stat{background:var(--paper);display:flex;flex-direction:column;
+      padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,30px);min-height:clamp(170px,22vh,240px)}
+.stat .fig{font-size:clamp(27px,1rem + 2vw,42px);font-weight:500;letter-spacing:-.028em}
+
+/* ---------- the shift ---------- */
+.figure-pair{display:grid;gap:clamp(18px,2.4vw,30px);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:900px){ .figure-pair{grid-template-columns:1fr 1fr} }
+.panel{border:1px solid var(--rule);padding:clamp(18px,2.4vw,28px)}
+.panel svg{width:100%;height:auto;color:var(--ink)}
+.panel .cap{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule)}
+
+/* ---------- capabilities, a plate of cells ---------- */
+.caps{list-style:none;margin:clamp(24px,3vw,36px) 0 0;padding:0;
+      display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+      grid-template-columns:repeat(2,1fr)}
+@media (min-width:760px){ .caps{grid-template-columns:repeat(4,1fr)} }
+.cap-row{background:var(--paper);display:flex;flex-direction:column;gap:12px;
+         padding:clamp(16px,2vw,24px);min-height:clamp(120px,15vh,168px)}
+.cap-row .mark{width:26px;height:26px;color:var(--accent)}
+.cap-name{font-size:clamp(15px,1rem + .2vw,17.5px);font-weight:500;letter-spacing:-.012em;margin-top:auto}
+/* the eighth cell completes the grid with the mark rather than filler copy */
+.cap-fill{background:var(--ink);display:grid;place-items:center;padding:clamp(16px,2vw,24px)}
+.cap-fill svg{width:clamp(56px,7vw,84px);height:auto;color:var(--paper)}
+@media (max-width:759px){ .cap-fill{display:none} }
+
+/* ---------- company ---------- */
+.mv{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:860px){ .mv{grid-template-columns:1fr 1fr} }
+.mv > div{background:var(--paper);padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,32px)}
+.mv .h-m{margin-top:14px}
+.mv .body{margin-top:14px;color:var(--ink-2);font-size:15px;line-height:1.6}
+
+/* ---------- team ---------- */
+.grid-people{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr);
+             margin-top:clamp(24px,3vw,36px)}
+@media (min-width:640px){ .grid-people{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:1000px){ .grid-people{grid-template-columns:repeat(6,1fr)} }
+.grid-people .plate{background:#171714;border-color:var(--rule)}
+.grid-people .plate i{--cm:#57574F}
+.grid-people .plate .num{font-size:clamp(22px,2.6vw,30px)}
+.grid-people .name{font-size:15.5px;font-weight:500;margin-top:12px}
+.grid-people .role{color:var(--accent)}
+.grid-people .bio{font-size:13px;line-height:1.5}
+
+/* ---------- the close ---------- */
+.closing{text-align:center}
+.closing h3{max-width:18ch;margin-inline:auto}
+.closing .deck{margin-top:clamp(20px,2.6vw,28px);max-width:42ch;margin-inline:auto;color:var(--ink-2)}
+.closing .actions{justify-content:center}
+.closing .mailto{margin-top:clamp(26px,3.4vw,38px);color:var(--ink);border-bottom-color:var(--rule)}
+.closing .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- careers page ----------
+   Two panels: the ask, then the article. The article panel does NOT snap
+   and is not viewport-locked, because a wall of prose held to one screen
+   is unreadable. This is the one place the layout deliberately lets go. */
+.panel-open{min-height:auto}
+.article{padding:calc(var(--bar) + clamp(30px,4vw,52px)) var(--pad) clamp(44px,6vw,76px)}
+@media (min-width:1100px){ .article{padding-left:calc(var(--pad) + 76px)} }
+.article .plate-inner{max-width:900px;margin-inline:0}
+.prose{display:grid;gap:clamp(17px,2vw,24px);max-width:68ch;margin-top:clamp(26px,3.4vw,40px)}
+.pull{margin-block:clamp(12px,1.6vw,18px);padding-block:clamp(19px,2.4vw,27px);
+      border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+      font-weight:500;font-size:clamp(22px,1rem + 1.2vw,30px);letter-spacing:-.022em;max-width:22ch}
+.contact-block{margin-top:clamp(28px,3.4vw,40px);padding:clamp(22px,2.6vw,30px);
+               border:1px solid var(--rule)}
+.contact-block .mailto{color:var(--ink);border-bottom-color:var(--rule)}
+.contact-block .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- gallery card: the opening panel, unsnapped ---------- */
+body.embed{--bar:34px}
+body.embed html,body.embed{scroll-snap-type:none}
+body.embed .ticks{display:none}
+body.embed .panel-full{min-height:0;padding:calc(var(--bar) + 16px) 16px 18px;scroll-snap-align:none}
+body.embed .topbar{position:static;height:34px;padding-inline:16px}
+body.embed .topbar .brand svg{height:13px}
+body.embed .nav{display:none}
+body.embed .panel-full > .stamp{top:12px;right:16px;font-size:9px}
+body.embed .opening .rule-t{width:52px;margin-bottom:14px}
+body.embed .h-xl{font-size:17px;line-height:1.14;max-width:26ch}
+body.embed .opening .deck{font-size:10.5px;line-height:1.46;margin-top:11px;max-width:50ch}
+body.embed .opening .actions{margin-top:13px}
+body.embed .btn{font-size:9px;padding:7px 11px}
+
+@media (max-width:600px){
+  .nav a{padding-block:15px}
+  /* this layer redefines .nav a.is-cta after the base, at equal specificity,
+     so the base's mobile tap-target rule loses. Restate it here. */
+  .nav a.is-cta{padding:15px 14px}
+  .topbar{height:auto;position:static;flex-wrap:wrap;padding-block:6px}
+  .panel-full{padding-top:clamp(30px,7vw,44px)}
+  .panel-full > .stamp{top:clamp(10px,3vw,16px)}
+  :root{--bar:0px}
+}
+
+@media print{
+  :root{--paper:#fff;--ink:#000;--ink-2:#444;--rule:#bbb;--accent:#000}
+  html{scroll-snap-type:none}
+  .panel-full{min-height:auto;padding-block:24px;break-inside:avoid}
+  .topbar,.ticks{position:static;display:none}
+  .cap-fill{display:none}
+  .site-foot{background:#fff!important;color:#000!important}
+  .site-foot a,.colophon span{color:#000!important}
+}

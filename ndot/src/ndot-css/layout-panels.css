@@ -1,0 +1,208 @@
+
+/* ============================================================
+   LAYOUT: PANELS  (Systems, round 3)
+
+   One screen at a time. Against the other systems rounds the
+   change is structural:
+
+     R1  stacked sections, sticky rail per section, one column
+     R2  fixed split, a pinned pane and a streaming pane
+     R3  every section is its own full-viewport panel, composed
+         to fill it, and the page advances a screen at a time.
+         There is no continuous column of text anywhere: each
+         panel is a self-contained plate with its own geometry.
+
+   Scroll snapping is PROXIMITY, never mandatory, and it is off
+   below 900px wide or 680px tall. Mandatory snapping traps any
+   panel taller than the viewport, and a phone is exactly where
+   that happens. Panels use min-height, so a panel that needs
+   more room simply takes it and the snap lets go.
+   ============================================================ */
+:root{
+  --face:var(--sans);
+  --paper:#0C0C0A;
+  --paper-2:#19191600;
+  --ink:#F4F4EE;          /* 17.6:1 on the ground */
+  --ink-2:#A3A399;        /*  7.9:1 on the ground */
+  --rule:#45453E;         /*  3.0:1, clears SC 1.4.11 */
+  --plate:#45453E;
+
+  --ink-field:#050504;
+  --on-ink:#F4F4EE;
+  --on-ink-2:#9A9A90;
+  --rule-ink:#45453E;
+
+  --accent:#FF6A52;       /* 7.6:1 on the ground */
+  --accent-ink:#FF6A52;
+
+  --bar:56px;
+}
+body{font-size:16px;line-height:1.55}
+@media (min-width:768px){ body{font-size:17px} }
+h1,h2,h3{font-weight:500;letter-spacing:-.024em}
+.h-xl{font-size:clamp(30px,1rem + 2.6vw,50px);line-height:1.06;letter-spacing:-.03em}
+.h-l{font-size:clamp(26px,1rem + 1.8vw,38px);line-height:1.1}
+.h-m{font-size:clamp(19px,1rem + .7vw,25px);line-height:1.24;font-weight:500}
+.deck{font-weight:400;font-size:clamp(16px,1rem + .4vw,19px);line-height:1.5}
+
+/* ---------- the snap track ----------
+   Proximity, and only where a full-viewport panel is a reasonable unit.
+   Never mandatory: mandatory snapping strands any panel taller than the
+   screen, which is precisely what happens on a phone. */
+@media (min-width:900px) and (min-height:680px){
+  html{scroll-snap-type:y proximity}
+  .panel-full{scroll-snap-align:start;min-height:100dvh}
+}
+.panel-full{
+  display:grid;align-content:center;position:relative;
+  padding:calc(var(--bar) + clamp(34px,5vw,64px)) var(--pad) clamp(40px,6vw,72px);
+  border-bottom:1px solid var(--rule);
+}
+@media (min-width:1100px){ .panel-full{padding-left:calc(var(--pad) + 76px)} }
+.plate-inner{max-width:1240px;margin-inline:auto;width:100%}
+
+/* the panel's own folio, set large in the corner: on a page with no
+   continuous column, the number is how you know where you are */
+.panel-full > .stamp{
+  position:absolute;top:calc(var(--bar) + clamp(16px,2.4vw,26px));right:var(--pad);
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-2);margin:0;
+}
+.panel-full > .stamp b{color:var(--accent);font-weight:500}
+
+/* ---------- fixed chrome ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:60;
+        background:var(--paper);border-bottom:1px solid var(--rule);
+        display:flex;align-items:center;justify-content:space-between;
+        gap:16px;padding-inline:var(--pad)}
+.topbar .brand svg{height:17px;width:auto;color:var(--ink)}
+.nav{display:flex;align-items:center;gap:clamp(13px,2.2vw,28px)}
+.nav a{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;
+       text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a.is-cta{color:var(--paper);background:var(--ink);padding:8px 13px}
+.nav a.is-cta:hover{background:var(--accent)}
+
+/* the tick rail: six marks down the left edge, one per panel */
+.ticks{position:fixed;left:0;top:var(--bar);bottom:0;width:76px;z-index:55;
+       display:none;flex-direction:column;justify-content:center;gap:2px;
+       border-right:1px solid var(--rule);background:var(--paper)}
+@media (min-width:1100px){ .ticks{display:flex} }
+.ticks a{display:flex;align-items:center;gap:9px;padding:9px 0 9px 18px;text-decoration:none;
+         font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.1em;color:var(--ink-2)}
+.ticks a::after{content:"";width:14px;height:1px;background:var(--rule)}
+.ticks a:hover{color:var(--ink)}
+.ticks a:hover::after{background:var(--accent);width:22px}
+
+/* ---------- opening panel ---------- */
+.opening h1{max-width:20ch}
+.opening .deck{margin-top:clamp(20px,2.6vw,30px);max-width:56ch;color:var(--ink-2)}
+.opening .rule-t{height:2px;background:var(--accent);width:76px;margin-bottom:clamp(24px,3vw,34px)}
+
+/* ---------- proof: three figures across the plate ---------- */
+.stats{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:820px){ .stats{grid-template-columns:repeat(3,1fr)} }
+.stat{background:var(--paper);display:flex;flex-direction:column;
+      padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,30px);min-height:clamp(170px,22vh,240px)}
+.stat .fig{font-size:clamp(27px,1rem + 2vw,42px);font-weight:500;letter-spacing:-.028em}
+
+/* ---------- the shift ---------- */
+.figure-pair{display:grid;gap:clamp(18px,2.4vw,30px);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:900px){ .figure-pair{grid-template-columns:1fr 1fr} }
+.panel{border:1px solid var(--rule);padding:clamp(18px,2.4vw,28px)}
+.panel svg{width:100%;height:auto;color:var(--ink)}
+.panel .cap{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule)}
+
+/* ---------- capabilities, a plate of cells ---------- */
+.caps{list-style:none;margin:clamp(24px,3vw,36px) 0 0;padding:0;
+      display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+      grid-template-columns:repeat(2,1fr)}
+@media (min-width:760px){ .caps{grid-template-columns:repeat(4,1fr)} }
+.cap-row{background:var(--paper);display:flex;flex-direction:column;gap:12px;
+         padding:clamp(16px,2vw,24px);min-height:clamp(120px,15vh,168px)}
+.cap-row .mark{width:26px;height:26px;color:var(--accent)}
+.cap-name{font-size:clamp(15px,1rem + .2vw,17.5px);font-weight:500;letter-spacing:-.012em;margin-top:auto}
+/* the eighth cell completes the grid with the mark rather than filler copy */
+.cap-fill{background:var(--ink);display:grid;place-items:center;padding:clamp(16px,2vw,24px)}
+.cap-fill svg{width:clamp(56px,7vw,84px);height:auto;color:var(--paper)}
+@media (max-width:759px){ .cap-fill{display:none} }
+
+/* ---------- company ---------- */
+.mv{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:clamp(24px,3vw,36px)}
+@media (min-width:860px){ .mv{grid-template-columns:1fr 1fr} }
+.mv > div{background:var(--paper);padding:clamp(24px,3.2vw,40px) clamp(20px,2.4vw,32px)}
+.mv .h-m{margin-top:14px}
+.mv .body{margin-top:14px;color:var(--ink-2);font-size:15px;line-height:1.6}
+
+/* ---------- team ---------- */
+.grid-people{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr);
+             margin-top:clamp(24px,3vw,36px)}
+@media (min-width:640px){ .grid-people{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:1000px){ .grid-people{grid-template-columns:repeat(6,1fr)} }
+.grid-people .plate{background:#171714;border-color:var(--rule)}
+.grid-people .plate i{--cm:#57574F}
+.grid-people .plate .num{font-size:clamp(22px,2.6vw,30px)}
+.grid-people .name{font-size:15.5px;font-weight:500;margin-top:12px}
+.grid-people .role{color:var(--accent)}
+.grid-people .bio{font-size:13px;line-height:1.5}
+
+/* ---------- the close ---------- */
+.closing{text-align:center}
+.closing h3{max-width:18ch;margin-inline:auto}
+.closing .deck{margin-top:clamp(20px,2.6vw,28px);max-width:42ch;margin-inline:auto;color:var(--ink-2)}
+.closing .actions{justify-content:center}
+.closing .mailto{margin-top:clamp(26px,3.4vw,38px);color:var(--ink);border-bottom-color:var(--rule)}
+.closing .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- careers page ----------
+   Two panels: the ask, then the article. The article panel does NOT snap
+   and is not viewport-locked, because a wall of prose held to one screen
+   is unreadable. This is the one place the layout deliberately lets go. */
+.panel-open{min-height:auto}
+.article{padding:calc(var(--bar) + clamp(30px,4vw,52px)) var(--pad) clamp(44px,6vw,76px)}
+@media (min-width:1100px){ .article{padding-left:calc(var(--pad) + 76px)} }
+.article .plate-inner{max-width:900px;margin-inline:0}
+.prose{display:grid;gap:clamp(17px,2vw,24px);max-width:68ch;margin-top:clamp(26px,3.4vw,40px)}
+.pull{margin-block:clamp(12px,1.6vw,18px);padding-block:clamp(19px,2.4vw,27px);
+      border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+      font-weight:500;font-size:clamp(22px,1rem + 1.2vw,30px);letter-spacing:-.022em;max-width:22ch}
+.contact-block{margin-top:clamp(28px,3.4vw,40px);padding:clamp(22px,2.6vw,30px);
+               border:1px solid var(--rule)}
+.contact-block .mailto{color:var(--ink);border-bottom-color:var(--rule)}
+.contact-block .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- gallery card: the opening panel, unsnapped ---------- */
+body.embed{--bar:34px}
+body.embed html,body.embed{scroll-snap-type:none}
+body.embed .ticks{display:none}
+body.embed .panel-full{min-height:0;padding:calc(var(--bar) + 16px) 16px 18px;scroll-snap-align:none}
+body.embed .topbar{position:static;height:34px;padding-inline:16px}
+body.embed .topbar .brand svg{height:13px}
+body.embed .nav{display:none}
+body.embed .panel-full > .stamp{top:12px;right:16px;font-size:9px}
+body.embed .opening .rule-t{width:52px;margin-bottom:14px}
+body.embed .h-xl{font-size:17px;line-height:1.14;max-width:26ch}
+body.embed .opening .deck{font-size:10.5px;line-height:1.46;margin-top:11px;max-width:50ch}
+body.embed .opening .actions{margin-top:13px}
+body.embed .btn{font-size:9px;padding:7px 11px}
+
+@media (max-width:600px){
+  .nav a{padding-block:15px}
+  /* this layer redefines .nav a.is-cta after the base, at equal specificity,
+     so the base's mobile tap-target rule loses. Restate it here. */
+  .nav a.is-cta{padding:15px 14px}
+  .topbar{height:auto;position:static;flex-wrap:wrap;padding-block:6px}
+  .panel-full{padding-top:clamp(30px,7vw,44px)}
+  .panel-full > .stamp{top:clamp(10px,3vw,16px)}
+  :root{--bar:0px}
+}
+
+@media print{
+  :root{--paper:#fff;--ink:#000;--ink-2:#444;--rule:#bbb;--accent:#000}
+  html{scroll-snap-type:none}
+  .panel-full{min-height:auto;padding-block:24px;break-inside:avoid}
+  .topbar,.ticks{position:static;display:none}
+  .cap-fill{display:none}
+  .site-foot{background:#fff!important;color:#000!important}
+  .site-foot a,.colophon span{color:#000!important}
+}

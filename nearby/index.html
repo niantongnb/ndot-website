@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nearby AI — four directions for one site</title>
+<meta name="description" content="Four design directions for the Nearby AI website, each built as a working self-contained page. Hover a row to preview it live.">
+<meta name="theme-color" content="#E9E9E6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="catalog.css">
+</head>
+<body>
+<a class="skip" href="#list">Skip to the directions</a>
+
+<header class="bar">
+  <h1 class="cell is-title">Nearby AI — four directions</h1>
+  <a class="cell" href="../">All prototypes</a>
+  <a class="cell" href="HANDOFF.md">Handoff notes</a>
+  <span class="cell is-mark" aria-label="Nearby AI">
+    <svg viewBox="0 0 657 862" fill="currentColor" aria-hidden="true"><rect x="441.871" width="214.712" height="858.848"/><rect y="3.11426" width="214.712" height="858.848"/><path d="M12.4482 116.692L214.5 3L643.988 743.785L441.872 860.477L12.4482 116.692Z"/></svg>
+  </span>
+</header>
+
+<main id="list" tabindex="-1">
+  <!-- Newest first, which is also status order: the picked direction,
+       the previously live homepage, then its two ancestors. Provenance
+       and editing rules are in HANDOFF.md. -->
+  <ul class="list">
+    <li><a class="row v4" href="v4/" data-peek="v4/"><span class="name">Held Still</span><span class="kind">V4 &middot; Picked</span></a></li>
+    <li><a class="row v3" href="v3/" data-peek="v3/"><span class="name">Street Atlas</span><span class="kind">V3 &middot; Previously Live</span></a></li>
+    <li><a class="row v2" href="v2/" data-peek="v2/"><span class="name">Editorial</span><span class="kind">V2 &middot; Black &amp; White</span></a></li>
+    <li><a class="row v1" href="v1/" data-peek="v1/"><span class="name">Cinematic</span><span class="kind">V1 &middot; First Take</span></a></li>
+  </ul>
+</main>
+
+<div class="peek" id="peek" aria-hidden="true"></div>
+
+<footer class="foot">
+  <span>Every version is one self-contained page — the mission and vision one-pager for the AI-native platform for local life. Held Still is Editorial with exactly one change, the hero's county map held as a static SVG; it is the direction Rebecca picked.</span>
+  <span>Nearby AI is the consumer local-life product. NDot AI is a separate company; its directions live under <a href="../ndot/">/ndot/</a>.</span>
+  <span>&copy; 2026 Nearby AI</span>
+</footer>
+
+<script>
+(function () {
+  /* Inside the gallery card the whole page is ~340px wide, so a click
+     should escape the iframe rather than navigate inside it. */
+  var embedded = window.self !== window.top;
+  if (embedded) document.body.classList.add('embed');
+
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.row'));
+  if (embedded) {
+    rows.forEach(function (r) { r.target = '_blank'; r.rel = 'noopener'; });
+    return;                       /* no cursor preview inside a 340px card */
+  }
+
+  var peek = document.getElementById('peek');
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)');
+  var still = window.matchMedia('(prefers-reduced-motion:reduce)');
+  if (!fine.matches) return;
+
+  /* One iframe per version, mounted on first hover and kept. Mounting
+     all four up front would fetch four sites nobody has asked for yet. */
+  var frames = Object.create(null);
+  function frameFor(src, title) {
+    if (frames[src]) return frames[src];
+    var f = document.createElement('iframe');
+    f.src = src;
+    f.title = title;
+    f.tabIndex = -1;
+    f.hidden = true;
+    f.setAttribute('scrolling', 'no');
+    f.setAttribute('aria-hidden', 'true');
+    frames[src] = f;
+    peek.appendChild(f);          /* mounted once and left in place — moving
+                                     an iframe in the DOM reloads it, which
+                                     would re-fetch on every row change */
+    return f;
+  }
+
+  var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, on = false;
+
+  function place() {
+    var w = peek.offsetWidth, h = peek.offsetHeight, m = 18;
+    /* Keep the card beside the pointer, but never off-screen. */
+    var x = Math.min(Math.max(tx + m, m), window.innerWidth - w - m);
+    var y = Math.min(Math.max(ty - h - m, m), window.innerHeight - h - m);
+    cx += (x - cx) * 0.22;
+    cy += (y - cy) * 0.22;
+    if (Math.abs(x - cx) < 0.5 && Math.abs(y - cy) < 0.5) { cx = x; cy = y; }
+    peek.style.transform = 'translate3d(' + Math.round(cx) + 'px,' + Math.round(cy) + 'px,0)';
+    raf = on ? requestAnimationFrame(place) : 0;
+  }
+
+  function show(row, e) {
+    var src = row.getAttribute('data-peek');
+    var f = frameFor(src, row.querySelector('.name').textContent + ' — preview');
+    Object.keys(frames).forEach(function (k) { frames[k].hidden = (k !== src); });
+    tx = e.clientX; ty = e.clientY;
+    if (!on) {                    /* first frame: land it, do not fly it in */
+      var w = peek.offsetWidth, h = peek.offsetHeight, m = 18;
+      cx = Math.min(Math.max(tx + m, m), window.innerWidth - w - m);
+      cy = Math.min(Math.max(ty - h - m, m), window.innerHeight - h - m);
+    }
+    on = true;
+    peek.classList.add('is-on');
+    if (still.matches) {
+      peek.style.transform = 'translate3d(' + Math.round(cx) + 'px,' + Math.round(cy) + 'px,0)';
+    } else if (!raf) {
+      raf = requestAnimationFrame(place);
+    }
+  }
+
+  function hide() {
+    on = false;
+    peek.classList.remove('is-on');
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') show(row, e); });
+    row.addEventListener('pointermove',  function (e) { if (on) { tx = e.clientX; ty = e.clientY; } });
+    row.addEventListener('pointerleave', hide);
+  });
+  window.addEventListener('blur', hide);
+  document.addEventListener('scroll', hide, { passive: true });
+})();
+</script>
+</body>
+</html>

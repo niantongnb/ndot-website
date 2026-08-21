@@ -1,47 +1,37 @@
-# NDot AI — mission / vision one-pager
+# Two sites, one repo
 
-Static prototype. No build step: each page is a single self-contained HTML file
-plus the county dataset.
+This repo hosts the design prototypes for two separate companies. The root is a
+chooser; each site has its own catalog of every direction built for it.
 
-## Versions
+| Path | Project | What |
+|---|---|---|
+| `/` | — | The chooser: one preview card per site. |
+| `/ndot/` | **NDot AI** | The catalogue: eight directions, full-bleed rows, live hover previews. See `ndot/README.md`. |
+| `/ndot/editorial/1..3/` | NDot AI | Publication — the original page plus the Broadsheet and Broadside rounds. |
+| `/ndot/systems/1..3/` | NDot AI | Schematic — the original page plus the Facing Pages and Panels rounds. |
+| `/ndot/v3-index/` `/ndot/v4-signal/` `/ndot/v5-institution/` | NDot AI | Index, Signal, Institution. |
+| `/ndot/console/` `/ndot/institutional/` `/ndot/lab/` | NDot AI | Console, Prospectus, Lab. |
+| `/ndot/explorations/publisher-deck/` | NDot AI | The 15-page pitch-deck direction. |
+| `/nearby/` | **Nearby AI** | The catalog. Consumer local-life product. See `nearby/HANDOFF.md`. |
+| `/nearby/v1..v4/` | Nearby AI | The four Nearby directions. V4 is the picked one. |
+| `/v1..v4/` | — | Redirect stubs to `/nearby/v1..v4/` for links shared before the move. |
 
-| URL | What it is |
-|---|---|
-| `/` | The current design. Mirrors `/v3/`. |
-| `/v3/` | Current: street-atlas treatment, oversized hero, county drill-down. |
-| `/v2/` | Editorial black-and-white build (from the Codex handoff), with this project's hero engine dropped into it. |
-| `/v1/` | The first take: dark and cinematic, typewriter hero, constellation field. |
+**NDot AI and Nearby AI are separate companies and their material must not
+mix.** NDot is a B2B growth platform for media companies: no map, no county
+data, no local-life vocabulary, ever. Nearby is the consumer local-life product
+and owns everything with a county map in it.
 
-`/` and `/v3/` are the same page. When changing the current design, update
-`index.html` and copy it to `v3/index.html`.
-
-## The hero
-
-`/v3/` renders 3,142 US county centroids (`assets/counties.json`,
-`[x, y, sqrt(land_area), "County, ST"]` in Albers USA space, 975 x 610).
-Hover names a county; clicking one reforms the dots into that county's state,
-and clicking again returns to the nation. "Signal field" is the loose, chaotic
-scatter across the whole frame.
-
-## Local
+## Run locally
 
 ```
 python3 serve.py 8899     # http://localhost:8899
 ```
 
-`serve.py` sends `no-store`, which `python3 -m http.server` does not — without
-it browsers keep serving a stale copy and edits look like they did nothing.
+Use `serve.py`, not `python3 -m http.server`. It sends `Cache-Control: no-store`;
+without it browsers hold a stale copy and edits look like they did nothing.
 
-## /v2/ — the editorial build
+## Deploy
 
-Layout, typography, sections, Lenis smooth scrolling and stacked section covers
-are from the Codex handoff package and are left as they were. Only the county
-engine was replaced, with the same one `/v3/` uses.
-
-That swap closes the open item in the handoff brief: the old `buildTown()` cloned
-each county several times and arranged the copies into a synthetic 5px rectangular
-grid. Now one dot stays one county for the whole interaction, and a clicked state
-reforms from its own real counties, each scattered inside a disc sized to that
-county's share of the state's projected area so neighbours overlap into a single
-continuous mass. `buildTown`, `selectState`, `clearFocus` and `nearestNational`
-are gone.
+GitHub Pages serves this repo root directly from `main`, with no build step, so
+anything committed here is live about a minute after pushing. Every page carries
+`noindex, nofollow` and `robots.txt` says `Disallow: /`. Unlisted, not secret.

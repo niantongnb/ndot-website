@@ -1,0 +1,498 @@
+/* ============================================================
+   NDot AI — v4 "SIGNAL" — design tokens
+
+   Direction: the site is a LAB INSTRUMENT. Warm near-black
+   ground, one amber accent, and every single word set in
+   monospace — caps for chrome and headings, sentence case for
+   anything longer than a line. No serif, no grotesk, no white
+   page. Structure is drawn with hairlines, corner ticks and
+   dotted rules; the only "image" on the site is a field of
+   drifting dots rendered in a 2D canvas behind the hero.
+
+   Why dots: the NDot mark is literally built from dots — an O
+   ring, a full stop, a diagonal of rectangles. The hero lattice
+   is that mark dissolved into a signal field. It brightens
+   under the cursor and settles. It is decorative only: the H1
+   is real DOM text sitting above it and reads fine with JS off,
+   with canvas unsupported, or with motion reduced.
+
+   Deliberately unlike its siblings: v1 is a printed publication
+   (Newsreader serif, near-white stock, printer's red); v2 is a
+   systems drawing (Archivo grotesk, same near-white stock).
+   v4 shares no colour, no family and no structural idea with
+   either. Buttons are the only rounded thing on the page.
+
+   CONTRAST — computed (WCAG 2.1 relative luminance), not
+   eyeballed. Amber on near-black is the risk in a scheme like
+   this, so every pair used for text is stated:
+
+     --fg      #F5F1E8 on --ink  17.56:1   headings
+     --fg-2    #D6D2CA on --ink  13.13:1   body, decks, prose
+     --fg-3    #9A9384 on --ink   6.48:1   labels, captions, nav
+     --amber   #E8952E on --ink   8.26:1   figures, section nos
+     --amber-2 #F5A623 on --ink   9.76:1   hover, focus ring
+     --ink     #0B0A08 on --amber 8.26:1   text inside amber pill
+     --ink     #0B0A08 on --amber-2 9.76:1 pill hover
+     --fg-2    #D6D2CA on --panel 12.61:1  body inside consoles
+     --fg-3    #9A9384 on --panel  6.23:1  labels inside consoles
+     --amber   #E8952E on --panel  7.94:1  figures inside consoles
+     --rule-2  #6A6254 on --ink    3.29:1  borders that carry
+                                           meaning (SC 1.4.11)
+     --rule-2  #6A6254 on --panel  3.16:1  the ghosted plate
+                                           ordinal — large text,
+                                           clears the 3:1 floor
+     --rule    #262119 on --ink    1.24:1  DECORATIVE hairline
+                                           only — never a glyph,
+                                           never a control edge.
+
+   The hero lattice is the one non-token colour a word ever sits
+   on: its dots are --amber-2 at alpha, so their alpha IS a
+   background. Capped at 0.42 in the canvas script (#765115 —
+   --fg 6.30:1, --fg-2 4.71:1); the pointer halo reads through
+   the radius swell, never past that ceiling.
+
+   Rule of the house: long body copy is NEVER set in amber and
+   NEVER set in caps. Amber is for figures, ordinals, glyphs,
+   one pill and the particles.
+   ============================================================ */
+:root{
+  --ink:#0B0A08;          /* page ground — brown-black, not blue-black       */
+  --panel:#12100C;        /* lifted surface: consoles, plates, readouts      */
+  --panel-2:#191610;      /* hovered rows                                    */
+
+  --fg:#F5F1E8;           /* warm white — headings          17.56:1          */
+  --fg-2:#D6D2CA;         /* warm light grey — body         13.13:1          */
+  --fg-3:#9A9384;         /* warm mid grey — labels          6.48:1          */
+
+  --amber:#E8952E;        /* the single accent               8.26:1          */
+  --amber-2:#F5A623;      /* lifted amber: hover, focus      9.76:1          */
+
+  --rule:#262119;         /* decorative hairline             1.24:1          */
+  --rule-2:#6A6254;       /* meaningful border / glyph       3.29:1          */
+
+  /* Two monospaced faces, because in an all-mono page hierarchy has to come
+     from the letterforms themselves. Azeret Mono is the display voice: wide,
+     geometric, engineered — it holds up as a readout figure. JetBrains Mono
+     is the working voice: tall x-height, unambiguous, built to be read in
+     long runs, which matters when the careers page is six mono paragraphs. */
+  --display:"Azeret Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  --pad:clamp(20px,4vw,64px);
+  --section:clamp(64px,7.5vw,116px);
+  --tick:12px;            /* arm length of every corner tick on the page     */
+}
+
+/* ---------- reset ---------- */
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+/* color-scheme is not cosmetic here: without it the UA paints scrollbars,
+   the caret and any native control in its light theme, which on a #0B0A08
+   page is a bright bar down the right edge of every screenshot. */
+html{-webkit-text-size-adjust:100%;background:var(--ink);color-scheme:dark;scrollbar-color:var(--rule-2) var(--ink)}
+::selection{background:var(--amber);color:var(--ink)}
+body{
+  margin:0;background:var(--ink);color:var(--fg-2);
+  font-family:var(--mono);font-size:15px;line-height:1.72;font-weight:400;
+  font-variant-numeric:lining-nums tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  overflow-wrap:break-word;
+}
+@media (min-width:768px){ body{font-size:16px} }
+img,svg,canvas{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0}
+ol,ul{margin:0;padding:0;list-style:none}
+
+/* Motion contract: nothing that carries words animates. The lattice is the
+   only moving thing, it is aria-hidden, and it renders a single static frame
+   under prefers-reduced-motion. No scroll-triggered reveals anywhere, so a
+   screenshot taken at any moment contains every word on the page. */
+a,.btn,.lrow,.plate{transition:color .14s ease,background-color .14s ease,border-color .14s ease,opacity .14s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- frame ---------- */
+.wrap{max-width:1280px;margin-inline:auto;padding-inline:var(--pad)}
+section[id]{scroll-margin-top:88px}
+main:focus{outline:none}
+.skip{position:absolute;left:-9999px;top:0;z-index:99;background:var(--amber);color:var(--ink);
+      padding:13px 20px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--amber-2);outline-offset:3px}
+
+/* The dotted rule is the connective tissue of the whole layout — it is the
+   lattice flattened into one dimension. Used in every section header, in
+   console title bars and in the hero footer strip. */
+.dotrule{
+  flex:1 1 auto;min-width:16px;height:3px;align-self:center;
+  background-image:radial-gradient(circle at 1.5px 1.5px,var(--rule-2) 1.05px,transparent 1.25px);
+  background-size:7px 3px;background-repeat:repeat-x;
+}
+
+/* ---------- the mono type system ----------
+   Only four text roles exist on this site. Everything else is chrome. */
+.label{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-3);line-height:1.4}
+.meta{font-size:10px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-3);white-space:nowrap}
+.body{color:var(--fg-2);font-size:15px;line-height:1.78}
+h1,h2,h3{margin:0;font-weight:400;color:var(--fg)}
+
+/* Display lines are mono caps. Mono caps are WIDE, so the size stays modest
+   and the leading stays generous — the line does the work, not the point
+   size. Tracking is small here on purpose: 0.15em tracking is right for a
+   three-word label and completely unreadable for a forty-word sentence. */
+.h-hero{
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(20px,.75rem + 1.55vw,34px);
+  line-height:1.5;letter-spacing:.005em;text-transform:uppercase;color:var(--fg);
+  max-width:30ch;
+}
+.h-page{
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(22px,.8rem + 1.8vw,38px);
+  line-height:1.42;letter-spacing:.01em;text-transform:uppercase;color:var(--fg);
+  max-width:22ch;
+}
+.h-band{
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(19px,.7rem + 1.35vw,30px);
+  line-height:1.46;letter-spacing:.01em;text-transform:uppercase;color:var(--fg);
+  max-width:24ch;
+}
+/* The deck drops to sentence case. Caps would cost about 15% reading speed
+   over a fifty-word paragraph, and the deck is the one thing a visitor
+   actually reads before deciding whether to keep going. */
+.deck{font-size:clamp(14px,.5rem + .55vw,17px);line-height:1.8;color:var(--fg-2);max-width:62ch}
+
+/* ---------- header ---------- */
+.site-head{
+  position:sticky;top:0;z-index:50;
+  background:rgba(11,10,8,.88);border-bottom:1px solid var(--rule);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
+.brand svg{height:18px;width:auto;color:var(--fg)}
+.brand:hover svg{color:var(--amber)}
+/* status LED — chrome, not the mark. The mark itself is pasted verbatim and
+   is a single currentColor shape; nothing is ever recoloured inside it. */
+.led{width:6px;height:6px;background:var(--amber);border-radius:50%;flex:0 0 auto;
+     box-shadow:0 0 0 3px rgba(232,149,46,.14)}
+@media (prefers-reduced-motion:no-preference){
+  .led{animation:led 3.6s ease-in-out infinite}
+  @keyframes led{0%,100%{opacity:1}50%{opacity:.45}}
+}
+.nav{display:flex;align-items:center;gap:clamp(14px,2.2vw,30px)}
+.nav a{font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+       color:var(--fg-3);text-decoration:none;white-space:nowrap}
+.nav a:hover{color:var(--amber)}
+.nav a.is-cta{color:var(--ink);background:var(--amber);padding:8px 15px;border-radius:999px}
+.nav a.is-cta:hover{background:var(--amber-2);color:var(--ink)}
+
+/* ---------- buttons ----------
+   The only rounded objects on the site. Straight from the reference: a solid
+   amber pill with a trailing arrow, and a hairline ghost beside it. */
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,3.6vw,40px)}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;border-radius:999px;
+  font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  padding:15px 24px;border:1px solid var(--rule-2);color:var(--fg-2);
+}
+.btn .arw{font-family:var(--mono);transform:translateY(-.5px)}
+.btn-amber{background:var(--amber);border-color:var(--amber);color:var(--ink);font-weight:600}
+.btn-amber:hover{background:var(--amber-2);border-color:var(--amber-2);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ---------- section header ----------
+   Reads like one line of an instrument's status bar: ordinal, name, a run
+   of dots to fill the channel, then a count. */
+.sec{padding-block:var(--section)}
+.sec-head{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--rule);
+          margin-bottom:clamp(30px,4vw,48px)}
+.sec-no{font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.14em;color:var(--amber);white-space:nowrap}
+.sec-name{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--fg);white-space:nowrap}
+.sec-lead{font-size:clamp(14px,.5rem + .5vw,16px);line-height:1.82;color:var(--fg-2);max-width:66ch;
+          margin-bottom:clamp(30px,4vw,44px)}
+
+/* ---------- 01 PROVEN AT SCALE — three instrument readouts ----------
+   A bordered row of panels. Ordinal, figure in amber, label in grey caps.
+   Corner ticks on every panel: the drawing convention that says "this is a
+   measured field, not a card". */
+.readouts{display:grid;gap:0;border:1px solid var(--rule-2)}
+.readout{position:relative;padding:clamp(24px,3vw,34px) clamp(20px,2.4vw,30px);
+         border-bottom:1px solid var(--rule-2);background:var(--panel)}
+.readout:last-child{border-bottom:0}
+.readout::before,.readout::after{content:"";position:absolute;width:var(--tick);height:var(--tick);pointer-events:none}
+.readout::before{top:10px;left:10px;border-top:1px solid var(--amber);border-left:1px solid var(--amber)}
+.readout::after{bottom:10px;right:10px;border-bottom:1px solid var(--amber);border-right:1px solid var(--amber)}
+.ro-no{font-family:var(--display);font-size:10px;font-weight:500;letter-spacing:.2em;color:var(--fg-3);display:block}
+.ro-fig{
+  font-family:var(--display);font-weight:400;color:var(--amber);
+  font-size:clamp(17px,.6rem + 1.1vw,25px);line-height:1.34;letter-spacing:.005em;
+  text-transform:uppercase;margin-top:20px;
+}
+.ro-label{display:block;margin-top:16px;font-size:10px;font-weight:500;letter-spacing:.18em;
+          text-transform:uppercase;color:var(--fg-3)}
+@media (min-width:820px){
+  .readouts{grid-template-columns:repeat(3,1fr)}
+  .readout{border-bottom:0;border-right:1px solid var(--rule-2);min-height:270px;display:flex;flex-direction:column}
+  .readout:last-child{border-right:0}
+  .ro-label{margin-top:auto;padding-top:20px}
+}
+
+/* ---------- 02 PLATFORM — the ledger ----------
+   A terminal table. Seven rows, each an ordinal, a name and a static glyph
+   built from three dots. Nothing blinks; the glyph brightens on hover only. */
+.ledger{border:1px solid var(--rule-2);background:var(--panel)}
+.lrow{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:14px;
+      padding:clamp(15px,1.9vw,20px) clamp(14px,2vw,22px);border-bottom:1px solid var(--rule)}
+.lrow:last-child{border-bottom:0}
+.lrow:hover{background:var(--panel-2)}
+.lno{font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--amber)}
+.lname{font-size:clamp(11px,.35rem + .5vw,13px);font-weight:500;letter-spacing:.13em;
+       text-transform:uppercase;color:var(--fg);line-height:1.55}
+.lglyph{display:flex;gap:4px;align-items:center;flex:0 0 auto}
+.lglyph i{width:4px;height:4px;border-radius:50%;background:var(--rule-2)}
+.lrow:hover .lglyph i{background:var(--amber)}
+.lrow:hover .lname{color:var(--amber)}
+@media (min-width:720px){ .lrow{grid-template-columns:56px minmax(0,1fr) auto;gap:22px} }
+
+/* ---------- 03 COMPANY — two console panes ----------
+   Each pane is a framed terminal window: a title bar with the tag, a run of
+   dots, and an address. Body copy inside stays sentence case and grey. */
+.consoles{display:grid;gap:clamp(20px,2.6vw,28px)}
+@media (min-width:900px){ .consoles{grid-template-columns:1fr 1fr} }
+.console{border:1px solid var(--rule-2);background:var(--panel);display:flex;flex-direction:column}
+.console-bar{display:flex;align-items:center;gap:12px;padding:12px clamp(16px,2vw,22px);
+             border-bottom:1px solid var(--rule-2)}
+.console-tag{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);white-space:nowrap}
+.console-body{padding:clamp(22px,2.8vw,32px) clamp(16px,2vw,22px) clamp(26px,3vw,34px)}
+.console-h{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(14px,.45rem + .7vw,18px);line-height:1.62;letter-spacing:.02em;
+  text-transform:uppercase;color:var(--fg);max-width:34ch;
+}
+.console-body .body{margin-top:18px;color:var(--fg-2);max-width:46ch;font-size:14px;line-height:1.8}
+
+/* ---------- 04 TEAM ----------
+   PLACEHOLDER PLATES. The photo slot is a dark cell on a faint dot grid with
+   four amber crop marks — the frame is registered, the image is not placed.
+   Swap .plate for the 4:5 photograph and the furniture still holds. */
+/* There are exactly six people, so the column count is set rather than
+   auto-filled: auto-fill lands on four at desktop width and leaves the
+   second row two-thirds empty. Two by three, then three by two. */
+.people{display:grid;gap:clamp(22px,2.6vw,34px);grid-template-columns:1fr}
+@media (min-width:520px){ .people{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:940px){ .people{grid-template-columns:repeat(3,1fr)} }
+.plate{
+  position:relative;aspect-ratio:4/5;border:1px solid var(--rule);
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 1px 1px,rgba(154,147,132,.17) 1px,transparent 1.5px) 0 0/13px 13px,var(--panel);
+}
+.person:hover .plate{border-color:var(--rule-2)}
+/* The ordinal is the only mark identifying an unfilled slot, so it is held at
+   --rule-2: 3.16:1 on --panel, which clears the 3:1 large-text floor. It is
+   aria-hidden, and a hardcoded hex here was the one text colour on the site
+   outside the palette table above. */
+.plate .num{font-family:var(--display);font-size:clamp(30px,5vw,46px);font-weight:300;
+            letter-spacing:.06em;color:var(--rule-2);line-height:1}
+.plate i{position:absolute;width:var(--tick);height:var(--tick)}
+.plate .tl{top:9px;left:9px;border-top:1px solid var(--amber);border-left:1px solid var(--amber)}
+.plate .tr{top:9px;right:9px;border-top:1px solid var(--amber);border-right:1px solid var(--amber)}
+.plate .bl{bottom:9px;left:9px;border-bottom:1px solid var(--amber);border-left:1px solid var(--amber)}
+.plate .br{bottom:9px;right:9px;border-bottom:1px solid var(--amber);border-right:1px solid var(--amber)}
+.person .name{margin-top:18px;font-size:13px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--fg);line-height:1.4}
+.person .role{margin-top:8px;font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--amber)}
+.person .bio{margin-top:12px;font-size:13px;line-height:1.75;color:var(--fg-3)}
+
+/* ---------- 05 CAREERS — the amber band ----------
+   The one place amber becomes structure. A 2px amber frame with a bleed of
+   warmth behind it, so the page ends on the accent rather than on a rule. */
+.cta{padding-block:var(--section)}
+.cta-box{
+  position:relative;border:2px solid var(--amber);
+  padding:clamp(32px,5vw,72px) clamp(22px,4vw,64px);
+  background:radial-gradient(120% 140% at 12% 0%,rgba(232,149,46,.10),transparent 58%),var(--panel);
+}
+.cta-box .deck{margin-top:20px;max-width:46ch;color:var(--fg-2)}
+.cta-box .actions{margin-top:clamp(28px,3.6vw,40px)}
+.mailto{
+  display:inline-block;margin-top:clamp(28px,3.4vw,38px);text-decoration:none;color:var(--amber);
+  font-size:clamp(13px,.4rem + .5vw,16px);font-weight:500;letter-spacing:.14em;
+  border-bottom:1px solid var(--rule-2);padding-bottom:6px;
+}
+.mailto:hover{color:var(--amber-2);border-bottom-color:var(--amber-2)}
+
+/* ---------- HERO ----------
+   The canvas is decorative and sits at z-index 0 with pointer-events:none.
+   The H1 is real DOM text at z-index 1. If the script never runs, the canvas
+   is an empty transparent box and the hero simply reads as type on black. */
+.hero{position:relative;overflow:hidden;padding-block:clamp(56px,8vw,120px) clamp(28px,3.4vw,40px)}
+.lattice{position:absolute;inset:0;z-index:0;pointer-events:none}
+.lattice canvas{width:100%;height:100%}
+/* bottom fade, so the field dissolves into the ground instead of being cropped */
+.lattice::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 46%,rgba(11,10,8,.72) 82%,var(--ink) 100%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(110% 80% at 50% 40%,rgba(232,149,46,.07),transparent 62%)}
+.hero-in{position:relative;z-index:1}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:600;
+         letter-spacing:.24em;text-transform:uppercase;color:var(--fg-3);margin-bottom:clamp(24px,3.2vw,36px)}
+.hero .deck{margin-top:clamp(22px,2.8vw,32px);color:var(--fg-2)}
+.hero-foot{position:relative;z-index:1;display:flex;align-items:center;gap:14px;
+           margin-top:clamp(48px,7vw,96px);padding-top:14px;border-top:1px solid var(--rule)}
+
+/* ---------- careers page ----------
+   The lattice at rest: the same dot field, drawn statically in CSS and
+   masked away toward the fold. No canvas, no script on this page. */
+.page-hero{position:relative;overflow:hidden;padding-block:clamp(52px,7vw,104px) clamp(36px,4.5vw,60px);
+           border-bottom:1px solid var(--rule)}
+/* The field is only drawn where the mask can shape it. Without a mask the
+   grid would run edge to edge behind the h1 as flat wallpaper, so the whole
+   effect is gated on mask support rather than degraded into noise. */
+@supports (mask-image:radial-gradient(#000,transparent)) or (-webkit-mask-image:radial-gradient(#000,transparent)){
+  .page-hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.55;
+    background:radial-gradient(circle at 1px 1px,rgba(232,149,46,.42) 1.1px,transparent 1.6px) 0 0/22px 22px;
+    -webkit-mask-image:radial-gradient(78% 92% at 72% 18%,#000,transparent 72%);
+            mask-image:radial-gradient(78% 92% at 72% 18%,#000,transparent 72%);
+  }
+}
+.page-hero > .wrap{position:relative;z-index:1}
+.page-hero .deck{margin-top:clamp(22px,2.8vw,30px);max-width:52ch}
+
+/* Six mono paragraphs is a lot of monospace, so the prose column is narrow,
+   the leading is long and the size is held at 15px — mono needs both. */
+.prose{max-width:66ch;display:grid;gap:clamp(20px,2.4vw,28px)}
+.prose p{color:var(--fg-2);font-size:15px;line-height:1.9}
+/* .prose p is (0,1,1); every override inside the column has to match or beat
+   it, hence the doubled selectors below rather than a scattering of
+   !important. The two pulls are the only amber text on the careers page. */
+.prose .pull{
+  font-family:var(--display);font-weight:400;color:var(--amber);
+  font-size:clamp(15px,.5rem + .85vw,22px);line-height:1.5;letter-spacing:.02em;
+  text-transform:uppercase;max-width:24ch;
+  margin-block:clamp(12px,1.6vw,20px);padding:clamp(20px,2.6vw,28px) 0;
+  border-top:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2);
+}
+.prose .label{font-size:10px;line-height:1.4;letter-spacing:.2em;color:var(--fg-3)}
+.contact{margin-top:clamp(40px,5vw,64px);border:1px solid var(--rule-2);background:var(--panel);
+         padding:clamp(24px,3.2vw,36px)}
+.contact .mailto{margin-top:14px}
+
+/* ---------- footer ---------- */
+.site-foot{border-top:1px solid var(--rule);padding-block:clamp(44px,5.5vw,68px)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:flex-start}
+.site-foot .brand svg{height:18px;color:var(--fg-3)}
+.site-foot .brand:hover svg{color:var(--fg)}
+.foot-links{display:flex;flex-wrap:wrap;gap:10px 26px}
+.foot-links a{font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-3);text-decoration:none}
+.foot-links a:hover{color:var(--amber)}
+.colophon{margin-top:clamp(30px,4vw,46px);padding-top:20px;border-top:1px solid var(--rule);
+          display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+.colophon span{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-3)}
+
+/* ============================================================
+   MOBILE — 360px first
+
+   Three things break a dark all-mono layout on a phone, and all
+   three are fixed here:
+   1. Mono caps at .2em tracking overflow at 360px. Tracking is
+      cut on the two widest components (ledger names, nav) and
+      the H1 measure is released from 30ch to full width.
+   2. A sticky bar costs ~9% of a phone viewport for the entire
+      scroll. It goes static below 640px.
+   3. 10px nav links are 14px tall. Every link gets padding to
+      a 44px touch target instead.
+   ============================================================ */
+@media (max-width:640px){
+  .site-head{position:static}
+  .site-head .wrap{height:auto;padding-block:6px;flex-wrap:wrap;gap:0}
+  .brand{padding-block:13px}
+  .nav{flex:1 1 100%;flex-wrap:wrap;column-gap:20px;row-gap:0;border-top:1px solid var(--rule)}
+  .nav a{padding-block:15px;letter-spacing:.14em}
+  .nav a.is-cta{padding:14px 18px;margin-block:5px}   /* 45px tall, not 39 */
+
+  .foot-links{column-gap:22px;row-gap:0}
+  .foot-links a{padding-block:15px;letter-spacing:.14em}
+
+  /* the mailto is a link, not a caption — it needs a real target too */
+  .mailto{padding-block:12px 10px}
+
+  section[id]{scroll-margin-top:16px}
+  .h-hero{max-width:none}
+  .lname{letter-spacing:.09em}
+  .btn{padding:14px 20px;letter-spacing:.13em}
+  .hero-foot{margin-top:44px}
+}
+@media (max-width:400px){
+  .label,.meta,.sec-name,.ro-label,.person .role,.console-tag,.colophon span,.foot-links a,.nav a{letter-spacing:.12em}
+  .readout::before,.readout::after,.plate i{--tick:9px}
+}
+
+/* ============================================================
+   TOUCH, LANDSCAPE AND FORCED COLOURS
+
+   Three environments this scheme would otherwise fail in.
+   ============================================================ */
+
+/* 1. TOUCH. The ledger's status glyph and the plate borders only reach their
+      lit state on :hover, and a touch device never hovers — so on touch the
+      lit state IS the resting state. Without this the ledger reads as seven
+      dead rows on every phone and tablet on earth. */
+@media (hover:none){
+  .lglyph i{background:var(--amber);opacity:.65}
+  .plate{border-color:var(--rule-2)}
+  .lrow:active{background:var(--panel-2)}
+}
+
+/* 2. LANDSCAPE PHONES. A 360x780 phone turned sideways is 780x360, and the
+      hero's clamp() padding is driven by vw, so it would eat the entire
+      viewport before the h1 appeared. Height-based, not width-based. */
+@media (max-height:560px) and (min-width:641px){
+  .hero{padding-block:36px 20px}
+  .hero-foot{margin-top:32px}
+  .page-hero{padding-block:36px 28px}
+}
+
+/* 3. FORCED COLOURS (Windows high contrast). Every structural line on this
+      site is a 1px border and every accent is a background — both of which
+      the OS repaints. The canvas cannot be repainted, so it is dropped, and
+      the borders are pinned to system keywords so the frames survive. */
+@media (forced-colors:active){
+  .lattice,.hero::after,.page-hero::before{display:none}
+  .readouts,.readout,.ledger,.lrow,.console,.console-bar,.plate,.contact{border-color:CanvasText}
+  .cta-box{border-color:Highlight;background:none}
+  .readout::before,.readout::after,.plate i{border-color:Highlight}
+  .lglyph i,.led{background:Highlight;forced-color-adjust:none}
+  .dotrule{background:none;border-top:1px solid CanvasText;height:1px}
+}
+
+/* ---------- gallery iframe preview ----------
+   The repo gallery frames each prototype at roughly 16:11, so the embed has
+   to say what this direction is in one still: the lattice, the amber pill,
+   and the mono caps H1. */
+body.embed .site-head{position:static}
+body.embed .site-head .wrap{height:46px}
+body.embed .nav{display:none}
+body.embed .hero{padding-block:22px 12px}
+body.embed .eyebrow{margin-bottom:14px;font-size:8px}
+body.embed .h-hero{font-size:15px;line-height:1.45;max-width:34ch}
+body.embed .hero .deck{margin-top:12px;font-size:10px;line-height:1.6;max-width:52ch}
+body.embed .actions{margin-top:16px}
+body.embed .btn{font-size:8px;padding:9px 14px}
+body.embed .hero-foot{margin-top:22px}
+body.embed .hero-foot .meta{font-size:8px}
+
+/* ---------- print ----------
+   A near-black page prints as a solid block of toner, so the whole scheme is
+   inverted back to paper and the amber is darkened to a colour that survives
+   a monochrome laser. The canvas is dropped entirely. */
+@media print{
+  :root{--ink:#fff;--panel:#fff;--panel-2:#fff;--fg:#111;--fg-2:#222;--fg-3:#555;
+        --amber:#8A4E06;--amber-2:#8A4E06;--rule:#CCC;--rule-2:#666}
+  html,body{background:#fff;color:#222}
+  .site-head,.skip,.lattice,.hero::after,.page-hero::before,.led{display:none}
+  .hero{padding-top:0}
+  .cta-box{background:none;border-color:#8A4E06}
+  .plate{background:#F4F4F0}
+  .readout,.console,.ledger,.contact{background:none}
+  .readouts,.ledger,.lrow,.console,.person,.readout{break-inside:avoid}
+}

@@ -1,0 +1,266 @@
+
+/* ============================================================
+   LAYOUT: BROADSHEET  (Editorial, round 2)
+
+   A newspaper front page. Nameplate across the full measure,
+   then the lead running three columns wide with the record
+   boxed beside it in the fourth, then every following section
+   banded across all four and set in columns of its own.
+
+     R1  asymmetric two-track, sticky rail, one field
+     R2  nameplate + four-column front page, nothing sticky
+     R3  one centred 660px measure, dark
+
+   ---------------------------------------------------------------
+   THE BASELINE GRID IS THE WHOLE POINT
+
+   A newspaper coheres because one vertical unit governs
+   everything: rules, leading, the space above a head, the space
+   under a deck. Columns align because they are all counting the
+   same unit.
+
+   The first draft of this round did not do that. It sized
+   vertical space with clamp() containing vw, which produces a
+   different arbitrary number at every viewport width. Measured
+   at 1024px it had 23 distinct vertical spacing values including
+   10.24, 16.38, 18.43, 20.48, 22.53, 24.58, 26.62, 30.72, 34.82,
+   40.96, 45.06 and 56.32, and 19 different size/leading pairs
+   whose leadings shared no common multiple. Nothing could align
+   with anything. The review note was "lots of spacings are super
+   off", and it was exactly right.
+
+   So, two rules for this file:
+
+     1. EVERY vertical measure is a whole multiple of --b (6px).
+        Margins, padding, row gaps, rule heights, section
+        heights. No exceptions.
+     2. NO vw UNIT IN ANY VERTICAL MEASURE, ever. Type steps at
+        discrete breakpoints instead, so the numbers stay whole
+        at every width rather than drifting between them.
+
+   Leading is drawn from a fixed set, all multiples of --b:
+   18 / 24 / 30 / 36 / 42 / 48 / 54. Body is 17/24, which is a
+   newspaper's tight measure rather than a web default.
+
+   Horizontal space may still be fluid: it does not affect the
+   vertical rhythm. Only --gut is fixed, because the column
+   gutter has to stay constant for the rules to read as a grid.
+   ============================================================ */
+:root{
+  --face:var(--serif);
+  --paper:#F7F5EE;         /* newsprint stock, warmer than R1 */
+  --paper-2:#EFEDE4;
+  --rule:#CFCCBF;
+  --b:6px;                 /* the baseline unit */
+  --gut:18px;              /* column gutter, 3 units */
+}
+@media (min-width:1300px){ :root{ --gut:24px } }
+
+body{font-size:17px;line-height:24px}
+
+.sheet{max-width:1400px;margin-inline:auto;padding-inline:var(--pad)}
+
+/* ---------- nameplate ----------
+   Centred across the full measure, with the classic heavy-over-hairline
+   double rule beneath it. Not sticky: a front page does not follow you
+   down the screen. */
+.nameplate{background:var(--paper)}
+.nameplate .sheet{padding-block:24px 0}
+.np-mark{display:flex;justify-content:center;text-decoration:none}
+.np-mark svg{height:36px;width:auto;color:var(--ink)}
+@media (min-width:700px){ .np-mark svg{height:48px} }
+@media (min-width:1300px){ .np-mark svg{height:60px} }
+/* one element, exactly 2 units tall: 3px rule, 8px gap, 1px rule */
+.np-rule{height:12px;box-sizing:border-box;margin-top:24px;
+         border-top:3px solid var(--ink);border-bottom:1px solid var(--ink)}
+.dateline{display:flex;flex-wrap:wrap;justify-content:center;
+          gap:0 clamp(16px,2.6vw,34px);padding-block:12px;
+          border-bottom:1px solid var(--ink)}
+.dateline span,.dateline a{font-family:var(--mono);font-size:11px;font-weight:500;
+          line-height:18px;letter-spacing:.13em;text-transform:uppercase;
+          color:var(--ink-2);text-decoration:none}
+.dateline a:hover{color:var(--accent)}
+.dateline a.is-cta{color:var(--ink);box-shadow:0 1px 0 var(--accent)}
+
+/* ---------- the column grid ----------
+   gap:1px over a rule-coloured ground: the gap IS the rule, so rules can
+   never fall out of step with the columns they divide. */
+.cols{display:grid;gap:1px;background:var(--rule)}
+.cols > *{background:var(--paper);padding:24px var(--gut)}
+/* Only the front's two tracks flush to the measure. Scoped deliberately:
+   in a wrapping multi-row grid :first-child is one cell, not one column,
+   so a global flush rule would unalign every row after the first. */
+.front .cols > *:first-child{padding-left:0}
+.front .cols > *:last-child{padding-right:0}
+
+.front{padding-block:36px 0}
+@media (min-width:1000px){ .front .cols{grid-template-columns:3fr 1fr} }
+
+/* ---------- the lead ----------
+   Type steps at breakpoints rather than sliding, so leading stays a whole
+   multiple of the unit at every width. The head is set with slightly
+   negative leading at the largest step, which is how a broadsheet sets a
+   lead head. */
+.lead h1{font-size:30px;line-height:36px;letter-spacing:-.02em;max-width:24ch;margin:0}
+@media (min-width:700px){  .lead h1{font-size:40px;line-height:42px;letter-spacing:-.024em} }
+@media (min-width:1000px){ .lead h1{font-size:48px;line-height:48px} }
+@media (min-width:1300px){ .lead h1{font-size:56px;line-height:54px;letter-spacing:-.028em} }
+.lead .deck{font-size:18px;line-height:24px;color:var(--ink-2);margin-top:24px;max-width:62ch}
+/* under a spanning head the deck runs in two columns, as a lead does */
+@media (min-width:1000px){
+  .lead .deck{columns:2;column-gap:var(--gut);column-rule:1px solid var(--rule);
+              max-width:none;text-align:justify;hyphens:auto}
+}
+.lead .actions{margin-top:24px;gap:12px}
+
+/* record, boxed in the fourth column beside the lead */
+.boxed{display:flex;flex-direction:column}
+.boxed .folio{line-height:18px}
+.boxed > .label{margin-top:6px}
+.boxed .stat{padding-block:18px;border-bottom:1px solid var(--rule)}
+.boxed .stat:first-of-type{padding-top:12px}
+.boxed .stat:last-of-type{border-bottom:0;padding-bottom:0}
+.boxed .stat .ord{margin-bottom:6px;line-height:18px}
+.boxed .stat .fig{font-size:26px;line-height:30px}
+.boxed .stat .label{padding-top:6px;line-height:18px}
+
+/* ---------- section banner ----------
+   Exactly 8 units tall including its rules, so a banner never knocks the
+   page off the grid. Heavy rule above, hairline below. */
+.sec-head{height:48px;box-sizing:border-box;margin-top:48px;
+          display:flex;align-items:center;gap:18px;
+          border-top:3px solid var(--ink);border-bottom:1px solid var(--ink)}
+.sec-head .folio{line-height:18px;flex:0 0 auto}
+.sec-head .banner{font-size:26px;line-height:30px;font-weight:400;letter-spacing:-.016em;flex:0 0 auto}
+.sec-head .label{margin-left:auto;line-height:18px;text-align:right}
+@media (max-width:520px){
+  /* the kicker is the first thing to go when the banner cannot hold a row */
+  .sec-head .label{display:none}
+}
+
+/* the standfirst that opens a section, across the full measure */
+.standfirst{margin-top:24px;margin-bottom:24px;font-size:22px;line-height:30px;
+            font-weight:300;letter-spacing:-.012em;max-width:44ch}
+@media (min-width:1000px){ .standfirst{font-size:24px;line-height:30px} }
+
+/* ---------- capabilities, set in columns ----------
+   Seven items never fill a three-wide grid, so the gap:1px-over-a-ground
+   trick used elsewhere would leave the last row showing two grey blanks.
+   Here the hairlines are borders on the cells instead: the rules stay
+   continuous and the short last row is simply blank paper, which is what a
+   column foot looks like in a newspaper. */
+.caps{list-style:none;margin:24px 0 0;padding:0;display:grid;background:var(--paper);gap:0;
+      border-bottom:1px solid var(--rule)}
+.caps .cap-row{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:baseline;
+               padding:18px var(--gut);background:var(--paper);
+               border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.caps .cap-row:first-child{border-left:0}
+@media (max-width:759px){  .caps .cap-row{border-left:0} }
+@media (min-width:760px){
+  .caps{grid-template-columns:repeat(2,1fr)}
+  .caps .cap-row:nth-child(2n+1){border-left:0}
+}
+@media (min-width:1100px){
+  .caps{grid-template-columns:repeat(3,1fr)}
+  .caps .cap-row:nth-child(2n+1){border-left:1px solid var(--rule)}
+  .caps .cap-row:nth-child(3n+1){border-left:0}
+}
+.caps .cap-num{line-height:24px}
+.caps .cap-name{font-size:19px;line-height:24px}
+@media (min-width:1000px){ .caps .cap-name{font-size:20px;line-height:24px} }
+
+/* ---------- mission and vision, two columns of text ---------- */
+.mv{margin-top:24px}
+@media (min-width:860px){ .mv{grid-template-columns:1fr 1fr} }
+.mv .label{line-height:18px}
+.mv .h-m{margin-top:12px;font-size:22px;line-height:30px;font-weight:400;letter-spacing:-.01em}
+.mv .body{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:24px}
+
+/* ---------- team, a strip along the foot ---------- */
+.grid-people{margin-top:24px;grid-template-columns:repeat(2,1fr)}
+@media (min-width:700px){  .grid-people{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:1100px){ .grid-people{grid-template-columns:repeat(6,1fr)} }
+.grid-people .person{padding:18px var(--gut)}
+.grid-people .name{font-size:17px;line-height:24px;margin-top:12px}
+.grid-people .role{margin-top:6px;line-height:18px}
+.grid-people .bio{margin-top:6px;font-size:14px;line-height:18px}
+.grid-people .plate .num{font-size:30px;line-height:36px}
+
+/* ---------- careers, the black strap across the foot ---------- */
+.strap{margin-top:48px;background:var(--ink-field);color:var(--on-ink)}
+.strap .sheet{padding-block:48px}
+.strap-grid{display:grid;gap:24px}
+@media (min-width:900px){ .strap-grid{grid-template-columns:1.15fr 1fr;align-items:end;gap:48px} }
+/* the banner rules change sides with the band, or they vanish */
+.strap .sec-head{border-top-color:var(--on-ink);border-bottom-color:var(--rule-ink);margin-top:0;margin-bottom:24px}
+.strap .banner{color:var(--on-ink)}
+.strap h3{max-width:16ch;color:var(--on-ink);font-size:30px;line-height:36px;font-weight:300}
+@media (min-width:1000px){ .strap h3{font-size:40px;line-height:42px} }
+.strap .deck{margin-top:12px;max-width:40ch;font-size:18px;line-height:24px}
+.strap .actions{margin-top:0}
+.strap .mailto{margin-top:24px;font-size:24px;line-height:30px}
+
+/* ---------- careers page: the article, set in columns ----------
+   Justified with hyphenation, which is what a newspaper does and what
+   makes a narrow column measure hold together. */
+.article{padding-block:36px 60px}
+.article h1{font-size:30px;line-height:36px;max-width:18ch;letter-spacing:-.02em;margin-top:30px}
+@media (min-width:700px){  .article h1{font-size:40px;line-height:42px} }
+@media (min-width:1000px){ .article h1{font-size:48px;line-height:48px} }
+.article .deck{margin-top:18px;font-size:20px;line-height:30px;max-width:46ch}
+/* the head and its deck sit side by side across the full measure, the way a
+   feature masthead does, rather than leaving two thirds of the page empty */
+@media (min-width:900px){
+  .article-head{display:grid;grid-template-columns:2fr 1fr;gap:0 var(--gut);align-items:end;
+                border-bottom:1px solid var(--rule);padding-bottom:24px}
+  .article-head h1{max-width:none}
+  .article .deck{margin-top:0;max-width:none}
+}
+.prose{margin-top:30px}
+@media (min-width:900px){
+  .prose{columns:2;column-gap:var(--gut);column-rule:1px solid var(--rule);
+         text-align:justify;hyphens:auto}
+  .prose > *{break-inside:avoid}
+}
+@media (min-width:1300px){ .prose{columns:3} }
+.prose p{margin-bottom:18px;font-size:17px;line-height:24px}
+.prose .pull{break-inside:avoid;margin-block:12px 24px;padding-block:18px;
+             border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+             font-size:24px;line-height:30px;text-align:left;hyphens:none}
+@media (min-width:1000px){ .prose .pull{font-size:28px;line-height:36px} }
+/* the versal: a front page opens its lead story with one. Sized in whole
+   lines so the body it wraps stays on the baseline. */
+.prose > p:first-of-type::first-letter{
+  float:left;font-size:72px;line-height:48px;padding:6px 6px 0 0;font-weight:400;color:var(--ink)}
+.contact-block{break-inside:avoid;margin-top:24px;padding:24px;
+               background:var(--paper-2);border:1px solid var(--rule)}
+.contact-block .label{line-height:18px}
+
+/* ---------- gallery card: the nameplate and the lead ---------- */
+body.embed .nameplate .sheet{padding-block:12px 0}
+body.embed .np-mark svg{height:18px}
+body.embed .np-rule{margin-top:12px;height:6px}
+body.embed .dateline{display:none}
+body.embed .front{padding-top:12px}
+body.embed .cols > *{padding-block:12px}
+body.embed .lead h1{font-size:18px;line-height:24px;max-width:30ch}
+body.embed .lead .deck{margin-top:12px;font-size:11px;line-height:18px;max-width:52ch;columns:auto;column-rule:none}
+body.embed .lead .actions{margin-top:12px}
+body.embed .btn{font-size:9px;padding:6px 12px}
+body.embed .boxed .stat .fig{font-size:14px;line-height:18px}
+body.embed .boxed .stat{padding-block:6px}
+
+@media (max-width:760px){
+  .cols > *{padding-inline:0}
+  .dateline{justify-content:flex-start;gap:0 20px}
+  .dateline a,.dateline span{padding-block:13px}
+  .caps .cap-row{padding-inline:0}
+  .grid-people .person{padding-inline:0}
+}
+
+@media print{
+  .strap,.site-foot{background:#fff!important;color:#000!important}
+  .strap h3,.strap .deck,.strap .mailto,.strap .banner,
+  .site-foot a,.colophon span{color:#000!important}
+  .prose{columns:2}
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nearby AI — design directions</title>
+<meta name="theme-color" content="#E9EAE4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9EAE4; --paper-2:#DFE1D9; --ink:#15181A;
+    --ink-40:rgba(21,24,26,.40); --ink-18:rgba(21,24,26,.18); --ink-08:rgba(21,24,26,.08);
+    --pin:#DC3A26;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --sans:"Instrument Sans",-apple-system,system-ui,sans-serif;
+    --serif:"Instrument Serif",Georgia,serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+       font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+       background-image:
+         linear-gradient(var(--ink-08) 1px, transparent 1px),
+         linear-gradient(90deg, var(--ink-08) 1px, transparent 1px);
+       background-size:80px 80px}
+  ::selection{background:var(--pin);color:#fff}
+  .wrap{max-width:1180px;margin-inline:auto;padding:clamp(26px,5vw,60px) clamp(20px,4vw,48px)}
+  .head{display:flex;align-items:baseline;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--ink)}
+  .brand{font-family:var(--serif);font-size:26px;letter-spacing:-.01em}
+  .brand .dot{color:var(--pin)}
+  .label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+         text-transform:uppercase;color:var(--ink-40);margin:0}
+  .head .back{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:500;
+         letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);
+         text-decoration:none;padding-block:10px}
+  .head .back:hover{color:var(--pin)}
+  h1{margin:clamp(32px,4.5vw,50px) 0 0;font-family:var(--serif);font-weight:400;
+     letter-spacing:-.01em;line-height:1.12;
+     font-size:clamp(30px,1rem + 2.4vw,46px);max-width:22ch}
+  .note{margin-top:16px;color:var(--ink-40);max-width:62ch}
+  .note b{color:var(--ink);font-weight:500}
+  h2.dir{margin:clamp(38px,5vw,60px) 0 0;font-family:var(--mono);font-size:11px;font-weight:500;
+         letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);
+         padding-bottom:12px;border-bottom:1px solid var(--ink)}
+  .grid{display:grid;gap:1px;background:var(--ink-18);border:1px solid var(--ink-18);border-top:0}
+  @media (min-width:720px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  .card{background:var(--paper);padding:clamp(20px,2.4vw,26px);text-decoration:none;color:inherit;
+        display:flex;flex-direction:column;min-height:190px;
+        transition:background-color .12s ease}
+  .card:hover{background:var(--paper-2)}
+  .card .r{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--pin)}
+  .card h3{margin:16px 0 0;font-family:var(--serif);font-weight:400;font-size:24px;
+        letter-spacing:-.01em;line-height:1.2}
+  .card p{margin:10px 0 0;color:var(--ink-40);font-size:14.5px;line-height:1.5}
+  .card .go{margin-top:auto;padding-top:18px;font-family:var(--mono);font-size:10px;
+            letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+  footer{margin-top:clamp(40px,5vw,64px);padding-top:18px;border-top:1px solid var(--ink-18)}
+  footer p{margin:0 0 6px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink-40)}
+  :focus-visible{outline:2px solid var(--pin);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="brand">Nearby <span class="dot">AI</span></span>
+    <p class="label">Design directions</p>
+    <a class="back" href="../">All prototypes</a>
+  </div>
+
+  <h1>Four directions for the Nearby AI site.</h1>
+  <p class="note">The mission and vision one-pager for the AI-native platform for
+  local life. Every version is one self-contained HTML page. <b>V4 is the picked
+  direction</b> &mdash; V2 with the hero held still. V3 was the previously live
+  homepage. See <a href="HANDOFF.md" style="color:inherit">HANDOFF.md</a> for the
+  full history and the rules for editing.</p>
+
+  <h2 class="dir">The directions</h2>
+  <div class="grid">
+    <a class="card" href="v4/">
+      <span class="r">V4 &middot; picked</span>
+      <h3>Held still</h3>
+      <p>V2 with exactly one change: the hero's county-dot map is a static inline
+      SVG instead of the animated canvas. No external requests at all. The
+      direction Rebecca picked.</p>
+      <span class="go">Open</span>
+    </a>
+    <a class="card" href="v3/">
+      <span class="r">V3 &middot; previously live</span>
+      <h3>Street atlas</h3>
+      <p>Street-atlas treatment on paper: oversized hero of 3,142 county
+      centroids, hover names a county, click reforms the dots into that county's
+      state. Was the homepage at the repo root.</p>
+      <span class="go">Open</span>
+    </a>
+    <a class="card" href="v2/">
+      <span class="r">V2</span>
+      <h3>Editorial</h3>
+      <p>Black and white editorial build from the Codex handoff &mdash; stacked
+      section covers, smooth scrolling, the vision constellation &mdash; with the
+      county engine swapped for the real-counties one. V4's parent.</p>
+      <span class="go">Open</span>
+    </a>
+    <a class="card" href="v1/">
+      <span class="r">V1</span>
+      <h3>Cinematic</h3>
+      <p>The first take: dark, cinematic, typewriter headline over a
+      constellation field.</p>
+      <span class="go">Open</span>
+    </a>
+  </div>
+
+  <footer>
+    <p>Nearby AI is the consumer local-life product. NDot AI is a separate company; its directions live under /ndot/.</p>
+    <p>Internal review only. Not indexed, not announced.</p>
+  </footer>
+
+</div>
+</body>
+</html>

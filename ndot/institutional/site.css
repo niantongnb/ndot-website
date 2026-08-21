@@ -1,0 +1,781 @@
+/* ==========================================================================
+   NDot AI: Direction A "Institutional"
+   Reference language: hebbia.com (warm near-black, high-contrast serif,
+   4/8/12 column rules drawn on the page, hairline dividers, one blue accent)
+   ========================================================================== */
+
+/* ---------- tokens ---------- */
+:root{
+  /* ground + ink */
+  --black:#000;
+  --ground:#0E0B0B;          /* warm near-black */
+  --ground-2:#151110;
+  --sand:#EEECDD;            /* the one light ground */
+  --sand-2:#E5E2D1;
+  --ink:#130F0F;
+  --warm:#F4F1EB;            /* primary type on dark */
+  --warm-soft:#B4AFA6;       /* secondary type on dark  9.2:1 */
+  --ink-soft:#54504A;        /* secondary type on sand  6.6:1 */
+  --blue:#465BFF;            /* the only accent, only on the primary CTA */
+  --blue-hover:#3043E0;
+
+  /* rules */
+  --rule:#272220;            /* hairline on dark */
+  --rule-soft:#1C1917;       /* column rules on dark */
+  --rule-light:#CFCBB8;      /* hairline on sand */
+  --rule-light-soft:#DCD9C7;
+
+  /* section theming (flipped by .theme-sand) */
+  --bg:var(--ground);
+  --fg:var(--warm);
+  --fg-soft:var(--warm-soft);
+  --bd:var(--rule);
+  --bd-grid:var(--rule-soft);
+
+  /* geometry */
+  --maw:1596px;
+  --outer:20px;
+  --gap:20px;
+  --cols:4;
+  --radius:8px;
+  --radius-sm:4px;
+  --pill:100px;
+  --hdr:73px;                /* sticky header height, drives scroll-margin */
+
+  /* rhythm */
+  --sp-1:.25rem; --sp-2:.5rem;  --sp-3:.75rem; --sp-4:1rem;
+  --sp-5:1.25rem;--sp-6:1.5rem; --sp-8:2rem;   --sp-10:2.5rem;
+  --sp-12:3rem;  --sp-16:4rem;
+  --band:clamp(3.5rem,2.4rem + 4.6vw,7.5rem);   /* section block padding */
+  --band-sm:clamp(2.25rem,1.7rem + 2.4vw,4rem);
+
+  /* bento geometry, the one place the reference's numbers are load bearing */
+  --bento-gap:10px;
+  --card-pad:18px;
+  --card-h:220px;
+  --card-hr:44px;
+  --card-hr-hover:96px;
+
+  /* type */
+  --ff-display:"Bodoni Moda","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --ff-sans:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
+  --fz-meta:.8125rem;        /* 13px: labels and meta only, never prose */
+  --fz-ui:.9375rem;          /* 15px: nav, buttons, captions */
+  --fz-body:1.0625rem;       /* 17px: every running paragraph */
+  --lts-meta:.16em;
+  --lts-label:.2em;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-firm:cubic-bezier(.72,0,.24,1);
+  --trs:.25s var(--ease);
+}
+@media (min-width:40em){ :root{ --cols:8; --outer:32px; --card-pad:20px; --card-h:250px; } }
+@media (min-width:57.5em){ :root{ --cols:12; --outer:44px; --gap:24px; --card-pad:24px; --card-h:340px; } }
+@media (min-width:76.25em){ :root{ --outer:60px; } }
+
+.theme-sand{
+  --bg:var(--sand);
+  --fg:var(--ink);
+  --fg-soft:var(--ink-soft);
+  --bd:var(--rule-light);
+  --bd-grid:var(--rule-light-soft);
+}
+.theme-black{ --bg:var(--black); }
+
+/* ---------- reset ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--warm);
+  font-family:var(--ff-sans);
+  font-size:var(--fz-body);
+  line-height:1.5;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img,svg{max-width:100%;display:block}
+p{margin:0}
+h1,h2,h3,h4{margin:0;font-weight:400}
+ul,ol{margin:0;padding:0;list-style:none}
+a{color:inherit}
+
+/* anchors must clear the sticky header, or the section label lands under it */
+[id]{scroll-margin-block-start:calc(var(--hdr) + 16px)}
+
+/* film grain, lifted from the reference's feTurbulence overlay */
+body::after{
+  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode:overlay;
+}
+
+/* ---------- focus ---------- */
+:focus-visible{
+  outline:2px solid var(--fg);
+  outline-offset:3px;
+  border-radius:2px;
+}
+.skip{
+  position:absolute;left:var(--outer);top:-100px;z-index:80;
+  background:var(--warm);color:var(--black);
+  padding:14px 20px;border-radius:var(--radius-sm);
+  font-size:var(--fz-ui);min-height:44px;display:inline-flex;align-items:center;
+  transition:top .2s var(--ease);
+}
+.skip:focus{top:12px}
+
+/* ---------- shell + drawn column rules ---------- */
+.shell{
+  position:relative;
+  max-width:var(--maw);
+  margin-inline:auto;
+  border-inline:1px solid var(--bd-grid);
+}
+.pad{padding-inline:var(--outer)}
+
+.band{
+  position:relative;
+  background:var(--bg);
+  color:var(--fg);
+  border-block-start:1px solid var(--bd);
+}
+.band:first-of-type{border-block-start:0}
+.band__inner{position:relative;z-index:1;padding-block:var(--band)}
+.band__inner--tight{padding-block:var(--band-sm)}
+
+/* The signature: the column grid is visible, not implied. The step is the
+   real content column pitch (column width plus one gap), so a drawn rule
+   lands on the leading edge of the matching content column at every width.
+   The second layer closes the field on the content right edge. */
+.rules{
+  position:absolute;inset:0 var(--outer);z-index:0;pointer-events:none;
+  --step:calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols) + var(--gap));
+  background-image:
+    repeating-linear-gradient(to right, var(--bd-grid) 0 1px, transparent 1px var(--step)),
+    linear-gradient(to right, transparent calc(100% - 1px), var(--bd-grid) calc(100% - 1px));
+  background-position:left top;
+}
+
+/* ---------- type ---------- */
+.display{
+  font-family:var(--ff-display);
+  font-optical-sizing:auto;
+  font-weight:400;
+  line-height:1.1;
+  letter-spacing:.005em;
+  text-wrap:balance;
+}
+.d-hero{font-size:clamp(1.75rem,1.16rem + 2.95vw,3.5rem);line-height:1.12}
+.d-lead{font-size:clamp(1.5rem,1.1rem + 2vw,2.75rem);line-height:1.16}
+.d-lead--sand{font-size:clamp(1.375rem,1.06rem + 1.58vw,2.375rem);line-height:1.2}
+.d-sec {font-size:clamp(1.375rem,1.1rem + 1.4vw,2.1875rem);line-height:1.18}
+.d-sec--lg{font-size:clamp(1.625rem,1.16rem + 2.35vw,3rem);line-height:1.1}
+.d-sec--sm{font-size:clamp(1.1875rem,1.06rem + .65vw,1.625rem);line-height:1.24}
+.d-fig {
+  font-size:clamp(1.5rem,1.05rem + 2.25vw,2.875rem);
+  letter-spacing:.005em;line-height:1.1;
+  font-weight:500;
+}
+
+/* Casing rule for the whole direction: anything quoted from the source document
+   renders in the source's own casing, so the company name reads "NDot AI" and
+   the three ledger entries read as the company states them. Uppercase is
+   reserved for the labels this build wrote (section markers, column keys,
+   footer heads). The hero's opening clause is therefore separated by weight and
+   size, not by capitals, and it carries the em dash so the remainder starts on
+   a word rather than on a hanging dash. */
+.d-hero__lead{
+  display:block;
+  font-weight:500;
+  margin-block-end:.16em;
+}
+.d-hero__rest{
+  display:block;
+  font-size:.6em;line-height:1.3;letter-spacing:.005em;
+  color:var(--warm-soft);
+  max-width:46ch;
+}
+.d-hero--solo{font-weight:500}
+
+/* Page level eyebrow: display serif, wider set. */
+.eyebrow{
+  font-family:var(--ff-display);
+  font-size:var(--fz-meta);
+  text-transform:uppercase;
+  letter-spacing:var(--lts-meta);
+  color:var(--fg-soft);
+  font-weight:500;
+  margin:0;
+}
+/* Section marker: grotesk, tighter colour, tracked wider, always ruled.
+   Deliberately a different construction from .eyebrow so the reader can tell a
+   page level eyebrow from a section marker without reading either. */
+.label{
+  display:flex;align-items:baseline;gap:var(--sp-3);
+  font-family:var(--ff-sans);
+  font-size:var(--fz-meta);
+  text-transform:uppercase;
+  letter-spacing:var(--lts-label);
+  color:var(--fg);
+  font-weight:600;
+  padding-block-end:var(--sp-4);
+  border-block-end:1px solid var(--bd);
+  margin-block-end:var(--sp-8);
+}
+.label::after{content:"";flex:1 1 auto}
+
+.prose{
+  font-size:var(--fz-body);
+  line-height:1.62;
+  color:var(--fg-soft);
+  max-width:62ch;
+}
+.prose + .prose{margin-block-start:1.15em}
+.prose--fg{color:var(--fg)}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.55em;
+  min-height:48px;padding:12px 26px;
+  font-family:var(--ff-sans);font-size:var(--fz-ui);font-weight:500;
+  letter-spacing:.01em;line-height:1;
+  border:1px solid transparent;border-radius:var(--pill);
+  text-decoration:none;cursor:pointer;
+  transition:background-color var(--trs),color var(--trs),border-color var(--trs),transform .18s var(--ease-firm);
+}
+.btn:active{transform:translateY(1px)}
+.btn--primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn--primary:hover{background:var(--blue-hover);border-color:var(--blue-hover)}
+.btn--ghost{background:transparent;color:var(--fg);border-color:var(--bd)}
+.btn--ghost:hover{border-color:var(--fg)}
+.btn--solid{background:var(--warm);color:var(--black);border-color:var(--warm)}
+.btn--solid:hover{background:#fff;border-color:#fff}
+.btn__arrow{transition:transform .28s var(--ease-firm)}
+.btn:hover .btn__arrow{transform:translateX(4px)}
+.btn-row{display:flex;flex-wrap:wrap;gap:var(--sp-3)}
+
+/* ---------- header ---------- */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  background:var(--black);
+  border-block-end:1px solid var(--rule);
+}
+.site-header .shell{border-inline-color:var(--rule-soft)}
+.hbar{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);
+  min-height:72px;
+}
+.brand{display:inline-flex;align-items:center;text-decoration:none;min-height:44px;padding-block:7px}
+/* ndot-wordmark.svg is transparent, tight-cropped, drawn in currentColor which
+   resolves to black inside an <img>. Both places it appears (header, footer)
+   sit on the pure black ground, so it is inverted to warm white. Height is set
+   and width follows the intrinsic 2.903:1 ratio. No crop box, no offsets. */
+.wordmark{
+  height:26px;width:auto;max-width:none;flex:0 0 auto;
+  filter:invert(1);
+}
+@media (min-width:40em){ .wordmark{height:30px} }
+
+.dnav{display:none}
+@media (min-width:60em){
+  .dnav{display:flex;align-items:center;gap:var(--sp-1)}
+}
+.dnav a{
+  display:inline-flex;align-items:center;min-height:44px;padding:0 14px;
+  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
+  border-radius:var(--radius-sm);
+  transition:color var(--trs),background-color var(--trs);
+}
+.dnav a:hover{color:var(--warm);background:rgba(255,255,255,.06)}
+.dnav a[aria-current="page"]{color:var(--warm)}
+.hbar__right{position:relative;display:flex;align-items:center;gap:var(--sp-2)}
+.hbar__right .btn{min-height:44px;padding:10px 20px}
+
+.mnav{position:static}
+@media (min-width:60em){ .mnav{display:none} }
+.mnav>summary{
+  list-style:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:10px;
+  min-height:44px;padding:0 16px;
+  font-size:var(--fz-ui);color:var(--warm);
+  border:1px solid var(--rule);border-radius:var(--pill);
+  transition:background-color var(--trs),border-color var(--trs);
+}
+.mnav>summary:hover{background:rgba(255,255,255,.06);border-color:var(--warm-soft)}
+.mnav>summary::-webkit-details-marker{display:none}
+.mnav>summary::after{
+  content:"";width:9px;height:9px;flex:0 0 auto;
+  border-right:1px solid currentColor;border-bottom:1px solid currentColor;
+  transform:translateY(-2px) rotate(45deg);
+  transition:transform .25s var(--ease-firm);
+}
+.mnav[open]>summary::after{transform:translateY(1px) rotate(-135deg)}
+/* A closed <details> hides its slot with content-visibility, not display, so
+   the seven panel links keep real layout boxes and real bounding rects while
+   invisible. That leaves phantom geometry for anything measuring the page.
+   Taking the panel out of flow entirely when closed is the honest state. */
+.mnav:not([open]) .mnav__panel{display:none}
+.mnav__panel{
+  position:absolute;right:0;top:calc(100% + 12px);z-index:60;
+  min-width:min(74vw,260px);
+  background:var(--black);
+  border:1px solid var(--rule);border-radius:var(--radius);
+  padding:var(--sp-2);
+}
+.mnav__panel a{
+  display:flex;align-items:center;min-height:48px;padding:0 14px;
+  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
+  border-radius:var(--radius-sm);
+}
+.mnav__panel a:hover{color:var(--warm);background:rgba(255,255,255,.06)}
+.mnav__panel li + li{border-block-start:1px solid var(--rule-soft)}
+
+/* ---------- hero ---------- */
+.hero .band__inner{
+  padding-block:clamp(3.5rem,2rem + 7vw,8.5rem) clamp(3rem,2rem + 4vw,5.5rem);
+}
+.hero__grid{display:grid;gap:var(--sp-8)}
+@media (min-width:57.5em){
+  .hero__grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
+  .hero__head{grid-column:1 / 10}
+  .hero__foot{grid-column:1 / 13}
+}
+.hero__eyebrow{margin-block-end:var(--sp-6)}
+.hero h1{margin-block-end:var(--sp-8);max-width:24ch}
+@media (min-width:57.5em){ .hero h1{max-width:none} }
+.hero__rule{height:1px;background:var(--rule);margin-block:var(--sp-6) 0}
+.hero__standfirst{color:var(--warm-soft);max-width:26ch;margin-block-end:var(--sp-4)}
+@media (min-width:57.5em){ .hero__standfirst{max-width:30ch} }
+
+/* Hero lower third on both pages: a particulars table. The prospectus front
+   sheet, not a second copy of the nav. It is a ruled key and value record, so
+   it carries no links and adds no tab stops, and it states things the rest of
+   the screen does not: what the platform is, what it displaces, what the
+   publisher is left holding. On careers it states the disciplines, the shape of
+   the work and the address. */
+.particulars{margin:0}
+.particulars__row{
+  display:grid;gap:var(--sp-2);
+  padding-block:var(--sp-5);
+  border-block-end:1px solid var(--rule-soft);
+}
+.particulars__row:last-child{border-block-end:0;padding-block-end:0}
+.particulars dt{
+  font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
+  text-transform:uppercase;letter-spacing:var(--lts-label);
+  color:var(--warm-soft);
+}
+.particulars dd{
+  margin:0;
+  font-size:var(--fz-body);line-height:1.55;color:var(--warm);
+  max-width:62ch;
+}
+@media (min-width:57.5em){
+  .particulars__row{
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    column-gap:var(--gap);row-gap:0;
+    align-items:baseline;
+    padding-block:var(--sp-6);
+  }
+  .particulars dt{grid-column:1 / 4}
+  /* the column rule between key and value is the same hairline the page draws
+     behind it, landed on a real content column edge */
+  .particulars dd{
+    grid-column:4 / 11;
+    border-inline-start:1px solid var(--rule);
+    padding-inline-start:var(--gap);
+  }
+}
+
+/* ---------- generic section header ---------- */
+.two{display:grid;gap:var(--sp-8)}
+@media (min-width:57.5em){
+  .two{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
+  .two__a{grid-column:1 / 5}
+  .two__b{grid-column:5 / 13}
+  .two--split .two__b{grid-column:5 / 10}
+  .two--split .two__c{grid-column:10 / 13}
+}
+/* the right hand column gets a job: a ruled count, never empty ground */
+.colmeta{border-block-start:1px solid var(--bd);padding-block-start:var(--sp-4)}
+.colmeta__k{
+  font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
+  text-transform:uppercase;letter-spacing:var(--lts-label);color:var(--fg);
+}
+.colmeta__v{font-size:var(--fz-ui);color:var(--fg-soft);margin-block-start:var(--sp-2)}
+
+/* ---------- proof: a ruled ledger, not a card trio ---------- */
+.ledger{
+  margin-block-start:var(--sp-10);
+  border-block-start:1px solid var(--bd);
+}
+.ledger__row{
+  display:grid;gap:var(--sp-3);
+  padding-block:var(--sp-6);
+  border-block-end:1px solid var(--bd);
+  transition:background-color var(--trs);
+}
+.ledger__row:hover{background:rgba(255,255,255,.028)}
+@media (min-width:57.5em){
+  .ledger__row{
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    column-gap:var(--gap);row-gap:var(--sp-2);
+    align-items:baseline;
+    padding-block:var(--sp-8);
+  }
+  .ledger__key{grid-column:1 / 3}
+  .ledger__fig{grid-column:3 / 9}
+  .ledger__note{grid-column:9 / 13}
+}
+.ledger__key{
+  font-family:var(--ff-sans);font-size:var(--fz-meta);font-weight:600;
+  text-transform:uppercase;letter-spacing:var(--lts-label);color:var(--warm-soft);
+}
+.ledger__fig{color:var(--warm)}
+.ledger__cap{font-size:var(--fz-ui);color:var(--warm)}
+.ledger__src{
+  font-size:var(--fz-ui);line-height:1.55;color:var(--warm-soft);
+  margin-block-start:var(--sp-3);
+  padding-block-start:var(--sp-3);
+  border-block-start:1px solid var(--rule-soft);
+  max-width:44ch;
+}
+
+/* ---------- capabilities bento ---------- */
+.bento{display:flex;flex-direction:column;gap:var(--bento-gap);margin-block-start:var(--sp-10)}
+.bento__row{display:contents}
+@media (min-width:40em){
+  .bento__row{display:flex;gap:var(--bento-gap);width:100%;min-width:0}
+}
+.cap{
+  position:relative;overflow:hidden;isolation:isolate;
+  border-radius:var(--radius);
+  min-width:0;width:100%;
+  flex:0 0 auto;
+  min-height:var(--card-h);
+  padding:var(--card-pad);
+  display:flex;flex-direction:column;
+  background:var(--ground-2);
+  border:1px solid var(--cap-bd,rgba(255,255,255,.07));
+  transition:border-color var(--trs);
+}
+.cap:hover{border-color:var(--cap-bd-h,rgba(255,255,255,.20))}
+/* flex-basis:0 only ever acts on the inline axis. Below 40em .bento__row is
+   display:contents, which would make these the block axis of a column flex
+   container and crush every card to nothing, so the row ratios are scoped to
+   the widths where .bento__row is a real row. Declared after .cap so the
+   ratios win over its flex:0 0 auto. */
+@media (min-width:40em){
+  .cap--wide{flex:2.45 1 0}
+  .cap--narrow{flex:1 1 0}
+}
+.cap__t{
+  position:relative;z-index:2;
+  font-family:var(--ff-sans);font-size:1.125rem;font-weight:500;
+  letter-spacing:.01em;line-height:1.25;
+  max-width:18ch;
+}
+@media (min-width:57.5em){ .cap__t{font-size:1.25rem;max-width:20ch} }
+.cap__sub{
+  position:relative;z-index:2;
+  margin-block-start:10px;
+  font-size:var(--fz-ui);line-height:1.5;
+  color:currentColor;opacity:.72;
+  max-width:34ch;
+}
+.cap__hr{
+  position:relative;z-index:2;
+  width:var(--card-hr);height:1px;margin-block-start:auto;
+  background:currentColor;opacity:.45;
+  transition:width .45s var(--ease-firm),opacity .45s var(--ease-firm);
+}
+.cap:hover .cap__hr{width:var(--card-hr-hover);opacity:.85}
+.cap__art{position:absolute;inset:0;z-index:0;pointer-events:none;transition:opacity var(--trs)}
+.cap:hover .cap__art{opacity:.88}
+
+/* Seven grounds, all derived from this direction's own token set. No
+   photography and no video: NDot has no footage, so the cards carry rule
+   fields at seven densities, and the two wide cards carry a drawn structural
+   motif. Nothing here plots a number. */
+.cap--a{color:var(--warm);background:#171A38}
+.cap--a .cap__art::after{
+  background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.10) 0 1px,transparent 1px 18px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 42%,#000 100%);
+  mask-image:linear-gradient(to bottom,transparent 42%,#000 100%);}
+/* app frame plus newsletter sheet, outlines only */
+.cap--a .cap__art::before{
+  content:"";position:absolute;right:-6%;bottom:-14%;width:62%;height:88%;
+  background-repeat:no-repeat;background-position:right bottom;background-size:contain;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 150' fill='none' stroke='%23F4F1EB' stroke-opacity='0.22'><rect x='118' y='14' width='86' height='134' rx='12'/><line x1='118' y1='38' x2='204' y2='38'/><line x1='132' y1='60' x2='190' y2='60'/><line x1='132' y1='76' x2='176' y2='76'/><rect x='14' y='40' width='88' height='108' rx='4'/><line x1='30' y1='64' x2='86' y2='64'/><line x1='30' y1='82' x2='86' y2='82'/><line x1='30' y1='100' x2='70' y2='100'/><line x1='30' y1='118' x2='78' y2='118'/></svg>");
+  -webkit-mask-image:linear-gradient(to bottom,transparent 6%,#000 46%);
+  mask-image:linear-gradient(to bottom,transparent 6%,#000 46%);}
+
+.cap--b{color:var(--warm);background:#231D1B}
+.cap--b .cap__art::after{
+  background-image:repeating-linear-gradient(to right,rgba(255,255,255,.12) 0 1px,transparent 1px 13px);
+  -webkit-mask-image:linear-gradient(to right,transparent 8%,#000 100%);
+  mask-image:linear-gradient(to right,transparent 8%,#000 100%);}
+
+.cap--c{color:var(--ink);background:var(--sand-2);--cap-bd:rgba(0,0,0,.13);--cap-bd-h:rgba(0,0,0,.30)}
+.cap--c .cap__art::after{
+  background-image:repeating-radial-gradient(circle at 84% 122%,rgba(0,0,0,.13) 0 1px,transparent 1px 26px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 30%,#000 90%);
+  mask-image:linear-gradient(to bottom,transparent 30%,#000 90%);}
+
+.cap--d{color:var(--warm);background:#2A2320}
+.cap--d .cap__art::after{
+  background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.10) 0 1px,transparent 1px 15px),
+                   repeating-linear-gradient(to right,rgba(255,255,255,.06) 0 1px,transparent 1px 60px);
+  -webkit-mask-image:radial-gradient(140% 120% at 100% 118%,#000 0%,transparent 76%);
+  mask-image:radial-gradient(140% 120% at 100% 118%,#000 0%,transparent 76%);}
+/* nested shells: a returning reader, outlines only */
+.cap--d .cap__art::before{
+  content:"";position:absolute;right:-8%;bottom:-24%;width:56%;height:96%;
+  background-repeat:no-repeat;background-position:right bottom;background-size:contain;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160' fill='none' stroke='%23F4F1EB' stroke-opacity='0.20'><rect x='8' y='8' width='184' height='144' rx='24'/><rect x='34' y='30' width='132' height='122' rx='20'/><rect x='60' y='52' width='80' height='100' rx='16'/><circle cx='100' cy='96' r='6'/></svg>");
+  -webkit-mask-image:linear-gradient(to bottom,transparent 8%,#000 44%);
+  mask-image:linear-gradient(to bottom,transparent 8%,#000 44%);}
+
+.cap--e{color:var(--warm);background:#1A1615}
+.cap--e .cap__art::after{
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 1px,transparent 1px 11px);
+  -webkit-mask-image:linear-gradient(120deg,transparent 22%,#000 100%);
+  mask-image:linear-gradient(120deg,transparent 22%,#000 100%);}
+
+.cap--f{color:var(--warm);background:#2E3350}
+.cap--f .cap__art::after{
+  background-image:radial-gradient(rgba(255,255,255,.18) .9px,transparent 1px);
+  background-size:14px 14px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 34%,#000 100%);
+  mask-image:linear-gradient(to bottom,transparent 34%,#000 100%);}
+
+.cap--g{color:var(--warm);background:#2B2219}
+.cap--g .cap__art::after{
+  background-image:repeating-linear-gradient(to right,rgba(255,255,255,.09) 0 1px,transparent 1px 34px),
+                   repeating-linear-gradient(to bottom,rgba(255,255,255,.09) 0 1px,transparent 1px 34px);
+  -webkit-mask-image:radial-gradient(120% 100% at 88% 112%,#000 0%,transparent 72%);
+  mask-image:radial-gradient(120% 100% at 88% 112%,#000 0%,transparent 72%);}
+
+.cap__art::after{content:"";position:absolute;inset:0}
+
+/* ---------- mission / vision (the one light band) ---------- */
+.pair{display:grid;gap:var(--sp-12)}
+@media (min-width:57.5em){
+  .pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+  .pair__col + .pair__col{border-inline-start:1px solid var(--bd);padding-inline-start:var(--gap)}
+  .pair__col:first-child{padding-inline-end:var(--gap)}
+}
+.pair h2{margin-block-end:var(--sp-5)}
+.pair .prose{margin-block-start:var(--sp-6)}
+
+/* ---------- team: one ruled roster, not four repeated plates ---------- */
+.roster{
+  margin-block-start:var(--sp-10);
+  border-block-start:1px solid var(--bd);
+}
+.roster__row{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  column-gap:var(--sp-5);row-gap:var(--sp-2);
+  align-items:center;
+  padding-block:var(--sp-5);
+  border-block-end:1px solid var(--bd);
+  transition:background-color var(--trs);
+}
+.roster__row:hover{background:rgba(255,255,255,.028)}
+.roster__plate{
+  position:relative;width:72px;aspect-ratio:4/5;overflow:hidden;
+  border:1px solid var(--bd);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,#17130F 0%,#0E0B0B 100%);
+  display:grid;place-items:center;
+}
+/* mesh density steps per row, so no two plates are the same plate */
+.roster__plate::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(to right,rgba(255,255,255,.05) 0 1px,transparent 1px var(--mesh,14px)),
+    repeating-linear-gradient(to bottom,rgba(255,255,255,.05) 0 1px,transparent 1px var(--mesh,14px));
+}
+.roster__mono{
+  position:relative;
+  font-family:var(--ff-display);font-size:1.25rem;font-weight:500;
+  color:var(--warm-soft);letter-spacing:.04em;
+}
+.roster__name{font-size:1.0625rem;color:var(--warm)}
+.roster__role{font-size:var(--fz-ui);color:var(--warm-soft);margin-block-start:2px}
+.roster__note{
+  grid-column:1 / -1;
+  font-size:var(--fz-meta);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--warm-soft);
+}
+/* declared after the base rules so the twelve column placement wins */
+@media (min-width:57.5em){
+  .roster__row{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);padding-block:var(--sp-6)}
+  .roster__plate{grid-column:1 / 2}
+  .roster__id{grid-column:3 / 8}
+  .roster__note{grid-column:11 / 13;justify-self:end;text-align:right}
+}
+
+/* ---------- careers CTA ---------- */
+.cta__inner{display:grid;gap:var(--sp-8)}
+@media (min-width:57.5em){
+  .cta__inner{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap);align-items:end}
+  .cta__a{grid-column:1 / 6}
+  .cta__mid{grid-column:6 / 10}
+  .cta__b{grid-column:10 / 13;justify-self:end}
+}
+.cta__mid ul{border-block-start:1px solid var(--bd)}
+.cta__mid li{
+  border-block-end:1px solid var(--rule-soft);
+  padding-block:14px;
+  font-size:var(--fz-ui);letter-spacing:.01em;
+  color:var(--warm-soft);
+}
+
+/* ---------- careers page ---------- */
+.article{display:grid;gap:var(--sp-8)}
+@media (min-width:57.5em){
+  .article{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
+  .article__side{grid-column:1 / 4;position:sticky;top:calc(var(--hdr) + 31px);align-self:start}
+  .article__body{grid-column:5 / 13}
+}
+.article__body .prose{max-width:64ch}
+.article__body .prose + .prose{margin-block-start:1.3em}
+.pullrule{height:1px;background:var(--bd);margin-block:var(--sp-10)}
+
+.index-list{border-block-start:1px solid var(--bd);margin-block-start:var(--sp-8)}
+@media (min-width:57.5em){
+  .index-list{columns:2;column-gap:var(--gap);border-block-start:0}
+}
+.index-list li{
+  border-block-end:1px solid var(--bd);
+  padding-block:var(--sp-4);
+  font-size:var(--fz-ui);
+  break-inside:avoid;
+}
+@media (min-width:57.5em){ .index-list li{border-block-start:1px solid var(--bd);border-block-end:0} }
+
+.contact-card{
+  border:1px solid var(--bd);border-radius:var(--radius);
+  background:var(--ground-2);
+  padding:var(--sp-8);
+  display:grid;gap:var(--sp-6);
+  margin-block-start:var(--sp-10);
+}
+@media (min-width:57.5em){
+  .contact-card{grid-template-columns:1fr auto;align-items:center;gap:var(--sp-10)}
+}
+
+/* ---------- footer ---------- */
+.site-footer{background:var(--black);border-block-start:1px solid var(--rule)}
+.site-footer .shell{border-inline-color:var(--rule-soft)}
+.foot{display:grid;gap:var(--sp-10);padding-block:var(--sp-16) var(--sp-8)}
+@media (min-width:57.5em){
+  .foot{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
+  .foot__brand{grid-column:1 / 5}
+  .foot__nav{grid-column:6 / 9}
+  .foot__contact{grid-column:9 / 13}
+}
+.foot h2{font-size:var(--fz-meta);text-transform:uppercase;letter-spacing:var(--lts-label);
+  color:var(--warm-soft);font-family:var(--ff-sans);font-weight:600;
+  padding-block-end:var(--sp-4);border-block-end:1px solid var(--rule);margin-block-end:var(--sp-2)}
+.foot__nav a,.foot__contact a{
+  display:flex;align-items:center;min-height:48px;
+  font-size:var(--fz-ui);color:var(--warm-soft);text-decoration:none;
+  border-block-end:1px solid var(--rule-soft);
+  transition:color var(--trs);
+}
+.foot__nav a:hover,.foot__contact a:hover{color:var(--warm)}
+.foot__note{font-size:var(--fz-ui);color:var(--warm-soft);margin-block-start:var(--sp-5);max-width:34ch}
+.foot__bottom{
+  display:flex;flex-wrap:wrap;gap:var(--sp-4);justify-content:space-between;
+  border-block-start:1px solid var(--rule);
+  padding-block:var(--sp-6) var(--sp-8);
+  font-size:var(--fz-ui);letter-spacing:.04em;color:var(--warm-soft);
+}
+
+/* ---------- reveal (IO + timeout backstop; one transform property) ---------- */
+html.js .rv{opacity:0;transform:translate3d(0,16px,0)}
+html.js .rv.is-in{
+  opacity:1;transform:translate3d(0,0,0);
+  transition:opacity .85s var(--ease) var(--rvd,0s),transform .85s var(--ease) var(--rvd,0s);
+}
+/* ---------- text reveal: char scale ----------------------------------------
+   Adapted from Flowbase's GSAP Text Reveal booster, effect 3 "Line Divider
+   Reveal" (chars from scaleX 1.8 / scaleY .1 + blur(10px) brightness(50%)).
+   Rebuilt in vanilla CSS with no GSAP, no SplitType, no ScrollTrigger, and
+   played once on enter instead of scrubbed to scroll position.
+
+   Direction-specific change: the collapsed bar reads in this page's own rule
+   colour, but it gets there through opacity rather than through a colour
+   override. .12 of the section's own ink over the section's own ground lands
+   within a step or two of --rule on the dark grounds and of --rule-light on
+   sand, which is the ink the 12 column grid and every hairline divider on this
+   page is already drawn in. Doing it with opacity instead of `color` means the
+   char's computed colour is never anything other than its final colour, so the
+   reveal cannot lower a measured contrast ratio at any point in its run. It is
+   also the same property, and a shallower fade, than the .rv element reveal
+   directly above already uses on every other block of text on the page.
+
+   Blur is set in em, not px, because the display scale is clamped across a
+   4.5x range: a fixed 10px would erase a 19px heading and barely touch a 44px
+   one.
+
+   Composition with the element reveal above: the two never touch the same
+   element. Any element carrying .tr has had .rv removed and .rv moved onto its
+   siblings, so nothing writes transform, filter or opacity twice.
+
+   The pre-animation state is gated on .is-split, which only the script adds
+   after it has actually split the text. No JS and reduced motion therefore
+   render the original, unstyled text. Once the run has finished the script
+   drops both classes, so a settled heading carries no transform, no filter and
+   no opacity override at all: it is the rendering it had before, to the pixel.
+   -------------------------------------------------------------------------- */
+.tr__w{display:inline-block}                 /* keeps words from breaking mid-word */
+.tr__c{display:inline-block}
+
+html.js .tr.is-split{
+  /* transformed chars must not widen the document at a line end */
+  overflow:clip;overflow-clip-margin:0.5em;
+}
+html.js .tr.is-split .tr__c{
+  --trd:calc(var(--tr-lead,0ms) + var(--i,0) * var(--tr-step,22ms));
+  transform:scale(1.8,.08);      /* Flowbase effect 3: scaleX 1.8, scaleY .1 */
+  filter:blur(.14em);
+  opacity:.12;                   /* stands in for brightness(50%), see above */
+  will-change:transform,filter,opacity;
+}
+html.js .tr.is-split.is-in .tr__c{
+  transform:scale(1,1);
+  filter:blur(0em);
+  opacity:1;
+  transition:
+    transform var(--tr-dur,.62s) var(--ease) var(--trd,0s),
+    filter    var(--tr-dur,.62s) var(--ease) var(--trd,0s),
+    opacity   var(--tr-dur,.62s) linear      var(--trd,0s);
+}
+
+@media (prefers-reduced-motion:reduce){
+  html.js .rv,html.js .rv.is-in{opacity:1;transform:none;transition:none}
+  /* belt and braces: the script bails before splitting, so .is-split never
+     exists here. If it somehow did, it would still be inert. */
+  html.js .tr.is-split{overflow:visible}
+  html.js .tr.is-split .tr__c,html.js .tr.is-split.is-in .tr__c{
+    transform:none;filter:none;opacity:1;transition:none;will-change:auto;
+  }
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ---------- 320px: the header bar has to fit, so it is re-cut, not shrunk ---------- */
+@media (max-width:25.9375em){
+  :root{--outer:16px;--gap:16px;--hdr:65px}
+  .hbar{gap:var(--sp-2);min-height:64px}
+  .wordmark{height:22px}
+  .hbar__right{gap:6px}
+  .hbar__right .btn{padding:10px 14px;font-size:.875rem}
+  .mnav>summary{padding:0 12px;font-size:.875rem;gap:8px}
+  .mnav__panel{min-width:min(84vw,240px)}
+  .contact-card{padding:var(--sp-5)}
+}

@@ -1,0 +1,506 @@
+/* ============================================================
+   NDot AI — shared base
+
+   Tokens, type scale, components, motion and the review switcher.
+   Everything here is the SAME across rounds: it is what makes the
+   rounds read as one brand. The LAYOUT layer that follows this
+   block is what differs, and it is the only thing that differs.
+
+   No map, no geography, no dot field, no gradient, no shadow.
+   Contrast ratios are computed (WCAG 2.1), not eyeballed.
+   ============================================================ */
+:root{
+  --paper:#FAFAF8;
+  --paper-2:#F1F1EC;
+  --ink:#111110;          /* 18.08:1 on paper */
+  --ink-2:#6B6B63;        /*  5.14:1 on paper */
+  --rule:#D8D8CE;
+  --plate:#C9C9C0;
+
+  --ink-field:#131310;
+  --on-ink:#F4F4EE;       /* 16.86:1 on the band */
+  --on-ink-2:#9A9A90;     /*  6.56:1 on the band */
+  --rule-ink:#6A6A63;     /*  3.38:1, clears SC 1.4.11 */
+
+  /* Editorial chrome, not a brand colour. NEVER use --accent inside an
+     inverted band: #A6231A on --ink-field is 2.55:1. Use --accent-ink. */
+  --accent:#A6231A;       /* 6.98:1 on paper */
+  --accent-ink:#E86A52;   /* 5.80:1 on the band */
+
+  --serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:Archivo,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --face:var(--serif);
+
+  --pad:clamp(20px,4vw,64px);
+  --section:clamp(56px,7vw,104px);
+}
+
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--face);font-size:17px;line-height:1.62;font-weight:400;
+  font-variant-numeric:lining-nums tabular-nums;-webkit-font-smoothing:antialiased;
+}
+@media (min-width:768px){ body{font-size:19px} }
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0}
+a,.btn{transition:color .12s ease,background-color .12s ease,border-color .12s ease}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--on-ink);padding:12px 18px;z-index:99}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.on-ink :focus-visible,.band-ink :focus-visible{outline-color:var(--accent-ink)}
+main:focus{outline:none}
+
+/* ---------- the system layer (mono) ---------- */
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+       text-transform:uppercase;color:var(--ink-2);line-height:18px;margin:0}
+.on-ink .label,.band-ink .label{color:var(--on-ink-2)}
+.folio{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--accent);margin:0}
+.on-ink .folio,.band-ink .folio{color:var(--accent-ink)}
+
+/* ---------- display type ---------- */
+h1,h2,h3{margin:0;font-family:var(--face);font-weight:300;text-wrap:balance}
+.h-xl{font-size:clamp(34px,1.2rem + 3.4vw,62px);line-height:1.02;letter-spacing:-.022em}
+.h-l{font-size:clamp(28px,1rem + 2.2vw,44px);line-height:1.06;letter-spacing:-.018em}
+.h-m{font-size:clamp(21px,1rem + 1vw,28px);line-height:1.18;letter-spacing:-.01em;font-weight:400}
+.deck{font-size:clamp(19px,1rem + .7vw,24px);line-height:1.44;font-weight:300;color:var(--ink-2);margin:0}
+.on-ink .deck,.band-ink .deck{color:var(--on-ink-2)}
+
+/* ---------- buttons ---------- */
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;text-decoration:none;
+     font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;
+     text-transform:uppercase;height:48px;padding:0 22px;line-height:18px;
+     border:1px solid var(--ink)}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.on-ink .btn,.band-ink .btn{border-color:var(--on-ink);color:var(--on-ink)}
+.on-ink .btn-solid,.band-ink .btn-solid{background:var(--on-ink);color:var(--ink-field)}
+.on-ink .btn-solid:hover,.band-ink .btn-solid:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--ink-field)}
+.on-ink .btn-ghost:hover,.band-ink .btn-ghost:hover{background:var(--on-ink);color:var(--ink-field)}
+
+.band-ink{background:var(--ink-field);color:var(--on-ink)}
+.band-ink h1,.band-ink h2,.band-ink h3{color:var(--on-ink)}
+
+/* ---------- record components ----------
+   The internals are shared; each layout supplies its own container grid. */
+.stat .ord{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;
+           color:var(--accent);display:block;margin-bottom:12px}
+.on-ink .stat .ord,.band-ink .stat .ord{color:var(--accent-ink)}
+.stat .fig{font-size:clamp(30px,1rem + 2.6vw,50px);font-weight:300;letter-spacing:-.02em;
+           line-height:1;text-wrap:balance;color:inherit}
+.stat .label{display:block;margin-top:auto;padding-top:18px}
+
+.cap-num{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.06em}
+.on-ink .cap-num,.band-ink .cap-num{color:var(--accent-ink)}
+.cap-name{font-size:clamp(20px,1rem + .9vw,28px);font-weight:400;letter-spacing:-.012em;line-height:1.2}
+
+/* The photo slot is a PRE-PRESS PLATE: the frame is set, the image is not
+   placed yet. Crop marks read as a stage in production, not a broken image. */
+.plate{position:relative;aspect-ratio:4/5;background:var(--paper-2);
+       border:1px solid var(--rule);display:grid;place-items:center}
+.plate .num{font-size:clamp(38px,6vw,60px);font-weight:300;color:var(--plate);letter-spacing:.02em;line-height:1}
+.plate i{position:absolute;width:11px;height:11px;--cm:#8F8F86}
+.plate .tl{top:8px;left:8px;border-top:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .tr{top:8px;right:8px;border-top:1px solid var(--cm);border-right:1px solid var(--cm)}
+.plate .bl{bottom:8px;left:8px;border-bottom:1px solid var(--cm);border-left:1px solid var(--cm)}
+.plate .br{bottom:8px;right:8px;border-bottom:1px solid var(--cm);border-right:1px solid var(--cm)}
+.person .name{margin-top:18px;font-size:20px;font-weight:400;letter-spacing:-.01em;line-height:1.2}
+.person .role{margin-top:6px;font-family:var(--mono);font-size:11px;font-weight:500;
+              letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.on-ink .person .role,.band-ink .person .role{color:var(--accent-ink)}
+.person .bio{margin-top:12px;font-size:15px;line-height:1.55;color:var(--ink-2)}
+.on-ink .person .bio,.band-ink .person .bio{color:var(--on-ink-2)}
+.person .name,.person .role,.person .bio,.mailto{overflow-wrap:break-word}
+
+.mailto{display:inline-block;font-weight:400;letter-spacing:-.012em;text-decoration:none;
+        font-size:clamp(21px,1rem + 1vw,30px);border-bottom:1px solid currentColor;padding-bottom:6px}
+.on-ink .mailto,.band-ink .mailto{color:var(--on-ink);border-bottom-color:var(--rule-ink)}
+.on-ink .mailto:hover,.band-ink .mailto:hover{border-bottom-color:var(--accent-ink);color:var(--accent-ink)}
+
+/* ---------- careers prose ---------- */
+.prose p{color:var(--ink-2);line-height:1.68}
+.on-ink .prose p,.band-ink .prose p{color:var(--on-ink-2)}
+.pull{font-size:clamp(25px,1rem + 1.9vw,40px);font-weight:300;line-height:1.16;
+      color:var(--ink)!important;letter-spacing:-.014em}
+.on-ink .pull,.band-ink .pull{color:var(--on-ink)!important}
+.contact-block .mailto{color:var(--ink);border-bottom-color:var(--ink-2);margin-top:12px}
+.contact-block .mailto:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ---------- colophon / footer ---------- */
+.site-foot{background:var(--ink-field);color:var(--on-ink);border-top:1px solid var(--rule-ink);
+           padding-block:48px}
+.site-foot .wrap{max-width:1312px;margin-inline:auto;padding-inline:var(--pad)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between;align-items:flex-start}
+.site-foot svg{height:19px;width:auto;color:var(--on-ink)}
+.foot-links{display:flex;flex-wrap:wrap;gap:12px 26px}
+.foot-links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+              color:var(--on-ink-2);text-decoration:none}
+.foot-links a:hover{color:var(--on-ink)}
+.colophon{margin-top:36px;padding-top:18px;border-top:1px solid var(--rule-ink);
+          display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
+.colophon span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--on-ink-2)}
+
+/* ============================================================
+   MOTION: the drift-in
+
+   FAIL-OPEN CONTRACT. A load-time animation, never a scroll-driven
+   one: no requestAnimationFrame, no IntersectionObserver, no JS.
+   Every keyframe starts AND ends at the resting state, so if the
+   animation never runs the copy is simply there. Killed under
+   prefers-reduced-motion and in the gallery cards.
+   ============================================================ */
+@media (prefers-reduced-motion:no-preference){
+  .h-xl,.deck,.actions,.stat,.cap-row,.mv > div,.person,
+  .prose > *,.sec-head,.grid-people,.site-foot .foot-grid,.site-foot .colophon{
+    animation:drift-in .95s cubic-bezier(.22,.68,.24,1) both;
+  }
+  @keyframes drift-in{
+    from{opacity:0;transform:translateY(15px);filter:blur(9px)}
+    55% {filter:blur(0)}
+    to  {opacity:1;transform:none;filter:none}
+  }
+}
+/* Cards are framed and lazy-loaded, so a card caught mid-drift smears its
+   punctuation. In the gallery every element is pinned to its finished state. */
+body.embed .h-xl,body.embed .deck,body.embed .actions,body.embed .stat,
+body.embed .cap-row,body.embed .mv > div,body.embed .person,body.embed .prose > *,
+body.embed .sec-head,body.embed .grid-people,body.embed .site-foot .foot-grid,
+body.embed .site-foot .colophon{animation:none}
+
+/* ============================================================
+   REVIEW-ONLY VERSION SWITCHER
+
+   Not part of the design. Two pairs: direction and round; the lit
+   cell of each pair is where you are. Its own colours rather than
+   the theme's so it looks identical on the light and dark rounds.
+   Hidden in the gallery cards and in print. Strip before launch:
+   search for "vswitch".
+   ============================================================ */
+.vswitch{position:fixed;right:16px;bottom:16px;z-index:200;display:flex;max-width:calc(100vw - 32px);
+  background:#111110;border:1px solid #52524A;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase}
+.vswitch a{display:flex;align-items:center;color:#C4C4B9;text-decoration:none;
+  padding:0 11px;min-height:34px;white-space:nowrap;
+  transition:background-color .12s ease,color .12s ease}
+.vswitch a:hover{background:#2B2B24;color:#FFF}
+.vswitch a.is-on{background:#F4F4EE;color:#111110}
+.vswitch a:focus-visible{outline:2px solid #E86A52;outline-offset:-2px;position:relative}
+.vswitch-round{border-left:1px solid #52524A}
+body.embed .vswitch{display:none}
+@media print{.vswitch{display:none}}
+@media (max-width:600px){
+  .vswitch{right:10px;bottom:10px;max-width:calc(100vw - 20px)}
+  .vswitch a{min-height:44px;padding:0 10px}
+  .vswitch-dir{letter-spacing:.06em}
+}
+
+/* ---------- mobile floor ----------
+   Measured on a touch context, not eyeballed: 44px targets, the mark never
+   squeezed out of the header, and mono labels never scaled down. */
+.brand{flex:0 0 auto}
+@media (max-width:600px){
+  .brand{padding-block:14px}      /* the wordmark link is 17-20px of glyph on its own */
+  .nav a{padding-block:15px}
+  .nav a.is-cta{padding:15px 14px}  /* the CTA's own padding outranks .nav a */
+  .foot-links a{padding-block:15px}
+  /* the address is a link, so it needs a 44px target. Padding-top is
+     invisible (the underline hangs off padding-bottom) and buys the height. */
+  .mailto{padding-block:12px}
+  section[id]{scroll-margin-top:18px}
+}
+
+/* The review switcher is `position:fixed` and sits over the last line of the
+   colophon at phone widths. Measured at 320 and 390 it covered "ndot.ai" and
+   "(c) 2026 NDot AI" on every page. This padding buys the footer clearance and
+   goes away with the switcher: strip it when you strip "vswitch". */
+.site-foot{padding-bottom:72px}          /* the bar occupies the bottom 50px */
+@media (max-width:600px){
+  .site-foot{padding-bottom:114px}       /* and 54px there, on a taller bar */
+}
+
+/* ============================================================
+   LAYOUT: FACING PAGES  (Systems, round 2)
+
+   A spread. The left leaf carries the caption, the right leaf
+   carries the plate, and the caption CHANGES as each plate
+   scrolls past it.
+
+     R1  stacked sections, sticky rail per section, one column
+     R2  facing pages: left caption, right plate, one scrollbar
+     R3  full-viewport panels, one screen at a time
+
+   ---------------------------------------------------------------
+   How the caption changes, and why there is no JavaScript
+
+   Each pair is one grid row. The left cell stretches to the full
+   height of the pair (whatever the plate needs), and the caption
+   inside it is `position:sticky`. So while you are reading pair N
+   its caption is pinned; when the pair ends the caption scrolls
+   away and pair N+1's caption arrives behind it. The effect is a
+   caption that tracks the plate, and it is entirely CSS.
+
+   That matters beyond elegance. An IntersectionObserver version
+   would gate visible copy behind script, which this site does not
+   do: every word here is present with JS disabled, with rAF
+   suspended, and under prefers-reduced-motion. There is nothing
+   to fail.
+
+   ---------------------------------------------------------------
+   One scrollbar, deliberately
+
+   The previous round pinned the left pane with `height:100dvh;
+   overflow-y:auto`, which gave the page a second scrollbar and
+   two competing scroll contexts. Nothing here scrolls except the
+   page. Do not put `overflow` on .leaf-l or .stick: it would both
+   restore that confusion and silently kill `position:sticky`.
+   ============================================================ */
+:root{
+  --face:var(--sans);
+  --paper:#FBFBF9;
+  --paper-2:#F0F0EA;
+  --rule:#DCDCD2;
+  --leaf:#F2F2EC;          /* the caption leaf sits a shade back */
+  --bar:54px;
+}
+body{font-size:16px;line-height:1.58}
+@media (min-width:768px){ body{font-size:17px} }
+h1,h2,h3{font-weight:500;letter-spacing:-.022em}
+.h-l{font-size:clamp(25px,1rem + 1.5vw,34px);line-height:1.1}
+.h-m{font-size:clamp(19px,1rem + .7vw,24px);line-height:1.24;font-weight:500}
+.deck{font-weight:400;font-size:clamp(15.5px,1rem + .3vw,18px);line-height:1.5}
+
+/* ---------- the running bar ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:60;
+        background:var(--paper);border-bottom:1px solid var(--rule);
+        display:flex;align-items:center;justify-content:space-between;
+        gap:16px;padding-inline:clamp(16px,2.4vw,30px)}
+.topbar .brand svg{height:17px;width:auto;color:var(--ink)}
+.nav{display:flex;align-items:center;gap:clamp(13px,2.2vw,28px)}
+.nav a{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;
+       text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a.is-cta{color:var(--paper);background:var(--ink);padding:8px 13px}
+.nav a.is-cta:hover{background:var(--accent)}
+main{padding-top:var(--bar)}
+
+/* ---------- the spread ----------
+   Stacked by default. The facing arrangement needs BOTH a wide enough
+   viewport and a tall enough one: a pinned caption on a short window can
+   end up taller than the space it is pinned into, which strands its own
+   bottom edge. Below either threshold this is an ordinary stack. */
+.leafpair{display:block}
+.leafpair + .leafpair{border-top:1px solid var(--rule)}
+
+@media (min-width:1024px) and (min-height:640px){
+  .leafpair{display:grid;grid-template-columns:minmax(0,40%) minmax(0,1fr)}
+  /* NO align-items here. The left cell must keep the default `stretch`,
+     or it collapses to its content height and the caption has nothing to
+     be sticky inside. */
+  .leaf-l{background:var(--leaf);border-right:1px solid var(--rule)}
+  .leaf-l .stick{
+    position:sticky;top:var(--bar);
+    min-height:calc(100dvh - var(--bar));
+    display:grid;align-content:center;
+    padding:clamp(26px,3vw,48px) clamp(22px,2.6vw,44px);
+  }
+  .leaf-r{min-height:calc(100dvh - var(--bar));
+          display:grid;align-content:start;
+          padding:clamp(30px,3.6vw,60px) clamp(22px,2.8vw,52px)}
+
+}
+.leaf-l .stick{padding:clamp(24px,4vw,40px) var(--pad)}
+.leaf-r{padding:clamp(26px,4vw,44px) var(--pad)}
+@media (max-width:1023px),(max-height:639px){
+  .leaf-l{background:var(--leaf);border-bottom:1px solid var(--rule)}
+}
+
+/* ---------- the opening caption ----------
+   The type scale here is height-aware on purpose. A pinned caption has
+   exactly one viewport to live in, so the opening statement is sized off
+   BOTH axes: at 1024x640 it resolves near the floor and fits, at 1920
+   it resolves at the cap. Sizing off vw alone overflows short windows,
+   and an overflowing sticky element hides its own bottom. */
+.opening h1{font-size:clamp(22px,1.05vh + 1.55vw,38px);line-height:1.1;
+            letter-spacing:-.028em;max-width:22ch}
+.opening .deck{margin-top:clamp(14px,2vh,22px);color:var(--ink-2);max-width:40ch;
+               font-size:clamp(14px,.62vh + .55vw,17px);line-height:1.5}
+.opening .actions{margin-top:clamp(16px,2.4vh,28px)}
+
+/* ---------- a chapter caption ----------
+   Number, name, mark. No prose is invented for these: the only sentence
+   that appears on a caption leaf is the platform sentence, which is the
+   source document's own and was moved here rather than duplicated. */
+.cap-card{display:grid;gap:clamp(12px,1.8vh,20px);justify-items:start;max-width:34ch}
+.cap-card .n{font-family:var(--mono);font-weight:500;line-height:1;
+             font-size:clamp(40px,3.2vh + 2vw,72px);color:var(--accent);
+             letter-spacing:-.03em;margin:0;display:flex;align-items:baseline;gap:.28em}
+.cap-card .n .of{font-size:.3em;letter-spacing:.16em;color:var(--ink-2)}
+.cap-card .bar{width:clamp(40px,4vw,64px);height:2px;background:var(--accent)}
+.cap-card h2{font-size:clamp(23px,1.1vh + 1.2vw,36px);line-height:1.06;letter-spacing:-.028em}
+.cap-card .note{color:var(--ink-2);line-height:1.55;font-size:clamp(14px,.55vh + .5vw,16px)}
+/* the mark is the half of the caption that is an image, so it is set at a
+   size that reads as a drawing rather than an icon */
+.cap-card .fig-mark{width:clamp(88px,8.5vh + 4.6vw,184px);height:auto;color:var(--ink);
+                    margin-top:clamp(8px,1.8vh,20px)}
+
+/* ---------- plates ---------- */
+.plate-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+            padding-bottom:11px;border-bottom:2px solid var(--ink);
+            margin-bottom:clamp(20px,2.6vw,32px)}
+.plate-head .n{font-family:var(--mono);font-size:12px;font-weight:500;
+               letter-spacing:.06em;color:var(--accent);margin:0}
+.plate-head h2{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+               text-transform:uppercase;color:var(--ink)}
+.plate-head .label{margin-left:auto}
+
+.stats{display:grid;gap:0;border-top:1px solid var(--rule)}
+.stat{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:baseline;
+      padding-block:clamp(18px,2.4vh,30px);border-bottom:1px solid var(--rule)}
+.stat .ord{margin-bottom:0}
+.stat .fig{font-size:clamp(24px,1rem + 1.5vw,36px);font-weight:500;letter-spacing:-.026em}
+.stat .label{grid-column:2;margin-top:0;padding-top:6px}
+
+.figure-pair{display:grid;gap:clamp(16px,2.2vw,26px)}
+.panel{border:1px solid var(--rule);background:var(--paper-2);padding:clamp(16px,2vw,24px)}
+.panel svg{width:100%;height:auto;color:var(--ink)}
+.panel .cap{margin-top:11px;padding-top:9px;border-top:1px solid var(--rule)}
+
+.caps{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+      background:var(--rule);border:1px solid var(--rule)}
+.cap-row{background:var(--paper);display:flex;flex-direction:column;gap:14px;
+         padding:clamp(16px,2.2vw,28px)}
+.cap-row .mark{width:26px;height:26px;color:var(--accent)}
+.cap-name{font-size:clamp(15.5px,1rem + .3vw,18.5px);font-weight:500;
+          letter-spacing:-.014em;margin-top:auto}
+/* the eighth cell completes the grid with the mark rather than filler copy */
+.cap-fill{background:var(--ink);display:grid;place-items:center;padding:clamp(16px,2.2vw,28px)}
+.cap-fill svg{width:clamp(54px,6vw,88px);height:auto;color:var(--paper)}
+
+.mv{display:grid;gap:clamp(22px,3vh,34px);background:var(--rule)}
+.mv > div{background:var(--paper);padding:clamp(18px,2.4vw,30px) 0 0;border-top:2px solid var(--ink)}
+.mv .h-m{margin-top:12px}
+.mv .body{margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6}
+
+.grid-people{display:grid;gap:clamp(18px,2.2vw,26px);grid-template-columns:repeat(2,1fr)}
+@media (min-width:560px){ .grid-people{grid-template-columns:repeat(3,1fr)} }
+.grid-people .name{font-size:16.5px;font-weight:500}
+.grid-people .bio{font-size:13.5px;line-height:1.5}
+
+/* ---------- the close, full width across both leaves ---------- */
+.closing{background:var(--ink-field);color:var(--on-ink);border-top:1px solid var(--rule);
+         padding:clamp(40px,5.5vw,84px) var(--pad)}
+.closing .inner{max-width:1240px;margin-inline:auto;display:grid;gap:clamp(22px,3vw,44px)}
+@media (min-width:900px){ .closing .inner{grid-template-columns:1.1fr 1fr;align-items:end} }
+.closing .plate-head{border-bottom-color:var(--on-ink)}
+.closing .plate-head h2{color:var(--on-ink)}
+.closing .plate-head .n{color:var(--accent-ink)}
+.closing h3{max-width:17ch;color:var(--on-ink)}
+.closing .deck{margin-top:16px;max-width:40ch}
+.closing .mailto{margin-top:clamp(20px,2.6vw,30px)}
+@media (min-width:900px){ .closing .plate-head{grid-column:1 / -1} }
+
+/* ---------- careers page ----------
+   One pair, and the caption stays pinned for the whole article: the ask
+   and the address never leave the screen while the reasons scroll. */
+.prose{display:grid;gap:clamp(17px,2vw,23px);max-width:66ch}
+.pull{margin-block:clamp(12px,1.6vw,18px);padding-block:clamp(18px,2.2vw,26px);
+      border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+      font-weight:500;font-size:clamp(21px,1rem + 1.1vw,28px);letter-spacing:-.02em;max-width:22ch}
+.contact-block{margin-top:clamp(26px,3vw,36px);padding:clamp(20px,2.4vw,28px);
+               background:var(--paper-2);border:1px solid var(--rule)}
+/* the article is a long read, so its plate is top-aligned rather than centred */
+@media (min-width:1024px) and (min-height:640px){
+  .leafpair-article .leaf-r{align-content:start}
+}
+
+/* ---------- gallery card ----------
+   Show the spread itself: caption left, plate right, nothing sticky. */
+body.embed{--bar:32px}
+body.embed .topbar{position:static;height:32px;padding-inline:14px}
+body.embed .topbar .brand svg{height:13px}
+body.embed .nav{display:none}
+body.embed main{padding-top:0}
+body.embed .leafpair{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr)}
+body.embed .leaf-l{background:var(--leaf);border-right:1px solid var(--rule);border-bottom:0}
+body.embed .leaf-l .stick{position:static;min-height:0;padding:14px 16px}
+body.embed .leaf-r{min-height:0;padding:14px 16px;align-content:start}
+body.embed .opening h1{font-size:16px;line-height:1.16;max-width:26ch}
+body.embed .opening .deck{font-size:10px;line-height:1.44;margin-top:9px;max-width:40ch}
+body.embed .opening .actions{margin-top:12px}
+body.embed .btn{font-size:8.5px;padding:6px 10px}
+body.embed .plate-head{margin-bottom:11px;padding-bottom:7px}
+body.embed .stat{padding-block:9px}
+body.embed .stat .fig{font-size:14px}
+
+@media (max-width:600px){
+  /* The bar is position:fixed, so an overflowing nav does NOT widen the
+     document and no overflow check catches it: the links simply run off the
+     right edge and are unreachable. Measured at 320px the row wanted 355.8px.
+     So the bar goes static and the nav wraps to its own row. */
+  .topbar{position:static;height:auto;flex-wrap:wrap;padding-block:4px}
+  main{padding-top:0}
+  .nav{flex:1 1 100%;flex-wrap:wrap;column-gap:20px;border-top:1px solid var(--rule)}
+  .nav a{padding-block:15px}
+  .nav a.is-cta{padding:15px 14px}
+  .grid-people{grid-template-columns:repeat(2,1fr)}
+  section[id]{scroll-margin-top:8px}
+}
+@media (min-width:601px){ section[id]{scroll-margin-top:var(--bar)} }
+
+@media print{
+  .topbar{position:static}
+  main{padding-top:0}
+  .leafpair{display:block}
+  .leaf-l{background:#fff}
+  .leaf-l .stick{position:static;min-height:0}
+  .leaf-r{min-height:0}
+  .closing,.site-foot{background:#fff!important;color:#000!important}
+  .closing h3,.closing .deck,.closing .mailto,.closing .plate-head h2,
+  .site-foot a,.colophon span{color:#000!important}
+}
+
+
+/* ============================================================
+   PACING  (must stay LAST in this file)
+
+   A caption is only held for as long as its pair is TALLER than
+   the viewport: pinned travel is (pair height - viewport room),
+   so a plate exactly one screen tall pins for zero pixels and
+   the caption just scrolls by. Measured, that was the first
+   draft: pinned in 4% of samples at 1440x900.
+
+   POSITION IS LOAD-BEARING. These rules are single-class, same
+   specificity as the component rules above, and a media query
+   adds no specificity. When this block sat higher in the file
+   every min-height here was silently overridden by the component
+   rule below it, except .panel, which had no competing
+   min-height and so inflated the diagrams into tall empty boxes.
+   That is what the block being last prevents. If you add a
+   component rule, add it ABOVE this line, not below.
+
+   The heights are what the plate's own records want, never
+   filler. Where the content genuinely is short (three magnitudes,
+   two statements) the hold is shorter, and that is honest: the
+   diagrams earn their height from a taller viewBox instead.
+   ============================================================ */
+@media (min-width:1024px) and (min-height:640px){
+  .leaf-r{align-content:start}
+  .stat{min-height:42vh;display:grid;align-content:center;grid-template-columns:auto 1fr}
+  .stat .fig{font-size:clamp(28px,1rem + 2.4vw,52px)}
+  .figure-pair{grid-template-columns:1fr;gap:clamp(20px,3vh,34px)}
+  .caps{grid-template-columns:repeat(2,1fr)}
+  .cap-row{min-height:36vh}
+  .cap-row .mark{width:clamp(46px,5.8vh,74px);height:auto}
+  .mv{gap:1px}
+  .mv > div{min-height:70vh;display:grid;align-content:center}
+  .grid-people{grid-template-columns:repeat(2,1fr);gap:clamp(26px,3vw,44px)}
+}

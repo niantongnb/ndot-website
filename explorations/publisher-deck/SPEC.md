@@ -1,4 +1,4 @@
-# ndot for publishers — build spec
+# ndot for publishers : build spec
 
 Everything needed to rebuild the deck by hand. Slide size **13.333 × 7.5 in (1280 × 720 pt)**.
 All plates are **2560 × 720 px @2x = 192 DPI** on that slide.
@@ -74,22 +74,24 @@ Numbers are lining and tabular throughout.
 
 ## Structure
 
-15 pages: cover, contents, then four sections with a divider each.
+16 pages: cover, contents, then four sections with a divider each.
 
 | | Pages |
 |---|---|
-| § 01 The problem | 3–5 |
-| § 02 The shift | 6–7 |
-| § 03 The offer | 8–13 |
-| § 04 Next steps | 14–15 |
+| § 01 The problem | 3 to 6 |
+| § 02 The shift | 7 to 8 |
+| § 03 The offer | 9 to 14 |
+| § 04 Next steps | 15 to 16 |
 
-The dividers carry the argument: fragments adrift → gathering → assembled on ink →
-solid and settled. Pages 8 and 12 are the two dark beats.
+The dividers carry the argument: fragments adrift to gathering to assembled on ink to
+solid and settled. Pages 9 and 13 are the two dark beats.
 
 ## The data language
 
 One dot, one unit, everywhere:
-- traffic page: one dot = one percentage point, every rail is 100
+- traffic page: one dot = one percentage point. Page 4 sets it as four rails of
+  100; page 5 is the same data as four 10 x 10 blocks, for comparing the four
+  figures against each other rather than reading them one at a time. Pick one.
 - valuation page: one dot = one turn of revenue
 - engagement page: one dot = one multiple
 

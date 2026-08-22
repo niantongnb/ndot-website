@@ -500,11 +500,15 @@ body::after{
    `balance`, because balancing a line built out of two type sizes puts the
    break in the wrong place. */
 .ledger__fig{color:var(--fg);text-wrap:pretty}
-/* Relative to the figure so it stays a fixed step below it, floored at the UI
-   size so the phone, where the figure is at its smallest, never sets it at
-   ten pixels. */
+/* Relative to the figure so it holds one step below it at every width, floored
+   at the UI size so the phone, where the figure is at its smallest, never sets
+   it at ten pixels. .38em puts it at reading size beside a display figure: the
+   sentence drops out of display and finishes at the size the rest of the page
+   is read at. At .42em it sat above the running prose, which put three
+   different jobs — this tail, the standfirst, the provenance note — inside four
+   pixels of each other. */
 .ledger__tail{
-  font-size:max(.42em,var(--fz-ui));letter-spacing:.005em;line-height:1.2;
+  font-size:max(.38em,var(--fz-ui));letter-spacing:.005em;line-height:1.2;
   color:var(--fg-soft);
 }
 /* The provenance sits beside the sentence, hanging from its baseline. */

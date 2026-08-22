@@ -102,6 +102,34 @@ clause when actually read. The provenance takes the right column on its own.
 `text-wrap:pretty` rather than the display default `balance`, because balancing
 a line built out of two type sizes puts the break in the wrong place.
 
+### A section head is not the size of the thing it introduces
+Proof set its head at `d-sec--lg` and its three entries at `d-fig`, which at
+1440 is 48px over 46px. A four percent step is not a step: the head and the
+entries read as one level, and nothing on screen said which of them was the
+section's content. Measured across 1000, 1280, 1440 and 1920 the ratio never
+left 1.04 to 1.07.
+
+The entries are the content and the head is the signpost, so the head steps
+back to `d-sec`, 35px, and the ratio becomes 1.31. Mission and vision already
+worked this way, with a 26px head over a 38px statement; Proof now matches
+them.
+
+`d-sec--lg` survives on Capabilities and on the careers page, where the head
+*is* the largest type in its section. That is the rule the class now carries:
+`--lg` is for a head nothing beneath it outranks.
+
+Swept both pages for the same fault — every pair of display-scale runs inside
+one band, at 1440 — and the five that still land inside 1.15 are peers that
+are meant to match: the three ledger entries, the two mission and vision heads,
+and the two statements.
+
+### The ledger tail lands at reading size
+At `.42em` the tail was 19.3px, which put it *above* the 17px running prose it
+sits beside and 4px off the 15px provenance note: three jobs, three sizes,
+inside four pixels. It is `.38em` now, floored at the UI size, so it arrives at
+17.5px — the size the rest of the page is read at. The sentence drops out of
+display and finishes at reading size, which is what it is doing.
+
 ### Mission and vision take the width they were given
 Both statements were capped at `44ch`, a measure sized off Playfair's zero
 width, which at that display size drew about a third of the band and left the

@@ -820,6 +820,31 @@ html.js .rv.is-in{
    drops both classes, so a settled heading carries no transform, no filter and
    no opacity override at all: it is the rendering it had before, to the pixel.
    -------------------------------------------------------------------------- */
+/* The split makes every character its own inline-block, and an atomic inline is
+   its own shaping run, so kerning between characters is gone for as long as the
+   element is split. Putting the original markup back at the end brings it back
+   in a single frame and the line tightens — 400ms after the motion has already
+   stopped, which is exactly when the eye is free to notice it.
+
+   Measured at 1440: the hero's first line settles 509.83 -> 506.75 and "A
+   record, not a pitch" 292.33 -> 290.41. The other six headings move by under a
+   quarter pixel, which is why it reads as random rather than as a step: two of
+   the eight visibly tighten and the rest do not. Same string at 48px measures
+   398.27 plain, 398.41 in per-character inline spans, 401.05 in per-character
+   inline-blocks, so the shaping break is the whole of it.
+
+   Kerning therefore comes off for the whole life of a split element and the two
+   states match. It costs 0.61% and 0.66% of width on those two headings and
+   under 0.1% on the rest, and takes the settle to 0.22px, under a device pixel.
+   Ligatures go with it: none of the current headings contain one, so it costs
+   nothing measurable today, and it stops the same snap arriving the first time
+   a heading is written with an "fi" in it.
+
+   Keyed on data-tr-n, which the script sets only when it has actually split an
+   element and never removes. No JS, reduced motion, and any run over the span
+   cap are never split, never carry the attribute, and keep full kerning. */
+html.js .tr[data-tr-n]{font-kerning:none;font-variant-ligatures:none}
+
 .tr__w{display:inline-block}                 /* keeps words from breaking mid-word */
 .tr__c{display:inline-block}
 

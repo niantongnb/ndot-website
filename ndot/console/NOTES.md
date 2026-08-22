@@ -34,7 +34,20 @@ Both pages point at the normalized wordmark. It is transparent, tight viewBox
 ground this direction opens on, on both the home page and careers.
 
 ## What changed in this pass (edit round)
-1. **The ruled contents line is gone from both heroes.** `Sections / Shift,
+1. **The record name came out of the console panel**, and the framing line took
+   its type tier and its top margin. The rail row for the open record is already
+   marked with a blue edge, a tinted ground and a blue number, so printing its
+   name in the panel beside it was the same string twice on one screen. All seven
+   names now occur exactly once on the page.
+2. **Both mission and vision bodies run two lines.** They were two and three, so
+   the pair read as mismatched blocks rather than one shape. VISION-BODY needs
+   78ch to fit in two; `.duo .prose` is set to 84ch, that plus a line break of
+   slack, with `text-wrap: balance` so the two lines come out level and the extra
+   measure never shows as a long line above a short one. Measured at 1024, 1280,
+   1440 and 1600: two and two at every width. The trade is a longer measure than
+   the 45 to 75ch that is comfortable for body copy, taken deliberately to get
+   the shape.
+3. **The ruled contents line is gone from both heroes.** `Sections / Shift,
    proof, capabilities, mission, vision, team, careers` on index, and
    `Document / Context, platform, track record, the work, apply` on careers. It
    restated the section labels the visitor was about to scroll through, and on
@@ -42,7 +55,7 @@ ground this direction opens on, on both the home page and careers.
    stays, because that one is a set of real links standing in for the nav links
    the header drops under 720px; it takes over the 32px top margin the contents
    line was holding. `.hero__note` is out of `site.css`.
-2. **The shift carries a schematic.** Each comparison row now draws its own
+4. **The shift carries a schematic.** Each comparison row now draws its own
    route under the phrase: publisher, third-party channels, readers, with the
    last leg dashed, against publisher and readers joined directly in both
    directions. Same two endpoints in both drawings at the same coordinates, so
@@ -51,7 +64,7 @@ ground this direction opens on, on both the home page and careers.
    10px mono label, no new vocabulary. The row's mono key labels the picture as
    well as the phrase, so nothing is printed twice. Dropped under 720px, where
    five nodes will not fit and the phrase carries the row on its own.
-3. **The capabilities standfirst stopped listing the seven.** It read `Our
+5. **The capabilities standfirst stopped listing the seven.** It read `Our
    platform spans app and newsletter development, audience growth,
    personalization, engagement, monetization, and publisher-advertiser networks
    — all proven at scale`, immediately above a rail printing those same seven
@@ -59,19 +72,19 @@ ground this direction opens on, on both the home page and careers.
    now names the four groups the record panel already has a field for, which is
    the one thing the rail does not show at a glance. POSITIONING-3 is therefore
    no longer present verbatim on the page; see Copy fidelity.
-4. **The proof figures came down a tier.** They were set to the exact `h1.display`
+6. **The proof figures came down a tier.** They were set to the exact `h1.display`
    clamp, which put `Hundreds of millions` on two lines at 45px inside a third of
    the column and read as a pull quote competing with the h1. Now
    `clamp(1.44rem, 1.16rem + 1.24vw, 2rem)` with line-height 1.14: all three fit
    on one line at 1440, and the band reads as three measurements rather than
    three statements.
-5. **The blue underscore cursor is gone from the text reveal.** It was the one
+7. **The blue underscore cursor is gone from the text reveal.** It was the one
    mark on either page that read as an effect rather than as the page settling,
    and it pulled the eye along the line instead of letting the line arrive. The
    character colour walk stays. Out with it: `text-decoration-*` on `.trc`,
    `--tr-hit`, `--tr-scan-d`, the `tr-cursor` keyframes, and the one script line
    that wrote the scan duration.
-6. **Nothing ends on an orphan word.** A new line-breaking block sets
+8. **Nothing ends on an orphan word.** A new line-breaking block sets
    `text-wrap: balance` on short blocks and `pretty` on running copy, and
    standfirsts balance from 640px up. Layout only: no text node is touched and
    no non-breaking space is introduced, so every string still matches its source
@@ -113,20 +126,30 @@ Exa's hero is a live search box with a Request/Response split. NDot has no API t
 demo, so the honest equivalent, moved to where it belongs:
 
 - Left rail = REQUEST. Seven buttons, the seven capabilities in source order.
-- Right panel = RESPONSE. For the selected record: its name, an authored framing
-  line set in Fraunces, a two line support paragraph, and two mono fields, GROUP
-  and POSITION nn / 07, pinned to the bottom of the panel so they land on the
-  same baseline as the foot of the rail.
+- Right panel = RESPONSE. For the selected record: an authored framing line set
+  in Fraunces as the panel's headline, a two line support paragraph, and two mono
+  fields, GROUP and POSITION nn / 07, pinned to the bottom of the panel so they
+  land on the same baseline as the foot of the rail.
 
 Verified: clicking all seven rail buttons produces seven distinct records, seven
-distinct names, and exactly one button in `aria-pressed="true"` afterwards. Arrow
-keys walk the rail and move both focus and selection, which is how a list of
-records is expected to behave.
+distinct framing lines, and exactly one button in `aria-pressed="true"`
+afterwards. Arrow keys walk the rail and move both focus and selection, which is
+how a list of records is expected to behave.
 
-Six of the seven names occur once in the page source. "App and newsletter
-development" occurs twice, as rail button 01 and as the title of the record that
-is open by default. That is the detail view naming its own record, not a second
-list, and without it the panel has no title with JavaScript disabled.
+**The panel does not print the record's name.** It used to, and that put the same
+string on screen twice at once: once in the rail row that is already marked
+selected, and again as the panel title directly beside it. Measured on the
+rendered page, each of the seven names now occurs exactly once, so the claim that
+the rail is the only place the seven are printed is now true without an
+exception. What the panel shows instead is the framing line, which is the one
+thing about the record that the rail does not already say.
+
+The record's identity is still available without the title. The control that
+changed is the rail button, which carries its own accessible name and
+`aria-pressed="true"`; the live region adds the framing, the support line, the
+group and POSITION nn / 07. With JavaScript disabled the panel still renders
+record 01 in full, because the framing line, support line, group and position are
+all in the static HTML.
 
 ### The framing lines are authored, not source copy
 Fourteen sentences (a framing line and a support line per capability) were written

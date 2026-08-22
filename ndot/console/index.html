@@ -207,7 +207,6 @@
             <div class="panel">
               <span class="mono">Response</span>
               <div class="rec-wrap" id="rec" aria-live="polite">
-                <p class="panel__title" id="rec-name">App and newsletter development</p>
                 <p class="panel__frame" id="rec-frame">The surfaces a publisher owns outright.</p>
                 <p class="panel__body" id="rec-body">An app and a newsletter reach the reader without a third party standing in between.</p>
                 <dl class="rec">
@@ -431,7 +430,6 @@
      without JavaScript. ---- */
   var rail = [].slice.call(document.querySelectorAll('.rail__b'));
   if (!rail.length) return;
-  var recName = document.getElementById('rec-name');
   var recFrame = document.getElementById('rec-frame');
   var recBody = document.getElementById('rec-body');
   var recGroup = document.getElementById('rec-group');
@@ -443,7 +441,6 @@
     var btn = rail[i - 1];
     if (!btn) return;
     rail.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
-    recName.textContent = btn.querySelector('.t').textContent;
     recFrame.textContent = btn.getAttribute('data-frame');
     recBody.textContent = btn.getAttribute('data-body');
     recGroup.textContent = btn.getAttribute('data-group');

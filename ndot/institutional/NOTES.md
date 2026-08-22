@@ -102,6 +102,46 @@ clause when actually read. The provenance takes the right column on its own.
 `text-wrap:pretty` rather than the display default `balance`, because balancing
 a line built out of two type sizes puts the break in the wrong place.
 
+### The reveal stopped tightening the line when it finished
+The split wraps every character in an inline-block. An atomic inline is its own
+shaping run, so for as long as an element is split there is no kerning between
+its characters. Putting the original markup back at the end brings kerning back
+in one frame and the line tightens — 400ms after the motion has stopped, which
+is exactly when the eye is free to notice it.
+
+Isolated, at 48px: "A record, not a pitch" measures 398.27 plain, 398.41 as
+per-character `display:inline` spans, and 401.05 as per-character
+`display:inline-block` spans. Chrome shapes across inline boundaries and treats
+inline-blocks as atomic, so the shaping break is the whole of the difference.
+
+On the page at 1440 the settle moved the hero's first line 509.83 to 506.75 and
+"A record, not a pitch" 292.33 to 290.41. The other six headings moved by under
+a quarter pixel, which is why it read as random rather than as a step: two of
+the eight tightened visibly and the rest did not.
+
+Fix: kerning comes off for the whole life of a split element, so the two states
+match. `html.js .tr[data-tr-n]{font-kerning:none;font-variant-ligatures:none}`.
+The settle now moves every heading by at most 0.22px, under a device pixel, and
+the cost is 0.61% and 0.66% of width on those two headings and under 0.1% on
+the rest. Line breaking is unchanged at every width the orphan sweep covers.
+
+Ligatures go off with kerning. No current heading contains one, so it costs
+nothing measurable, and it stops the same snap arriving the first time a
+heading is written with an "fi" in it.
+
+`data-tr-n` is the hook because the script sets it only when it has actually
+split an element, and never removes it. No JS, reduced motion and any run over
+the 480 span cap are never split, never carry the attribute, and keep full
+kerning. Both pages now say so at the line that sets it.
+
+Rejected: pinning each character's measured advance as an explicit width, which
+would have kept kerning in both states. It needs the measurement to happen
+after the webfont has loaded and the split to happen before first paint, so it
+needs a re-split on `document.fonts.ready`, plus `letter-spacing:0` on the
+character boxes to stop the measured advance being counted twice. Four sharp
+edges, each of which fails as mis-spaced characters during the animation — a
+worse artefact than the 3px it removes.
+
 ### A section head is not the size of the thing it introduces
 Proof set its head at `d-sec--lg` and its three entries at `d-fig`, which at
 1440 is 48px over 46px. A four percent step is not a step: the head and the

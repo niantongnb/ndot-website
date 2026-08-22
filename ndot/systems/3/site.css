@@ -376,10 +376,16 @@ h1,h2,h3{font-weight:500;letter-spacing:-.024em}
 .stat .fig{font-size:clamp(23px,2.7vw,37px);font-weight:500;letter-spacing:-.028em}
 /* below 820 the cards stack full width, so the three-up constraint is gone
    and the figure goes back to the size it wants */
-@media (max-width:819px){ .stat .fig{font-size:clamp(27px,1rem + 2vw,36px)} }
 /* the figure is the biggest type on the page and its caption was the
-   smallest; 11px at .14em tracking is where mono stops being readable */
-.stat .label{font-size:12.5px;letter-spacing:.1em}
+   smallest; 11px at .14em tracking is where mono stops being readable.
+   Fluid rather than fixed because the caption shares the card with the
+   figure: "SCALING MEDIA PRODUCTS" is the longest at 15.4em, which is what
+   sets the ceiling once the cards are three-up. */
+.stat .label{font-size:clamp(12px,1.05vw,15px);letter-spacing:.1em;line-height:1.5}
+@media (max-width:819px){
+  .stat .fig{font-size:clamp(27px,1rem + 2vw,36px)}
+  .stat .label{font-size:14px}
+}
 
 /* ---------- the shift ---------- */
 .figure-pair{display:grid;gap:clamp(18px,2.4vw,30px);margin-top:clamp(24px,3vw,36px)}

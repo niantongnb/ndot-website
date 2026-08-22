@@ -178,8 +178,8 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
    matches COPY.md character for character, and the settled DOM is the one
    the copy audit reads. `.display`, `.head`, `.lead` and `.fig` already
    carry their own value and are not repeated here. */
-.mono, .role, .fig-cap, .foot__blurb { text-wrap: balance; }
-.hero__sub, .prose, .panel__frame, .panel__body, dd { text-wrap: pretty; }
+.mono, .role, .fig-cap, .foot__blurb, .panel__frame { text-wrap: balance; }
+.hero__sub, .prose, .panel__body, dd { text-wrap: pretty; }
 /* standfirsts run two to four lines from 640px up, which is inside the range
    the browser will balance. Balanced they end level instead of trailing a
    two word stub. Below 640px they run long enough that balancing is dropped,
@@ -400,20 +400,23 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
     border-radius: 0 0 3px 0;
   }
 }
-.panel__title {
+/* the framing line is the panel's headline now that the record name is gone:
+   the rail already marks which record is open, so printing its name here was
+   the same string twice on one screen.
+
+   The top margin is the panel's own, not the one the record name used to
+   carry. RESPONSE and REQUEST are the console's two column heads and sit on
+   the same baseline, so the drop from each to the first thing under it should
+   read the same. REQUEST clears 27.3px of ink to ink, built out of the rail
+   head's padding, its rule and the first button's padding. Inheriting the old
+   12px left this side at 13px, half of it. 24px here measures 25px. */
+.panel__frame {
   font-family: "Fraunces", Georgia, serif; font-weight: 400;
   font-variation-settings: "SOFT" 22, "WONK" 1;
   font-size: clamp(1.25rem, 1.02rem + .95vw, 1.6rem); line-height: 1.16;
   letter-spacing: -.02em; color: var(--ink);
-  margin: var(--s3) 0 var(--s3);
+  margin: var(--s6) 0 var(--s4);
   overflow-wrap: anywhere;
-}
-.panel__frame {
-  font-family: "Fraunces", Georgia, serif; font-weight: 400;
-  font-variation-settings: "SOFT" 22, "WONK" 1;
-  font-size: clamp(1.06rem, .98rem + .42vw, 1.3rem); line-height: 1.26;
-  letter-spacing: -.02em; color: var(--ink);
-  margin-bottom: var(--s3);
 }
 .panel__body { font-size: 15px; line-height: 1.55; color: var(--body); max-width: 46ch; margin-bottom: var(--s5); }
 /* the record fills the panel so its mono fields sit on the same baseline as
@@ -508,6 +511,12 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 /* mission and vision in sequence, separated by the hairline */
 .duo .kicker { display: block; margin-bottom: var(--s4); }
 .duo .lead { margin-bottom: var(--s4); max-width: 44ch; }
+/* both bodies run two lines, so the pair reads as one shape rather than one
+   block of two lines above one of three. VISION-BODY needs 78ch to make it;
+   84ch is that plus a line break of slack, and `balance` sets the two lines
+   level so the extra measure never shows as a long line over a short one.
+   Measured at 1024 / 1280 / 1440 / 1600: 2 and 2 at every one. */
+.duo .prose { max-width: 84ch; text-wrap: balance; }
 
 /* ---------- team: four plates, deliberately blank rather than broken ---------- */
 .team {

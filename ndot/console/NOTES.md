@@ -35,10 +35,15 @@ ground this direction opens on, on both the home page and careers.
 
 ## What changed in this pass (edit round)
 1. **The record name came out of the console panel**, and the framing line took
-   its type tier and its top margin. The rail row for the open record is already
-   marked with a blue edge, a tinted ground and a blue number, so printing its
-   name in the panel beside it was the same string twice on one screen. All seven
-   names now occur exactly once on the page.
+   its type tier. The rail row for the open record is already marked with a blue
+   edge, a tinted ground and a blue number, so printing its name in the panel
+   beside it was the same string twice on one screen. All seven names now occur
+   exactly once on the page. The framing line does not inherit the name's top
+   margin: RESPONSE and REQUEST are the two column heads and sit on the same
+   baseline, so the drop under each should read the same. REQUEST clears 27.3px
+   of ink to ink, out of the rail head's padding, its rule and the first
+   button's padding; the old 12px left RESPONSE at 13px, half of it. It is
+   `--s6` now, which measures 25px.
 2. **Both mission and vision bodies run two lines.** They were two and three, so
    the pair read as mismatched blocks rather than one shape. VISION-BODY needs
    78ch to fit in two; `.duo .prose` is set to 84ch, that plus a line break of

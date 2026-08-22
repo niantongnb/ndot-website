@@ -402,14 +402,20 @@ h1.display { font-size: clamp(1.78rem, 1.12rem + 2.9vw, 2.85rem); }
 }
 /* the framing line is the panel's headline now that the record name is gone:
    the rail already marks which record is open, so printing its name here was
-   the same string twice on one screen. It takes the tier and the top margin
-   the name used to hold. */
+   the same string twice on one screen.
+
+   The top margin is the panel's own, not the one the record name used to
+   carry. RESPONSE and REQUEST are the console's two column heads and sit on
+   the same baseline, so the drop from each to the first thing under it should
+   read the same. REQUEST clears 27.3px of ink to ink, built out of the rail
+   head's padding, its rule and the first button's padding. Inheriting the old
+   12px left this side at 13px, half of it. 24px here measures 25px. */
 .panel__frame {
   font-family: "Fraunces", Georgia, serif; font-weight: 400;
   font-variation-settings: "SOFT" 22, "WONK" 1;
   font-size: clamp(1.25rem, 1.02rem + .95vw, 1.6rem); line-height: 1.16;
   letter-spacing: -.02em; color: var(--ink);
-  margin: var(--s3) 0 var(--s4);
+  margin: var(--s6) 0 var(--s4);
   overflow-wrap: anywhere;
 }
 .panel__body { font-size: 15px; line-height: 1.55; color: var(--body); max-width: 46ch; margin-bottom: var(--s5); }
